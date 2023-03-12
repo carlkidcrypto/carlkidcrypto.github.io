@@ -1,2 +1,2 @@
-# carlkidcrpto.github.io
-carlkidcrpto.github.io Github pages
+# carlkidcrypto.github.io
+carlkidcrypto.github.io Github pages
