@@ -1,6 +1,6 @@
 {
   "settings": {
-    "currentPage": "index.html",
+    "currentPage": "sample_post_html_file_name.html",
     "theme": {
       "name": "mobirise5",
       "title": "Mobirise 5",
@@ -71,7 +71,7 @@
       "underlineLink": false,
       "text": "By continuing you agree to our <a href='terms.html'>Terms of Service</a> and <a href='policy.html'>Privacy Policy</a>."
     },
-    "uniqCompNum": 3,
+    "uniqCompNum": 4,
     "versionPublish": "6.1.12",
     "publishChangesOnly": true,
     "screenshot": "screenshot.png"
@@ -1122,7 +1122,7 @@
           },
           "_name": "footer7",
           "_sourceTheme": "mobirise5",
-          "_customHTML": "<section data-bs-version=\"5.1\" class=\"footer7\" group=\"Footers\" global=\"\" once=\"footers\" mbr-class=\"{'mbr-reveal': reveal, 'mbr-parallax-background': bg.parallax}\">\n\n    <mbr-parameters>\n        <!-- Block parameters controls (Blue \"Gear\" panel) -->\n        <input type=\"range\" inline=\"\" title=\"Top\" name=\"paddingTop\" min=\"0\" max=\"8\" step=\"1\" value=\"2\">\n        <input type=\"range\" inline=\"\" title=\"Bottom\" name=\"paddingBottom\" min=\"0\" max=\"8\" step=\"1\" value=\"2\">\n        <input type=\"checkbox\" title=\"Reveal effect\" name=\"reveal\">\n        <header>Background</header>\n        <fieldset type=\"background\" name=\"bg\" parallax=\"\">\n            <input type=\"image\" title=\"Image\" value=\"../_images/background5.jpg\">\n            <input type=\"color\" title=\"Color\" value=\"#232323\" selected=\"\">\n        </fieldset>\n        <input type=\"checkbox\" title=\"Overlay\" name=\"overlay\" condition=\"bg.type !== 'color'\" checked=\"\">\n        <input type=\"color\" title=\"Overlay Color\" name=\"overlayColor\" value=\"#232323\" condition=\"overlay &amp;&amp; bg.type !== 'color'\">\n        <input type=\"range\" inline=\"\" title=\"Opacity\" name=\"overlayOpacity\" min=\"0\" max=\"1\" step=\"0.1\" value=\"0.6\" condition=\"overlay &amp;&amp; bg.type !== 'color'\">\n        <!-- End block parameters -->\n    </mbr-parameters>\n\n    <div class=\"mbr-overlay\" mbr-if=\"overlay &amp;&amp; bg.type !== 'color'\" opacity=\"{{overlayOpacity}}\" bg-color=\"{{overlayColor}}\"></div>\n\n    <div class=\"container\">\n        <div class=\"media-container-row align-center mbr-white\">\n            <div class=\"col-12\">\n                <p class=\"mbr-text mb-0 mbr-fonts-style\" mbr-theme-style=\"display-7\" data-app-selector=\".media-container-row .mbr-text\" data-app-placeholder=\"Type Text\">\n                    © Copyright 2025 Mobirise - All Rights Reserved\n                </p>\n            </div>\n        </div>\n    </div>\n</section>",
+          "_customHTML": "<section data-bs-version=\"5.1\" class=\"footer7\" group=\"Footers\" global once=\"footers\" mbr-class=\"{'mbr-reveal': reveal, 'mbr-parallax-background': bg.parallax}\">\n\n    <mbr-parameters>\n        <!-- Block parameters controls (Blue \"Gear\" panel) -->\n        <input type=\"range\" inline title=\"Top\" name=\"paddingTop\" min=\"0\" max=\"8\" step=\"1\" value=\"2\">\n        <input type=\"range\" inline title=\"Bottom\" name=\"paddingBottom\" min=\"0\" max=\"8\" step=\"1\" value=\"2\">\n        <input type=\"checkbox\" title=\"Reveal effect\" name=\"reveal\">\n        <header>Background</header>\n        <fieldset type=\"background\" name=\"bg\" parallax>\n            <input type=\"image\" title=\"Image\" value=\"../_images/background5.jpg\">\n            <input type=\"color\" title=\"Color\" value=\"#232323\" selected>\n        </fieldset>\n        <input type=\"checkbox\" title=\"Overlay\" name=\"overlay\" condition=\"bg.type !== 'color'\" checked>\n        <input type=\"color\" title=\"Overlay Color\" name=\"overlayColor\" value=\"#232323\" condition=\"overlay && bg.type !== 'color'\">\n        <input type=\"range\" inline title=\"Opacity\" name=\"overlayOpacity\" min=\"0\" max=\"1\" step=\"0.1\" value=\"0.6\" condition=\"overlay && bg.type !== 'color'\">\n        <!-- End block parameters -->\n    </mbr-parameters>\n\n    <div class=\"mbr-overlay\" mbr-if=\"overlay && bg.type !== 'color'\" opacity=\"{{overlayOpacity}}\" bg-color=\"{{overlayColor}}\"></div>\n\n    <div class=\"container\">\n        <div class=\"media-container-row align-center mbr-white\">\n            <div class=\"col-12\">\n                <p class=\"mbr-text mb-0 mbr-fonts-style\" mbr-theme-style=\"display-7\" data-app-selector=\".media-container-row .mbr-text\" data-app-placeholder=\"Type Text\">\n                    © Copyright 2025 Mobirise - All Rights Reserved\n                </p>\n            </div>\n        </div>\n    </div>\n</section>",
           "_cid": "sFF3CYc3p7",
           "_anchor": "footer7-9",
           "_protectedParams": [],
@@ -1548,6 +1548,69 @@
           "_anchor": "menu2-1"
         },
         {
+          "_name": "article09",
+          "_sourceTheme": "startm5",
+          "_customHTML": "<section data-bs-version=\"5.1\"\r\n  class=\"article9\"\r\n  group=\"Article\"\r\n  data-bg-video=\"{{bg.type == 'video' && bg.value.url}}\"\r\n  mbr-class=\"{\r\n    'mbr-fullscreen': fullScreen,\r\n    'mbr-parallax-background': bg.parallax}\"\r\n>\r\n  <mbr-parameters>\r\n    <header>Size</header>\r\n    <input type=\"checkbox\" title=\"Full Screen\" name=\"fullScreen\" />\r\n    <input type=\"checkbox\" title=\"Full Width\" name=\"fullWidth\" />\r\n    <input\r\n      type=\"range\"\r\n      inline\r\n      title=\"Top\"\r\n      name=\"paddingTop\"\r\n      min=\"0\"\r\n      max=\"10\"\r\n      step=\"1\"\r\n      value=\"5\"\r\n    />\r\n    <input\r\n      type=\"range\"\r\n      inline\r\n      title=\"Bottom\"\r\n      name=\"paddingBottom\"\r\n      min=\"0\"\r\n      max=\"10\"\r\n      step=\"1\"\r\n      value=\"5\"\r\n    />\r\n    <input\r\n      type=\"range\"\r\n      inline\r\n      title=\"Content Width\"\r\n      name=\"contentWidth\"\r\n      min=\"8\"\r\n      max=\"12\"\r\n      step=\"1\"\r\n      value=\"10\"\r\n    />\r\n    <header>Show/Hide</header>\r\n    <input type=\"checkbox\" title=\"Title\" name=\"showTitle\" checked />\r\n    <input type=\"checkbox\" title=\"Subtitle\" name=\"showSubtitle\" checked />\r\n    <input type=\"checkbox\" title=\"Text\" name=\"showText\" checked />\r\n    <input type=\"checkbox\" title=\"Image\" name=\"showImage\" checked />\r\n    <input type=\"color\" title=\"Wrap Bg\" name=\"wrapBgColor\" value=\"#ffffff\" />\r\n    <header>Background</header>\r\n    <fieldset type=\"background\" name=\"bg\" parallax>\r\n      <input\r\n        type=\"image\"\r\n        title=\"Image\"\r\n        value=\"../_images/background1.jpg\"\r\n        parallax\r\n      />\r\n      <input type=\"color\" title=\"Color\" value=\"#edefeb\" selected />\r\n      <input type=\"video\" title=\"Video\" value=\"https://vimeo.com/428046504\" />\r\n    </fieldset>\r\n    <header condition=\"bg.type === 'video'\">Fallback Image</header>\r\n    <input\r\n      type=\"image\"\r\n      title=\"Fallback Image\"\r\n      value=\"../_images/background1.jpg\"\r\n      name=\"fallBackImage\"\r\n      condition=\"bg.type === 'video'\"\r\n    />\r\n    <input\r\n      type=\"checkbox\"\r\n      title=\"Overlay\"\r\n      name=\"overlay\"\r\n      condition=\"bg.type !== 'color'\"\r\n      checked\r\n    />\r\n    <input\r\n      type=\"color\"\r\n      title=\"Overlay Color\"\r\n      name=\"overlayColor\"\r\n      value=\"#ffffff\"\r\n      condition=\"overlay && bg.type !== 'color'\"\r\n    />\r\n    <input\r\n      type=\"range\"\r\n      inline\r\n      title=\"Opacity\"\r\n      name=\"overlayOpacity\"\r\n      min=\"0\"\r\n      max=\"1\"\r\n      step=\"0.1\"\r\n      value=\"0.3\"\r\n      condition=\"overlay && bg.type !== 'color'\"\r\n    />\r\n  </mbr-parameters>\r\n\r\n  <div class=\"mbr-fallback-image disabled\" mbr-if=\"bg.type == 'video'\"></div>\r\n  <div\r\n    class=\"mbr-overlay\"\r\n    mbr-if=\"overlay && bg.type!== 'color'\"\r\n    mbr-style=\"{'opacity': overlayOpacity, 'background-color': overlayColor}\"\r\n  ></div>\r\n  <div mbr-class=\"{'container': !fullWidth, 'container-fluid': fullWidth}\">\r\n    <div class=\"row justify-content-center\">\r\n      <div class=\"card col-md-12 col-lg-{{contentWidth}}\">\r\n        <div class=\"card-wrapper\">\r\n          <div class=\"card-content-text\">\r\n            <h3\r\n            class=\"card-title mbr-fonts-style mbr-white mt-3 mb-4\"\r\n            mbr-theme-style=\"display-2\"\r\n            mbr-if=\"showTitle\"\r\n            data-app-selector=\".card-title, .card-box\"\r\n          >\r\n            <b>Washing</b>\r\n          </h3>\r\n          <div class=\"row card-box align-left\">\r\n            <div class=\"item features-without-image col-12\">\r\n              <div class=\"item-wrapper\">\r\n                <h4\r\n                  class=\"mbr-section-subtitle mbr-fonts-style mb-3\"\r\n                  mbr-if=\"showSubtitle\"\r\n                  data-app-selector=\".mbr-section-subtitle\"\r\n                  mbr-theme-style=\"display-5\"\r\n                >\r\n                  <b>Read the care label</b>\r\n                </h4>\r\n                <p\r\n                  class=\"mbr-text mbr-fonts-style\"\r\n                  mbr-theme-style=\"display-7\"\r\n                  mbr-if=\"showText\"\r\n                  data-app-selector=\".mbr-text, .mbr-section-btn\"\r\n                >\r\n                  Always check the care label attached to your clothing for\r\n                  specific washing instructions. The care label provides\r\n                  valuable information on fabric composition and recommended\r\n                  washing methods.<br />\r\n                </p>\r\n              </div>\r\n            </div>\r\n            <div class=\"item features-without-image col-12\">\r\n              <div class=\"item-wrapper\">\r\n                <h4\r\n                  class=\"mbr-section-subtitle mbr-fonts-style mb-3\"\r\n                  mbr-if=\"showSubtitle\"\r\n                  data-app-selector=\".mbr-section-subtitle\"\r\n                  mbr-theme-style=\"display-5\"\r\n                >\r\n                  <b>Water temperature</b>\r\n                </h4>\r\n                <p\r\n                  class=\"mbr-text mbr-fonts-style\"\r\n                  mbr-theme-style=\"display-7\"\r\n                  mbr-if=\"showText\"\r\n                  data-app-selector=\".mbr-text, .mbr-section-btn\"\r\n                >\r\n                  Follow the care label's instructions regarding water\r\n                  temperature. Hot water is suitable for white or heavily soiled\r\n                  items, while cold water is generally gentler on colors and\r\n                  delicate fabrics. Warm water is a middle-ground option\r\n                  suitable for most everyday clothing.<br />\r\n                </p>\r\n              </div>\r\n            </div>\r\n            <div class=\"item features-without-image col-12\">\r\n              <div class=\"item-wrapper\">\r\n                <h4\r\n                  class=\"mbr-section-subtitle mbr-fonts-style mb-3\"\r\n                  mbr-if=\"showSubtitle\"\r\n                  data-app-selector=\".mbr-section-subtitle\"\r\n                  mbr-theme-style=\"display-5\"\r\n                >\r\n                  <b>Air dry or tumble dry</b>\r\n                </h4>\r\n                <p\r\n                  class=\"mbr-text mbr-fonts-style\"\r\n                  mbr-theme-style=\"display-7\"\r\n                  mbr-if=\"showText\"\r\n                  data-app-selector=\".mbr-text, .mbr-section-btn\"\r\n                >\r\n                  Check the care label for drying instructions. Some items are\r\n                  suitable for air drying, while others can be tumble dried on\r\n                  low or medium heat. Avoid high heat settings as they may cause\r\n                  shrinkage or damage.<br />\r\n                </p>\r\n              </div>\r\n            </div>\r\n          </div>\r\n          </div>\r\n          <div class=\"image-wrapper d-flex justify-content-center mt-3\">\r\n            <img\r\n              mbr-if=\"showImage\"\r\n              src=\"../_images/hightlights/13.jpg\"\r\n              alt=\"Mobirise Website Builder\"\r\n            />\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</section>\r\n",
+          "_styles": {
+            "& when not (@fullScreen)": {
+              "padding-top": "(@paddingTop * 1rem)",
+              "padding-bottom": "(@paddingBottom * 1rem)"
+            },
+            "& when (@bg-type = \"color\")": {
+              "background-color": "@bg-value"
+            },
+            "& when (@bg-type = \"image\")": {
+              "background-image": "url(@bg-value)"
+            },
+            ".mbr-fallback-image.disabled": {
+              "display": "none"
+            },
+            ".mbr-fallback-image": {
+              "display": "block",
+              "background-size": "cover",
+              "background-position": "center center",
+              "width": "100%",
+              "height": "100%",
+              "position": "absolute",
+              "top": "0",
+              "& when (@bg-type = 'video')": {
+                "background-image": "url(@fallBackImage)"
+              }
+            },
+            ".card-content-text": {
+              "@media (max-width: 767px)": {
+                "padding": "1.5rem 1.5rem 0 1.5rem"
+              },
+              "@media (min-width: 768px)": {
+                "padding": "2.25rem 2.25rem 0 2.25rem"
+              },
+              "@media (min-width: 992px)": {
+                "padding": "4rem 4rem 1rem 4rem"
+              }
+            },
+            ".card-wrapper": {
+              "background": "@wrapBgColor"
+            },
+            ".mbr-text, .mbr-section-btn": {
+              "color": "#000000",
+              "text-align": "left"
+            },
+            ".card-title, .card-box": {
+              "text-align": "left",
+              "color": "#000000"
+            },
+            ".image-wrapper img": {
+              "width": "100%"
+            }
+          },
+          "_cid": "vxeLGQ1dXc",
+          "_protectedParams": [],
+          "_global": false,
+          "_once": false,
+          "_params": {},
+          "_anchor": "article09-3"
+        },
+        {
           "alias": false,
           "_styles": {
             "padding-top": "(@paddingTop * 15px)",
@@ -1562,7 +1625,7 @@
           },
           "_name": "footer7",
           "_sourceTheme": "mobirise5",
-          "_customHTML": "<section data-bs-version=\"5.1\" class=\"footer7\" group=\"Footers\" global=\"\" once=\"footers\" mbr-class=\"{'mbr-reveal': reveal, 'mbr-parallax-background': bg.parallax}\">\n\n    <mbr-parameters>\n        <!-- Block parameters controls (Blue \"Gear\" panel) -->\n        <input type=\"range\" inline=\"\" title=\"Top\" name=\"paddingTop\" min=\"0\" max=\"8\" step=\"1\" value=\"2\">\n        <input type=\"range\" inline=\"\" title=\"Bottom\" name=\"paddingBottom\" min=\"0\" max=\"8\" step=\"1\" value=\"2\">\n        <input type=\"checkbox\" title=\"Reveal effect\" name=\"reveal\">\n        <header>Background</header>\n        <fieldset type=\"background\" name=\"bg\" parallax=\"\">\n            <input type=\"image\" title=\"Image\" value=\"../_images/background5.jpg\">\n            <input type=\"color\" title=\"Color\" value=\"#232323\" selected=\"\">\n        </fieldset>\n        <input type=\"checkbox\" title=\"Overlay\" name=\"overlay\" condition=\"bg.type !== 'color'\" checked=\"\">\n        <input type=\"color\" title=\"Overlay Color\" name=\"overlayColor\" value=\"#232323\" condition=\"overlay &amp;&amp; bg.type !== 'color'\">\n        <input type=\"range\" inline=\"\" title=\"Opacity\" name=\"overlayOpacity\" min=\"0\" max=\"1\" step=\"0.1\" value=\"0.6\" condition=\"overlay &amp;&amp; bg.type !== 'color'\">\n        <!-- End block parameters -->\n    </mbr-parameters>\n\n    <div class=\"mbr-overlay\" mbr-if=\"overlay &amp;&amp; bg.type !== 'color'\" opacity=\"{{overlayOpacity}}\" bg-color=\"{{overlayColor}}\"></div>\n\n    <div class=\"container\">\n        <div class=\"media-container-row align-center mbr-white\">\n            <div class=\"col-12\">\n                <p class=\"mbr-text mb-0 mbr-fonts-style\" mbr-theme-style=\"display-7\" data-app-selector=\".media-container-row .mbr-text\" data-app-placeholder=\"Type Text\">\n                    © Copyright 2025 Mobirise - All Rights Reserved\n                </p>\n            </div>\n        </div>\n    </div>\n</section>",
+          "_customHTML": "<section data-bs-version=\"5.1\" class=\"footer7\" group=\"Footers\" global once=\"footers\" mbr-class=\"{'mbr-reveal': reveal, 'mbr-parallax-background': bg.parallax}\">\n\n    <mbr-parameters>\n        <!-- Block parameters controls (Blue \"Gear\" panel) -->\n        <input type=\"range\" inline title=\"Top\" name=\"paddingTop\" min=\"0\" max=\"8\" step=\"1\" value=\"2\">\n        <input type=\"range\" inline title=\"Bottom\" name=\"paddingBottom\" min=\"0\" max=\"8\" step=\"1\" value=\"2\">\n        <input type=\"checkbox\" title=\"Reveal effect\" name=\"reveal\">\n        <header>Background</header>\n        <fieldset type=\"background\" name=\"bg\" parallax>\n            <input type=\"image\" title=\"Image\" value=\"../_images/background5.jpg\">\n            <input type=\"color\" title=\"Color\" value=\"#232323\" selected>\n        </fieldset>\n        <input type=\"checkbox\" title=\"Overlay\" name=\"overlay\" condition=\"bg.type !== 'color'\" checked>\n        <input type=\"color\" title=\"Overlay Color\" name=\"overlayColor\" value=\"#232323\" condition=\"overlay && bg.type !== 'color'\">\n        <input type=\"range\" inline title=\"Opacity\" name=\"overlayOpacity\" min=\"0\" max=\"1\" step=\"0.1\" value=\"0.6\" condition=\"overlay && bg.type !== 'color'\">\n        <!-- End block parameters -->\n    </mbr-parameters>\n\n    <div class=\"mbr-overlay\" mbr-if=\"overlay && bg.type !== 'color'\" opacity=\"{{overlayOpacity}}\" bg-color=\"{{overlayColor}}\"></div>\n\n    <div class=\"container\">\n        <div class=\"media-container-row align-center mbr-white\">\n            <div class=\"col-12\">\n                <p class=\"mbr-text mb-0 mbr-fonts-style\" mbr-theme-style=\"display-7\" data-app-selector=\".media-container-row .mbr-text\" data-app-placeholder=\"Type Text\">\n                    © Copyright 2025 Mobirise - All Rights Reserved\n                </p>\n            </div>\n        </div>\n    </div>\n</section>",
           "_cid": "sFF3CYc3p7",
           "_protectedParams": [],
           "_global": true,

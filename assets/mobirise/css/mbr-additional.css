@@ -1485,6 +1485,54 @@ a {
   background-color: #232323;
   overflow: hidden;
 }
+.cid-vxeLGQ1dXc {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  background-color: #edefeb;
+}
+.cid-vxeLGQ1dXc .mbr-fallback-image.disabled {
+  display: none;
+}
+.cid-vxeLGQ1dXc .mbr-fallback-image {
+  display: block;
+  background-size: cover;
+  background-position: center center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+}
+@media (max-width: 767px) {
+  .cid-vxeLGQ1dXc .card-content-text {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .cid-vxeLGQ1dXc .card-content-text {
+    padding: 2.25rem 2.25rem 0 2.25rem;
+  }
+}
+@media (min-width: 992px) {
+  .cid-vxeLGQ1dXc .card-content-text {
+    padding: 4rem 4rem 1rem 4rem;
+  }
+}
+.cid-vxeLGQ1dXc .card-wrapper {
+  background: #ffffff;
+}
+.cid-vxeLGQ1dXc .mbr-text,
+.cid-vxeLGQ1dXc .mbr-section-btn {
+  color: #000000;
+  text-align: left;
+}
+.cid-vxeLGQ1dXc .card-title,
+.cid-vxeLGQ1dXc .card-box {
+  text-align: left;
+  color: #000000;
+}
+.cid-vxeLGQ1dXc .image-wrapper img {
+  width: 100%;
+}
 .cid-sFF0ciwnEL {
   z-index: 1000;
   width: 100%;
