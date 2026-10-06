@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html  >
+<head>
+  <!-- Site made with Mobirise Website Builder v6.1.12, https://mobirise.com -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Mobirise v6.1.12, mobirise.com">
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:image:src" content="assets/images/sample_post_html_file_name-meta.jpg">
+  <meta property="og:image" content="assets/images/sample_post_html_file_name-meta.jpg">
+  <meta name="twitter:title" content="Sample post 1 - title">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="assets/images/logo.png" type="image/x-icon">
+  <meta name="description" content="Sample post 1 - description">
+  
+  
+  <title>Monitor Your Air Quality with PurpleAir's Python API (The Easy Way)</title>
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/web/assets/gdpr-plugin/gdpr-styles.css">
+  <link rel="stylesheet" href="assets/dropdown/css/style.css">
+  <link rel="stylesheet" href="assets/socicon/css/styles.css">
+  <link rel="stylesheet" href="assets/theme/css/style.css">
+  <link rel="preload" href="https://fonts.googleapis.com/css?family=Lexend:100,200,300,400,500,600,700,800,900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lexend:100,200,300,400,500,600,700,800,900&display=swap"></noscript>
+  <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css?v=DdOVVT"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css?v=DdOVVT" type="text/css">
+
+  
+  
+  
+<meta name="title=Monitor Your Air Quality with PurpleAir's Python API (The Easy Way)" content="description=Learn how to query your PurpleAir sensors with three lines of Python using purpleair_api — the clean wrapper for the PurpleAir API."></head>
+<body>
+  
+  <section data-bs-version="5.1" class="menu menu2 cid-sFF0ciwnEL" once="menu" id="menu2-1">
+    
+    <nav class="navbar navbar-dropdown navbar-fixed-top navbar-expand-lg">
+        <div class="container">
+            <div class="navbar-brand">
+                
+                <span class="navbar-caption-wrap"><a class="navbar-caption text-primary display-7" href="https://mobiri.se">Carlos<br>Software Engineer</a></span>
+            </div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbarSupportedContent" data-bs-target="#navbarSupportedContent" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true"><li class="nav-item"><a class="nav-link link text-black text-primary display-4" href="#top">Home</a></li>
+                    <li class="nav-item"><a class="nav-link link text-black text-primary display-4" href="index.html#gallery5-3">My Projects</a></li><li class="nav-item"><a class="nav-link link text-black text-primary display-4" href="index.html#image1-b">About Me</a></li></ul>
+                
+                <div class="navbar-buttons mbr-section-btn"><a class="btn btn-secondary display-4" href="index.html#form4-6">
+                        Contacts</a></div>
+            </div>
+        </div>
+    </nav>
+</section>
+
+<section data-bs-version="5.1" class="article9 cid-vxeLGQ1dXc" id="article09-3">
+  
+
+  
+  
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="card col-md-12 col-lg-10">
+        <div class="card-wrapper">
+          <div class="card-content-text">
+            <h3 class="card-title mbr-fonts-style mbr-white mt-3 mb-4 display-2"><strong>Monitor Your Air Quality with PurpleAir's Python API (The Easy Way)</strong></h3>
+          <div class="row card-box align-left">
+            
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5">
+                    <strong>So What Is purpleair_api?</strong></h4>
+                  <div class="item-content">
+                    <p class="mbr-text mbr-fonts-style display-7">In short, it's a Python package that wraps the official PurpleAir API. PurpleAir makes hardware air quality sensors — the little devices you mount outside (or inside) your home that measure PM2.5, temperature, humidity, and a whole lot more. Their API is powerful, but talking to it directly means building your own HTTP request logic, handling pagination, and parsing JSON responses manually. This library does all of that for you.</p>
+                  <p class="mbr-text mbr-fonts-style display-7">The project is maintained by carlkidcrypto on GitHub, published on PyPI, and supports Python 3.10 through 3.14. It has CI/CD pipelines on GitHub Actions, code formatted with Black, and a solid test suite. Basically, it feels like a well-maintained, production-ready package — not a weekend hack project.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5">
+                    <strong>Getting Started — Installation Takes 30 Seconds</strong></h4>
+                  <div class="item-content">
+                    <p class="mbr-text mbr-fonts-style display-7">git clone https://github.com/carlkidcrypto/purpleair_api.git</p><br>
+<p class="mbr-text mbr-fonts-style display-7">cd purpleair_api</p><br>
+<p class="mbr-text mbr-fonts-style display-7">pip install .</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5">
+                    <strong>Your First Query — Three Lines of Code</strong></h4>
+                  <div class="item-content">
+                    <p class="mbr-text mbr-fonts-style display-7">my_paa = PurpleAirAPI(your_api_read_key, your_api_write_key, your_ipv4_address)</p><br>
+<p class="mbr-text mbr-fonts-style display-7">retval = my_paa.request_sensor_data(1234)</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5">
+                    <strong>Working with the Read API Only</strong></h4>
+                  <div class="item-content">
+                    <p class="mbr-text mbr-fonts-style display-7">my_paa = PurpleAirReadAPI(api_read_key)</p><br>
+<p class="mbr-text mbr-fonts-style display-7">retval = my_paa.request_multiple_sensors_data("name")</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5">
+                    <strong>Real-World Use Case: Logging Data to a Database</strong></h4>
+                  <div class="item-content">
+                    <p class="mbr-text mbr-fonts-style display-7">Here's where things get practical. Say you want to log your sensor readings every 5 minutes and store them in SQLite for later analysis. Combine purpleair_api with a small scheduling script and you've got yourself a personal air quality history tracker.</p>
+                  <p class="mbr-text mbr-fonts-style display-7">Throw this on a Raspberry Pi running at home, and you've got a cheap, reliable air quality monitoring station. This is exactly what the companion repo purpleair_data_logger does — it can write to PostgreSQL, CSV, or SQLite out of the box. 🌬️</p>
+                  <p class="mbr-text mbr-fonts-style display-7">Air quality is personal. PM2.5 — fine particulate matter smaller than 2.5 micrometers — is linked to respiratory issues, heart disease, and early death. Wildfires, traffic, industrial pollution — all of it shows up in your sensor data. Having visibility into your local air quality helps you make real decisions: keep the windows closed today, run an air purifier, don't go for that jog at noon.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5">
+                    <strong>TL;DR</strong></h4>
+                  <div class="item-content">
+                    <p class="mbr-text mbr-fonts-style display-7">purpleair_api is a well-maintained Python wrapper for the PurpleAir API. Install it with one pip command, query your sensors in three lines of code, and build anything from a simple dashboard to a full database logging system. It's perfect for Home Assistant automations, research projects, or just satisfying your curiosity about the air you're breathing.</p>
+                  <p class="mbr-text mbr-fonts-style display-7">If you run a PurpleAir sensor at home and know a little Python, this library is the fastest path from raw data to something useful. Check it out on GitHub at github.com/carlkidcrypto/purpleair_api or grab it from PyPI with a single pip command. Your lungs will thank you. 🌬️</p>
+                  </div>
+                </div>
+              </div>
+          </section><script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>  <script src="assets/web/assets/cookies-alert-plugin/cookies-alert-core.js"></script>  <script src="assets/web/assets/cookies-alert-plugin/cookies-alert-script.js"></script>  <script src="assets/smoothscroll/smooth-scroll.js"></script>  <script src="assets/ytplayer/index.js"></script>  <script src="assets/dropdown/js/navbar-dropdown.js"></script>  <script src="assets/theme/js/script.js"></script>  
+  
+  
+<input name="cookieData" type="hidden" data-cookie-cookiesAlertType='false' data-cookie-customDialogSelector='null' data-cookie-colorText='#424a4d' data-cookie-colorBg='rgb(255, 255, 255)' data-cookie-opacityOverlay='0' data-cookie-bgOpacity='100' data-cookie-textButton='GOT IT' data-cookie-rejectText='REJECT' data-cookie-colorButton='#e85a4f' data-cookie-rejectColor='#ffffff' data-cookie-colorLink='#424a4d' data-cookie-underlineLink='true' data-cookie-text="We use cookies to give you the best experience. Read our <a href='privacy.html'>cookie policy</a>.">
+  </body>
+</html>
