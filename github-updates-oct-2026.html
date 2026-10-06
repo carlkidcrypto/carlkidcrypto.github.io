@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A deep dive into migrating 11 gh-aw workflows from claude-sonnet-5 to GPT-6.1 Sol across 4 GitHub repos.">
+    <title>GitHub Project Update — Oct 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/web/assets/mobirise-icons2/mobirise2.css">
+    <link rel="stylesheet" href="assets/socicon/css/styles.css">
+    <link rel="stylesheet" href="assets/dropdown/css/style.css">
+    <link rel="stylesheet" href="assets/theme/css/style.css">
+    <link rel="stylesheet" href="_edit_style.css">
+    <style>
+        body { font-family: 'Lexend', sans-serif; background: #fafafa; }
+        .article-header { background: #eae7dc; padding: 4rem 1rem; text-align: center; }
+        .article-header h1 { color: #e85a4f; font-size: 2.2rem; margin-bottom: 1rem; }
+        .article-header .meta { color: #8e8d8a; font-size: 0.9rem; }
+        .article-body { max-width: 800px; margin: 3rem auto; padding: 0 1rem; }
+        .article-body h2 { color: #e85a4f; margin-top: 2.5rem; margin-bottom: 0.75rem; font-size: 1.5rem; }
+        .article-body p { color: #444; line-height: 1.7; margin-bottom: 1rem; }
+        .article-body ul { color: #444; line-height: 1.7; margin-bottom: 1rem; padding-left: 1.5rem; }
+        .article-body li { margin-bottom: 0.5rem; }
+        .article-body code { background: #eee; padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.9em; }
+        .article-body a { color: #e85a4f; }
+        .article-body a:hover { color: #c0392b; }
+        .back-link { display: inline-block; margin: 2rem 0; color: #e85a4f; font-weight: 600; }
+        .footer { background: #232323; color: #fff; padding: 2rem; text-align: center; font-size: 0.85rem; margin-top: 4rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white" style="position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
+        <div class="container">
+            <a class="navbar-brand" href="index.html" style="font-family:Lexend,sans-serif;font-weight:700;color:#e85a4f">carlkidcrypto</a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html#gallery5-3">Projects</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html#content2-59">Blog</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html#form4-6">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="article-header">
+        <div class="container">
+            <h1>GitHub Project Update — Oct 2026</h1>
+            <p class="meta">By <strong>Carlos (@carlkidcrypto)</strong> &nbsp;·&nbsp; Oct 6, 2026</p>
+        </div>
+    </header>
+
+    <article class="article-body">
+        <a class="back-link" href="index.html#content2-59">← Back to Blog</a>
+        <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5"><strong>Introduction</strong></h4>
+                  <p class="mbr-text mbr-fonts-style display-7">Over the past week, I completed a major infrastructure upgrade across all four of my GitHub repositories — <strong>ezsnmp</strong>, <strong>purpleair_api</strong>, <strong>purpleair_data_logger</strong>, and <strong>os-specific-runner</strong>. Every GitHub Agentic Workflow (gh-aw) has been migrated from the <code>claude-sonnet-5</code> model to <strong>GPT-6.1 Sol</strong> via the GitHub Copilot provider.</p>
+                  <p class="mbr-text mbr-fonts-style display-7">This wasn't just a model swap — it touched 11 workflow files and recompiled all <code>.lock.yml</code> entries. Here's a breakdown of what changed, what I learned, and what this means for each project.</p>
+                </div>
+              </div>
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5"><strong>Why GPT-6.1 Sol?</strong></h4>
+                  <p class="mbr-text mbr-fonts-style display-7">GitHub Agentic Workflows (gh-aw) allow repository maintainers to describe CI/CD tasks in natural language. The gh-aw CLI compiles these into GitHub Actions workflow YAML files, which GitHub's Copilot infrastructure then executes.</p>
+                  <p class="mbr-text mbr-fonts-style display-7">The <code>gpt-6.1-sol</code> model routes through GitHub's <code>github-copilot</code> provider and offers:</p>
+                  <ul>
+                    <li><strong>Faster compilation</strong> — fewer API calls per workflow</li>
+                    <li><strong>Lower latency</strong> — 1M token context window handles complex workflows efficiently</li>
+                    <li><strong>Simpler routing</strong> — no separate Anthropic API key needed</li>
+                    <li><strong>Better context retention</strong> — longer conversations without losing earlier steps</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5"><strong>What Changed in Each Repo</strong></h4>
+                  <p class="mbr-text mbr-fonts-style display-7"><strong>ezsnmp</strong> (PR <a href="https://github.com/carlkidcrypto/ezsnmp/pull/1357" target="_blank">#1357</a>): 8 workflow files migrated. Also saw unit tests added for <code>Session.set()</code> exception propagation.</p>
+                  <p class="mbr-text mbr-fonts-style display-7"><strong>purpleair_api</strong> (PR <a href="https://github.com/carlkidcrypto/purpleair_api/pull/422" target="_blank">#422</a>): Sphinx landing page and automated release docs CI landed this week, plus a fix for per-sensor network error isolation. gh-aw migration was the finishing touch.</p>
+                  <p class="mbr-text mbr-fonts-style display-7"><strong>purpleair_data_logger</strong> (PR <a href="https://github.com/carlkidcrypto/purpleair_data_logger/pull/496" target="_blank">#496</a>): gh-aw migration and full <code>.lock.yml</code> recompile with gh-aw v0.89.21.</p>
+                  <p class="mbr-text mbr-fonts-style display-7"><strong>os-specific-runner</strong> (PRs <a href="https://github.com/carlkidcrypto/os-specific-runner/pull/286" target="_blank">#286</a> &amp; <a href="https://github.com/carlkidcrypto/os-specific-runner/pull/287" target="_blank">#287</a>): gh-aw migration plus a fix to add the <code>node</code> ecosystem for npm registry access in the coverage workflow.</p>
+                </div>
+              </div>
+              <div class="item features-without-image col-12">
+                <div class="item-wrapper">
+                  <h4 class="mbr-section-subtitle mbr-fonts-style mb-3 display-5"><strong>Conclusion</strong></h4>
+                  <p class="mbr-text mbr-fonts-style display-7">The migration to GPT-6.1 Sol is complete across all four repos. Workflow compilation is faster, Copilot routing is simpler, and the gh-aw toolchain is current at v0.89.21.</p>
+                  <p class="mbr-text mbr-fonts-style display-7">Next up: watch for automated release notes, coverage autofix PRs, and docs improvements — all powered by the upgraded gh-aw infrastructure.</p>
+                </div>
+              </div>
+</div>
+              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+        <a class="back-link" href="index.html#content2-59">← Back to Blog</a>
+    </article>
+
+    <footer class="footer">
+        <p>© 2026 Carlos (@carlkidcrypto) · <a href="https://github.com/carlkidcrypto" style="color:#e85a4f">GitHub</a></p>
+    </footer>
+</body>
+</html>
