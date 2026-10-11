@@ -13,7 +13,7 @@ Carlos — Software Engineer
        <img src="_static/profile.webp" alt="Carlos" class="hero-avatar">
        <div class="hero-text">
            <h1>Welcome!</h1>
-           <p class="hero-tagline">Explore the options below.</p>
+           <p class="hero-tagline">I like to code, tinker, and explore AI.<br>Explore the options below.</p>
        </div>
    </div>
 
