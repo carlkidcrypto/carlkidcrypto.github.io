@@ -97,13 +97,6 @@ A collection of projects that I work on when time appears...
       +++
       `GitHub <https://github.com/carlkidcrypto/os-specific-runner>`_ • `Documentation <https://carlkidcrypto.github.io/os-specific-runner/>`_
 
-.. _about-me:
-
-About Me
---------
-
-UNDER CONSTRUCTION...
-
 .. _contact-me:
 
 Contact Me
