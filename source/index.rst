@@ -70,6 +70,15 @@ A collection of projects that I work on when time appears...
       +++
       `GitHub <https://github.com/carlkidcrypto/purpleair_data_logger>`_ • `Documentation <https://carlkidcrypto.github.io/purpleair_data_logger/>`_
 
+   .. grid-item-card:: 🏠 PurpleAir Matterbridge
+      :link: https://github.com/carlkidcrypto/purpleair-matterbridge
+      :link-type: url
+
+      Matterbridge plugin exposing PurpleAir sensor readings as bridged Matter air quality and environmental devices.
+
+      +++
+      `GitHub <https://github.com/carlkidcrypto/purpleair-matterbridge>`_ • `Documentation <https://carlkidcrypto.github.io/purpleair-matterbridge/>`_
+
    .. grid-item-card:: 📡 EzSnmp
       :link: https://github.com/carlkidcrypto/ezsnmp
       :link-type: url
