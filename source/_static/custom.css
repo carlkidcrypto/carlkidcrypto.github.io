@@ -1,0 +1,61 @@
+/* Custom styles for carlkidcrypto.github.io matching Furo theme */
+
+.hero-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin: 1.5rem 0 2.5rem 0;
+    padding: 1.75rem;
+    background: var(--color-background-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--color-background-border);
+}
+
+.hero-avatar {
+    width: 130px;
+    height: 130px;
+    min-width: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-brand-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.hero-text h1 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.85rem;
+    border-bottom: none;
+}
+
+.hero-tagline {
+    font-size: 1.1rem;
+    color: var(--color-foreground-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+@media (max-width: 600px) {
+    .hero-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+}
+
+/* Card hover and border styling */
+.sd-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--color-background-border) !important;
+    background: var(--color-background-primary) !important;
+}
+
+.sd-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.sd-card-title {
+    font-size: 1.15rem !important;
+    font-weight: 600 !important;
+}
