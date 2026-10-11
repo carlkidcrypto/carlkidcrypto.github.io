@@ -1,0 +1,85 @@
+{% extends "!base.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://carlkidcrypto.github.io/#person",
+        "name": "Carlos",
+        "alternateName": "carlkidcrypto",
+        "url": "https://carlkidcrypto.github.io/",
+        "sameAs": [
+          "https://github.com/carlkidcrypto"
+        ],
+        "jobTitle": "Software Engineer",
+        "knowsAbout": [
+          "Python",
+          "C++",
+          "SNMP",
+          "IoT",
+          "Matter",
+          "Air Quality",
+          "DevOps"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://carlkidcrypto.github.io/#website",
+        "url": "https://carlkidcrypto.github.io/",
+        "name": "carlkidcrypto",
+        "description": "Developer portfolio and home of ezsnmp, purpleair_api, purpleair_data_logger, purpleair-matterbridge, and os-specific-runner",
+        "author": { "@id": "https://carlkidcrypto.github.io/#person" }
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "ezsnmp",
+        "alternateName": "EzSnmp",
+        "programmingLanguage": "Python, C++",
+        "codeRepository": "https://github.com/carlkidcrypto/ezsnmp",
+        "url": "https://carlkidcrypto.github.io/ezsnmp/",
+        "description": "Fast, Pythonic SNMP library wrapping Net-SNMP with a C++ extension for network management, device polling, and telemetry."
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "purpleair_api",
+        "alternateName": ["PurpleAir API", "PAA"],
+        "programmingLanguage": "Python",
+        "codeRepository": "https://github.com/carlkidcrypto/purpleair_api",
+        "url": "https://carlkidcrypto.github.io/purpleair_api/",
+        "description": "Modern Python 3 wrapper for official PurpleAir air quality sensors and the PurpleAir sensor data API."
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "purpleair_data_logger",
+        "alternateName": ["PurpleAir Data Logger", "Purple Air Data Logger", "PADLs"],
+        "programmingLanguage": "Python",
+        "codeRepository": "https://github.com/carlkidcrypto/purpleair_data_logger",
+        "url": "https://carlkidcrypto.github.io/purpleair_data_logger/",
+        "description": "Automated data loggers for PurpleAir sensors supporting SQLite, PostgreSQL, CSV, Prometheus metrics, and Matter."
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "purpleair-matterbridge",
+        "alternateName": ["PurpleAir Matterbridge", "PurpleAir Matter Bridge"],
+        "programmingLanguage": "TypeScript, JavaScript",
+        "codeRepository": "https://github.com/carlkidcrypto/purpleair-matterbridge",
+        "url": "https://carlkidcrypto.github.io/purpleair-matterbridge/",
+        "description": "Matterbridge plugin exposing PurpleAir air quality sensor data as bridged Matter smart home devices."
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "name": "os-specific-runner",
+        "alternateName": "OS Specific Runner",
+        "programmingLanguage": "TypeScript, JavaScript",
+        "codeRepository": "https://github.com/carlkidcrypto/os-specific-runner",
+        "url": "https://carlkidcrypto.github.io/os-specific-runner/",
+        "description": "Cross-platform GitHub Action that executes operating-system-specific commands across Linux, macOS, and Windows runners."
+      }
+    ]
+  }
+  </script>
+{% endblock %}
