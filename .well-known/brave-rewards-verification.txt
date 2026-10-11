@@ -1,4 +1,4 @@
 This is a Brave Creators publisher verification file.
 
 Domain: carlkidcrypto.github.io
-Token: afdc0abdd71d26baf88cd5fb57422d7185395cc46e5d9fabbc7aa77f3aba13f1
+Token: 1eae3bb52d590b7a39788acdbdad338e4c19ad83596b5c738d8c3c8a62df2733
