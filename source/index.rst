@@ -1,3 +1,17 @@
+.. meta::
+   :description: Official developer portfolio and open source project index for Carlos (@carlkidcrypto) — home of ezsnmp (fast Python SNMP library), PurpleAir API, PurpleAir Data Logger (PADLs), PurpleAir Matterbridge, and OS Specific Runner.
+   :keywords: ezsnmp, purpleair api, purpleair_api, purple air data logger, purpleair_data_logger, purpleair matter bridge, purpleair-matterbridge, os-specific-runner, carlkidcrypto, python snmp, net-snmp, air quality iot, matter smart home
+   :author: Carlos (@carlkidcrypto)
+   :property=og:title: carlkidcrypto — ezsnmp, PurpleAir API, Data Logger, Matterbridge & OS Specific Runner
+   :property=og:description: Open source software by Carlos (@carlkidcrypto): ezsnmp (fast Python SNMP), PurpleAir API & Data Logger, PurpleAir Matterbridge, and OS Specific Runner.
+   :property=og:type: website
+   :property=og:url: https://carlkidcrypto.github.io/
+   :property=og:image: https://carlkidcrypto.github.io/_static/logo.png
+   :name=twitter:card: summary
+   :name=twitter:title: carlkidcrypto — ezsnmp, PurpleAir API, Data Logger, Matterbridge
+   :name=twitter:description: Open source software by Carlos (@carlkidcrypto): ezsnmp, PurpleAir API & Data Logger, PurpleAir Matterbridge, and OS Specific Runner.
+   :name=twitter:image: https://carlkidcrypto.github.io/_static/logo.png
+
 Carlos — Software Engineer
 ===========================
 
@@ -13,7 +27,7 @@ Carlos — Software Engineer
        <img src="_static/profile.webp" alt="Carlos" class="hero-avatar">
        <div class="hero-text">
            <h1>Welcome!</h1>
-           <p class="hero-tagline">Explore the options below.</p>
+           <p class="hero-tagline">I like to code, tinker, and explore AI.<br>Explore the options below.</p>
        </div>
    </div>
 
@@ -70,6 +84,15 @@ A collection of projects that I work on when time appears...
       +++
       `GitHub <https://github.com/carlkidcrypto/purpleair_data_logger>`_ • `Documentation <https://carlkidcrypto.github.io/purpleair_data_logger/>`_
 
+   .. grid-item-card:: 🏠 PurpleAir Matterbridge
+      :link: https://github.com/carlkidcrypto/purpleair-matterbridge
+      :link-type: url
+
+      Matterbridge plugin exposing PurpleAir sensor readings as bridged Matter air quality and environmental devices.
+
+      +++
+      `GitHub <https://github.com/carlkidcrypto/purpleair-matterbridge>`_ • `Documentation <https://carlkidcrypto.github.io/purpleair-matterbridge/>`_
+
    .. grid-item-card:: 📡 EzSnmp
       :link: https://github.com/carlkidcrypto/ezsnmp
       :link-type: url
@@ -87,13 +110,6 @@ A collection of projects that I work on when time appears...
 
       +++
       `GitHub <https://github.com/carlkidcrypto/os-specific-runner>`_ • `Documentation <https://carlkidcrypto.github.io/os-specific-runner/>`_
-
-.. _about-me:
-
-About Me
---------
-
-UNDER CONSTRUCTION...
 
 .. _contact-me:
 

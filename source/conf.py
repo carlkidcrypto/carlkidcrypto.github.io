@@ -19,6 +19,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "furo"
 html_title = "carlkidcrypto"
+html_baseurl = "https://carlkidcrypto.github.io/"
 html_logo = "_static/logo.png"
 html_favicon = "_static/logo.png"
 

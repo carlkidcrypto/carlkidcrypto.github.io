@@ -2,7 +2,7 @@
 
 Personal website and developer portfolio for Carlos ([@carlkidcrypto](https://github.com/carlkidcrypto)), built with [Sphinx](https://www.sphinx-doc.org/), [Furo](https://pradyunsg.me/furo/), and [sphinx-design](https://sphinx-design.readthedocs.io/).
 
-Styled to match the look and feel of [@carlkidcrypto](https://github.com/carlkidcrypto)'s open source projects ([ezsnmp](https://github.com/carlkidcrypto/ezsnmp), [purpleair_api](https://github.com/carlkidcrypto/purpleair_api), [purpleair_data_logger](https://github.com/carlkidcrypto/purpleair_data_logger), and [os-specific-runner](https://github.com/carlkidcrypto/os-specific-runner)).
+Styled to match the look and feel of [@carlkidcrypto](https://github.com/carlkidcrypto)'s open source projects ([ezsnmp](https://github.com/carlkidcrypto/ezsnmp), [purpleair_api](https://github.com/carlkidcrypto/purpleair_api), [purpleair_data_logger](https://github.com/carlkidcrypto/purpleair_data_logger), [purpleair-matterbridge](https://github.com/carlkidcrypto/purpleair-matterbridge), and [os-specific-runner](https://github.com/carlkidcrypto/os-specific-runner)).
 
 Hosted on GitHub Pages at [https://carlkidcrypto.github.io](https://carlkidcrypto.github.io).
 
