@@ -59,3 +59,11 @@
     font-size: 1.15rem !important;
     font-weight: 600 !important;
 }
+
+/* Sidebar logo styling */
+.sidebar-logo {
+    max-width: 140px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+}
