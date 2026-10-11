@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: carlkidcrypto.github.io
+Token: 2e0be62880b27b3ad43110d2f147a319894f2b2916abd0ff10ef1d212be83c7f
