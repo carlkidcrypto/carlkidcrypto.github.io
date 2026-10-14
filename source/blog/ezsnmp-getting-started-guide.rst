@@ -275,13 +275,41 @@ unreachable hosts separately from agent MIB faults:
     except GenericError as exc:
         print(f"General SNMP error encountered: {exc}")
 
-Concurrency & Multi-Threading
------------------------------
-ezsnmp is designed for high-concurrency monitoring daemons. Crucially, the
-C-extension layer **explicitly releases Python's Global Interpreter Lock (GIL)**
-during underlying Net-SNMP socket I/O. When polling large fleets of devices
-using ``concurrent.futures.ThreadPoolExecutor``, worker threads execute true
-parallel I/O without stalling the Python interpreter.
+Concurrency: Multiprocessing Recommended
+----------------------------------------
+When scaling SNMP polling across large fleets of network targets, **multiprocessing**
+is the officially supported and recommended concurrency model. Because the underlying
+Net-SNMP C library maintains process-global state (including global MIB tables and shared socket
+descriptors), high-concurrency multi-threading (>4 threads) can suffer from race conditions.
+
+Deploying Python's ``concurrent.futures.ProcessPoolExecutor`` (or ``multiprocessing.Pool``)
+provides each worker with an isolated Net-SNMP runtime and separate memory space, delivering
+reliable, linear performance across CPU cores:
+
+.. code-block:: python
+
+    from concurrent.futures import ProcessPoolExecutor, as_completed
+    from ezsnmp import Session
+    from ezsnmp.exceptions import TimeoutError, GenericError
+
+    TARGET_HOSTS = ['10.0.0.1', '10.0.0.2', '10.0.0.3']
+
+    def poll_device(host):
+        with Session(hostname=host, community='public', version=2, timeout=2) as session:
+            try:
+                results = session.get('sysDescr.0')
+                return host, results[0].value if results else None
+            except TimeoutError:
+                return host, "Timeout"
+            except GenericError as exc:
+                return host, f"Error: {exc}"
+
+    # Multiprocessing isolates Net-SNMP process state per worker
+    with ProcessPoolExecutor(max_workers=4) as executor:
+        futures = {executor.submit(poll_device, h): h for h in TARGET_HOSTS}
+        for future in as_completed(futures):
+            host, status = future.result()
+            print(f"{host}: {status}")
 
 Migration Guide: Upgrading from Easy SNMP
 =========================================
@@ -333,9 +361,12 @@ While core concepts remain familiar, ezsnmp modernizes several legacy convention
    * - **Result Attributes**
      - ``item.oid_index``, ``snmp_type``
      - ``item.index``, ``item.type``
-   * - **SNMPv3 Arguments**
-     - ``sec_level``, ``auth_password``
-     - ``security_level``, ``auth_passphrase``
+   * - **SNMPv3 Security Level**
+     - ``security_level='auth_with_privacy'``
+     - ``security_level='authPriv'``
+   * - **SNMPv3 Passwords**
+     - ``auth_password``, ``privacy_password``
+     - ``auth_passphrase``, ``privacy_passphrase``
 
 3. Code Migration Example
 -------------------------
@@ -346,7 +377,16 @@ Updating your polling calls is straightforward:
 
     # Legacy easysnmp:
     # from easysnmp import Session, EasySNMPTimeoutError
-    # session = Session(hostname='10.0.0.1', sec_level='authPriv', auth_password='secret')
+    # session = Session(
+    #     hostname='10.0.0.1',
+    #     version=3,
+    #     security_username='snmp_admin',
+    #     security_level='auth_with_privacy',
+    #     auth_protocol='SHA',
+    #     auth_password='secret',
+    #     privacy_protocol='AES',
+    #     privacy_password='privsecret'
+    # )
     # val = session.bulkwalk('ifDescr')
 
     # Modern ezsnmp:
