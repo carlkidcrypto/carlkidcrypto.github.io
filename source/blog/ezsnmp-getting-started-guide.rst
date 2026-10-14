@@ -317,13 +317,13 @@ While core concepts remain familiar, ezsnmp modernizes several legacy convention
      - ``import ezsnmp``
    * - **Bulk Walk Method**
      - ``session.bulkwalk()``
-     - ``session.bulk_walk()``
+     - ``session.bulk_walk()`` (standardized to snake_case)
    * - **Bulk Get Method**
-     - ``session.bulkget()``
-     - ``session.bulk_get()``
+     - ``session.get_bulk()``
+     - ``session.bulk_get()`` (standardized to ``bulk_`` prefix)
    * - **Get Next Method**
-     - ``session.getnext()``
      - ``session.get_next()``
+     - ``session.get_next()`` (signature retained)
    * - **Exception Hierarchy**
      - ``EasySNMPTimeoutError``
      - ``TimeoutError``, ``ConnectionError``
