@@ -90,9 +90,9 @@ Practical Configuration & Examples
 ----------------------------------------------
 
 To query devices requiring both authentication and privacy encryption, pass
-the USM credentials into ``Session``. Using a context manager ensures that the
-underlying C descriptors and network sockets are cleanly released when the
-block exits:
+the USM credentials into ``Session``. Using a context manager provides
+deterministic session lifecycle management and clean teardown of wrapper
+and library resources when the block exits:
 
 .. code-block:: python
 
@@ -198,20 +198,25 @@ EngineID to bypass discovery:
 Production Best Practices
 =========================
 
-Session Reuse & EngineID Discovery Caching
-------------------------------------------
+Session Reuse & EngineID Optimization
+-------------------------------------
 
-Under the hood, every new SNMPv3 session initiates an EngineID discovery probe
-to learn the remote agent's authoritative EngineID, engine boots, and engine
-time before encrypted PDUs can be dispatched.
+In ``ezsnmp``, each SNMP operation manages its own underlying Net-SNMP session
+struct, with an internal SNMPv3 operation guard that cleans up USM user entries
+and engine-time state around calls to prevent stale synchronization issues.
 
-.. important::
+Reusing ``Session`` instances across polling iterations remains a key best
+practice to avoid repeatedly validating parameters, allocating wrapper
+structures, and rebuilding configuration state.
 
-   **Do Not Instantiate Sessions Inside Polling Loops**:
-   Creating a new ``Session`` object inside high-frequency polling loops forces
-   engine discovery round-trips on every request, creating severe latency and
-   network overhead. Always reuse ``Session`` handles across polling cycles to
-   benefit from Net-SNMP's internal engine cache.
+.. tip::
+
+   **Eliminating EngineID Discovery Round Trips**:
+   Because ``ezsnmp`` isolates USM state between calls, the most effective way
+   to eliminate engine discovery handshakes across polling cycles is to
+   explicitly configure ``security_engine_id`` when instantiating the ``Session``
+   (as demonstrated in Section 4 above).
+
 
 Catching Specific SNMPv3 Exception States
 -----------------------------------------
@@ -241,12 +246,23 @@ issues from USM authentication and cryptographic failures:
             (res,) = session.get('sysDescr.0')
             print(f"System: {res.value}")
     except TimeoutError:
-        print("Timeout: Check IP reachability, UDP port 161, or firewall rules.")
+        # Note: SNMPv3 agents silently discard packets with invalid credentials
+        # (wrong passphrase or unknown user) per RFC 3414, manifesting as a timeout.
+        print("Timeout: Check IP reachability, firewall rules, or verify SNMPv3 passphrases.")
     except ConnectionError:
-        print("Connection failed: Socket setup or transport failure.")
+        print("Connection failed: Socket setup or network transport failure.")
     except GenericError as exc:
-        # Catches USM authentication mismatches, bad passphrases, or unknown users
+        # Catches syntax issues, unsupported security parameters, or MIB errors
         print(f"SNMPv3 operational error: {exc}")
+
+.. note::
+
+   **Why Invalid Passphrases Cause Timeouts in SNMPv3**:
+   Under the SNMPv3 USM specification (RFC 3414), network agents silently discard
+   incoming packets that fail cryptographic authentication or payload decryption
+   rather than responding with an error (defending against cryptographic oracle
+   and reflection attacks). Consequently, supplying an incorrect ``auth_passphrase``
+   or ``privacy_passphrase`` is reported by ``ezsnmp`` as a ``TimeoutError``.
 
 Concurrency Note: Multiprocessing vs. Multithreading
 ----------------------------------------------------

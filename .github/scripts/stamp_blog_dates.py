@@ -43,6 +43,35 @@ def get_current_date_formatted() -> str:
     return now.strftime("%B %d, %Y")
 
 
+def get_commit_date_for_file(path: Path) -> str | None:
+    """Derive the stable publication date from the commit that introduced the post to git."""
+    try:
+        rel_path = path.relative_to(REPO_ROOT)
+    except ValueError:
+        rel_path = path
+    try:
+        cmd = [
+            "git",
+            "log",
+            "--diff-filter=A",
+            "--follow",
+            "--format=%cI",
+            "-1",
+            "--",
+            str(rel_path),
+        ]
+        res = subprocess.run(
+            cmd, cwd=REPO_ROOT, capture_output=True, text=True, check=True
+        )
+        iso_str = res.stdout.strip()
+        if iso_str:
+            dt = datetime.fromisoformat(iso_str).astimezone(timezone.utc)
+            return dt.strftime("%B %d, %Y")
+    except Exception:
+        pass
+    return None
+
+
 def get_added_or_modified_posts_from_git() -> list[Path]:
     """Find blog post files added in the latest git commit."""
     try:
@@ -212,13 +241,15 @@ def main(argv: list[str] | None = None) -> int:
         print("No blog posts to stamp.")
         return 0
 
-    print(f"Stamping date '{date_to_stamp}' on {len(posts_to_process)} post(s)...")
     modified = False
 
     for post_path in sorted(posts_to_process):
         slug = post_path.stem
-        post_modified = stamp_post_file(post_path, date_to_stamp, dry_run=args.dry_run)
-        index_modified = stamp_index_file(slug, date_to_stamp, dry_run=args.dry_run)
+        # Derive stable date from the introduction commit if available, otherwise fallback
+        post_date = args.date or get_commit_date_for_file(post_path) or date_to_stamp
+        print(f"Stamping date '{post_date}' on {post_path.name}...")
+        post_modified = stamp_post_file(post_path, post_date, dry_run=args.dry_run)
+        index_modified = stamp_index_file(slug, post_date, dry_run=args.dry_run)
         if post_modified or index_modified:
             modified = True
 
