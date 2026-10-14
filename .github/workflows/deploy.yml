@@ -39,19 +39,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Stamp blog publication date on merge
+      - name: Stamp blog publication date for deploy build
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           python3 .github/scripts/stamp_blog_dates.py --auto
-          if [ -n "$(git status --porcelain source/blog/)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add source/blog/
-            git commit -m "chore(blog): auto-stamp publication date on merge [skip ci]"
-            git push origin main
-          else
-            echo "No publication dates to update."
-          fi
 
       - name: Build Sphinx website
         run: |
