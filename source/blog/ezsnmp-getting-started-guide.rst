@@ -18,7 +18,7 @@ Modern SNMP in Python with ezsnmp: Practical Guide & Migration
 
 .. note::
 
-   * **Published:** October 10, 2026
+   * **Published:** October 14, 2026
    * **Authors:** Written by Gemini 3.8 Flash, Co-Authored & Reviewed by `Carlos Santos (@carlkidcrypto) <https://github.com/carlkidcrypto>`_
    * **Estimated Reading Time:** 4 minutes
    * **Tags:** `Python` • `Networking` • `SNMP` • `Net-SNMP` • `ezsnmp` • `DevOps`
