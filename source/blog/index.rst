@@ -17,28 +17,23 @@ Blog
 
 Articles, release notes, and engineering tutorials on open source software, air quality sensing, and DevOps automation.
 
-.. note::
+.. toctree::
+   :maxdepth: 1
+   :caption: Articles:
 
-   No posts published yet. Stay tuned for tutorials, release notes, and engineering updates!
+   ezsnmp-getting-started-guide
 
-..
-   When adding a new blog post, add its filename (without extension) to the
-   toctree and add a card to the grid below:
+All Posts
+---------
 
-   .. toctree::
-      :maxdepth: 1
-      :caption: Articles:
+.. grid:: 1
+   :gutter: 3
 
-      my-new-post
+   .. grid-item-card:: 📡 Modern SNMP in Python with ezsnmp: Practical Guide & Migration
+      :link: ezsnmp-getting-started-guide
+      :link-type: doc
 
-   All Posts
-   ---------
+      A hands-on introduction to ezsnmp—a high-performance, C++17 Python wrapper for Net-SNMP. Covers v2c queries, GETBULK walks, SNMPv3 authPriv encryption, session reuse, and migrating from Easy SNMP.
 
-   .. grid:: 1
-      :gutter: 3
-
-      .. grid-item-card:: 📝 Post Title
-         :link: my-new-post
-         :link-type: doc
-
-         Post description...
+      +++
+      📅 *October 10, 2026* • ⏱️ *4 min read* • `Python` `Networking` `ezsnmp`
