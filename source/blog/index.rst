@@ -21,6 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+   ezsnmp-snmpv3-deep-dive
    ezsnmp-getting-started-guide
 
 All Posts
@@ -29,6 +30,15 @@ All Posts
 .. grid:: 1
    :gutter: 3
 
+   .. grid-item-card:: 🔒 Mastering SNMPv3 with ezsnmp: USM, AuthPriv, and EngineID Tips
+      :link: ezsnmp-snmpv3-deep-dive
+      :link-type: doc
+
+      A deep dive into secure SNMPv3 network monitoring with ezsnmp. Covers USM security levels, SHA/AES authPriv setup, VRF contexts, explicit EngineID caching, and robust exception handling.
+
+      +++
+      📅 *October 14, 2026* • ⏱️ *5 min read* • `Python` `Networking` `SNMPv3` `Security`
+
    .. grid-item-card:: 📡 Modern SNMP in Python with ezsnmp: Practical Guide & Migration
       :link: ezsnmp-getting-started-guide
       :link-type: doc
@@ -36,4 +46,5 @@ All Posts
       A hands-on introduction to ezsnmp—a high-performance, C++17 Python wrapper for Net-SNMP. Covers v2c queries, GETBULK walks, SNMPv3 authPriv encryption, session reuse, and migrating from Easy SNMP.
 
       +++
-      📅 *October 10, 2026* • ⏱️ *4 min read* • `Python` `Networking` `ezsnmp`
+      📅 *October 14, 2026* • ⏱️ *4 min read* • `Python` `Networking` `ezsnmp`
+
