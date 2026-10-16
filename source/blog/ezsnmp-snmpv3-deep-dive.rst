@@ -23,10 +23,6 @@ Mastering SNMPv3 with ezsnmp: USM, AuthPriv, and EngineID Tips
    * **Estimated Reading Time:** 5 minutes
    * **Tags:** `Python` • `Networking` • `SNMP` • `SNMPv3` • `ezsnmp` • `Security`
 
-.. contents:: Table of Contents
-   :depth: 2
-   :local:
-
 Why SNMPv3 Security Matters
 ===========================
 
