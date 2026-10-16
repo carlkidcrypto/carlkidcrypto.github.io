@@ -23,10 +23,6 @@ Modern SNMP in Python with ezsnmp: Practical Guide & Migration
    * **Estimated Reading Time:** 4 minutes
    * **Tags:** `Python` • `Networking` • `SNMP` • `Net-SNMP` • `ezsnmp` • `DevOps`
 
-.. contents:: Table of Contents
-   :depth: 2
-   :local:
-
 Why ezsnmp?
 ===========
 

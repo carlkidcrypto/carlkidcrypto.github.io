@@ -44,6 +44,10 @@ jobs:
         run: |
           python3 .github/scripts/stamp_blog_dates.py --auto
 
+      - name: Audit blog posts
+        run: |
+          python3 .github/scripts/audit_blog_posts.py
+
       - name: Build Sphinx website
         run: |
           make html SPHINXOPTS="-W"
