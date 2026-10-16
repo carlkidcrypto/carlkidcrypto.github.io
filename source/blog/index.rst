@@ -21,6 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+   ezsnmp-high-throughput-multithreading
    ezsnmp-snmpv3-deep-dive
    ezsnmp-getting-started-guide
 
@@ -29,6 +30,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: ⚡ High-Throughput Network Monitoring: Scaling ezsnmp Concurrency
+      :link: ezsnmp-high-throughput-multithreading
+      :link-type: doc
+
+      Scale network monitoring throughput in Python using ezsnmp. Learn how C-level GIL release, ThreadPoolExecutor worker pools, and GETBULK maximize parallel polling performance.
+
+      +++
+      📅 *October 15, 2026* • ⏱️ *5 min read* • `Python` `Networking` `Concurrency` `Performance`
 
    .. grid-item-card:: 🔒 Mastering SNMPv3 with ezsnmp: USM, AuthPriv, and EngineID Tips
       :link: ezsnmp-snmpv3-deep-dive
@@ -46,5 +56,6 @@ All Posts
       A hands-on introduction to ezsnmp—a high-performance, C++17 Python wrapper for Net-SNMP. Covers v2c queries, GETBULK walks, SNMPv3 authPriv encryption, session reuse, and migrating from Easy SNMP.
 
       +++
-      📅 *October 14, 2026* • ⏱️ *4 min read* • `Python` `Networking` `ezsnmp`
+      📅 *October 13, 2026* • ⏱️ *4 min read* • `Python` `Networking` `ezsnmp`
+
 
