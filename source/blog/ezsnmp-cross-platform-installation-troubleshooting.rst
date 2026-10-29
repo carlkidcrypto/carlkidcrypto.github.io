@@ -106,12 +106,10 @@ which provisions the Python package and compiled C dependencies together:
     brew tap carlkidcrypto/ezsnmp
     brew install carlkidcrypto/ezsnmp/ezsnmp
 
-If ``import ezsnmp`` fails in your shell after installation, export the tap's
-site-packages path in your shell profile (``~/.zshrc``):
-
-.. code-block:: bash
-
-    export PYTHONPATH="$(brew --prefix ezsnmp)/lib/python3.12/site-packages:$PYTHONPATH"
+If ``import ezsnmp`` fails after installation, run ``brew info ezsnmp`` and
+follow its version-specific ``PYTHONPATH`` caveat in your shell profile
+(``~/.zshrc``). Use the same Python major/minor version reported by the formula;
+the compiled extension cannot be loaded by a different Python ABI.
 
 Option B: Compiling into a Virtualenv via pip
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
