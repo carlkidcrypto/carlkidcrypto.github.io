@@ -187,10 +187,10 @@ properly by executing a quick check in Python:
 
 .. code-block:: python
 
-    import ezsnmp
+    from importlib.metadata import version
     from ezsnmp import Session
 
-    print(f"ezsnmp version: {ezsnmp.__version__}")
+    print(f"ezsnmp version: {version('ezsnmp')}")
 
     # Query local daemon or test agent
     with Session(hostname="localhost", community="public", version=2) as session:
