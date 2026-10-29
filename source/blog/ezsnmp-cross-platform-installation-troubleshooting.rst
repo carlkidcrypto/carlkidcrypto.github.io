@@ -42,9 +42,9 @@ failures typically trace back to one of four common issues:
 * **Linker Path Misconfigurations**: On macOS, tools installed via Homebrew
   live under architecture-specific prefixes (such as ``/opt/homebrew`` on Apple
   Silicon) that compilers do not always search by default.
-* **Missing SWIG for Raw Git Clones**: Developers building directly from a raw
-  GitHub repository clone require SWIG 4.x to generate C++ wrappers from interface
-  files (standard PyPI sdist releases bundle these pre-generated).
+* **Missing SWIG for Source Builds**: Both Git checkouts and PyPI source
+  distributions run SWIG to generate C++ wrappers. Isolated pip builds install
+  SWIG automatically; builds without isolation need a compatible SWIG on ``PATH``.
 
 Below is a complete installation walkthrough and diagnostic guide across Windows,
 macOS, Linux, and containerized Docker environments.
