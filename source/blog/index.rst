@@ -21,6 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+   ezsnmp-cross-platform-installation-troubleshooting
    ezsnmp-high-throughput-multithreading
    ezsnmp-snmpv3-deep-dive
    ezsnmp-getting-started-guide
@@ -30,6 +31,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 🛠️ Cross-Platform Installation & Troubleshooting ezsnmp Builds
+      :link: ezsnmp-cross-platform-installation-troubleshooting
+      :link-type: doc
+
+      Master ezsnmp installations across Windows, macOS, Linux distributions, and Docker. Learn how pre-built Windows wheels, Homebrew taps, and multi-stage Docker builds resolve C-extension header and linker bottlenecks.
+
+      +++
+      📅 *October 16, 2026* • ⏱️ *6 min read* • `Python` `DevOps` `Packaging` `Troubleshooting`
 
    .. grid-item-card:: ⚡ High-Throughput Network Monitoring: Scaling ezsnmp Concurrency
       :link: ezsnmp-high-throughput-multithreading
@@ -57,5 +67,3 @@ All Posts
 
       +++
       📅 *October 13, 2026* • ⏱️ *4 min read* • `Python` `Networking` `ezsnmp`
-
-
