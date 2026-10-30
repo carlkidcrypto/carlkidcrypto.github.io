@@ -45,10 +45,10 @@ All Posts
       :link: ezsnmp-high-throughput-multithreading
       :link-type: doc
 
-      Scale network monitoring throughput in Python using ezsnmp. Learn how native C++ execution, ProcessPoolExecutor worker pools, and GETBULK maximize polling performance.
+      Scale network monitoring throughput in Python using ezsnmp. Learn how C-level GIL release, ThreadPoolExecutor worker pools, and GETBULK maximize parallel polling performance.
 
       +++
-      📅 *October 15, 2026* • ⏱️ *6 min read* • `Python` `Networking` `Concurrency` `Performance`
+      📅 *October 15, 2026* • ⏱️ *5 min read* • `Python` `Networking` `Concurrency` `Performance`
 
    .. grid-item-card:: 🔒 Mastering SNMPv3 with ezsnmp: USM, AuthPriv, and EngineID Tips
       :link: ezsnmp-snmpv3-deep-dive
