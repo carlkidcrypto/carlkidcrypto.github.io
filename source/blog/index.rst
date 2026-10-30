@@ -24,6 +24,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-advanced-table-navigation
    ezsnmp-resilient-polling-error-handling
    ezsnmp-async-polling-event-loops
    ezsnmp-working-with-mibs-guide
@@ -37,6 +39,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Navigating Complex SNMP Tables with ezsnmp: Advanced Patterns
+      :link: ezsnmp-advanced-table-navigation
+      :link-type: doc
+
+      Unlike modern REST APIs or SQL databases that return structured JSON arrays or tabular rows, Simple Network Management Protocol (SNMP) represents tables as...
+
+      +++
+      📅 *October 20, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Tables` `Mib`
 
    .. grid-item-card:: 📖 Resilient SNMP Polling with ezsnmp: Timeouts, Retries & Errors
       :link: ezsnmp-resilient-polling-error-handling
