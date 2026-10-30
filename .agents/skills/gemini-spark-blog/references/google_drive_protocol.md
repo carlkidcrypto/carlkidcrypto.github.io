@@ -6,119 +6,160 @@ This reference defines the bidirectional communication pattern between the **Gem
 
 ## 1. Directory Structure on Google Drive
 
-The Gemini Spark Agent and the repository skill share a root folder on Google Drive named `Blog/` (or `Gemini Spark Blog/`):
+The Gemini Spark Agent and the repository skill share a root folder on Google Drive named **`Auto Blog Posts/`**:
 
 ```text
 Google Drive/
-└── Blog/
-    ├── Pending/
-    │   ├── 2026-10-28-ezsnmp-performance-tuning.md
-    │   └── ...
-    ├── Processed/
-    │   ├── 2026-10-16-ezsnmp-cross-platform-installation.rst
-    │   ├── 2026-10-15-ezsnmp-high-throughput-multithreading.rst
-    │   └── 2026-10-14-ezsnmp-snmpv3-deep-dive.rst
-    └── Feedback/
-        ├── 2026-10-16-ezsnmp-cross-platform-installation-feedback.md
-        ├── 2026-10-15-ezsnmp-high-throughput-multithreading-feedback.md
-        └── ...
+└── Auto Blog Posts/
+    ├── ezsnmp Blog Topic Tracker.gdoc                 # Master topic tracker & agenda
+    ├── ezsnmp_getting_started_guide.rst               # Draft uploaded by Gemini Spark
+    ├── ezsnmp_getting_started_guide - POSTED.rst      # Feedback marker posted by repository workflow
+    ├── ezsnmp_snmpv3_deep_dive.rst
+    ├── ezsnmp_snmpv3_deep_dive - POSTED.rst
+    ├── ezsnmp_high_throughput_multithreading.rst
+    ├── ezsnmp_high_throughput_multithreading - POSTED.rst
+    ├── ezsnmp_cross_platform_installation_troubleshooting.rst
+    ├── ezsnmp_cross_platform_installation_troubleshooting - POSTED.rst
+    ├── ezsnmp_working_with_mibs_guide.rst             # PENDING (unprocessed)
+    ├── ezsnmp_async_polling_event_loops.rst           # PENDING (unprocessed)
+    └── ...
+```
+
+### Local macOS Sync Paths
+Google Drive for Desktop synchronizes this directory locally at:
+1. `~/Library/CloudStorage/GoogleDrive-<email>/My Drive/Auto Blog Posts`
+2. `/Volumes/GoogleDrive/My Drive/Auto Blog Posts`
+3. Custom path defined via `$GOOGLE_DRIVE_BLOG_DIR`
+
+---
+
+## 2. Gemini Spark Agent Upload Specification
+
+The Gemini Spark Agent runs on a recurring schedule (daily) and uploads a new reStructuredText (`.rst`) draft into `Auto Blog Posts/`.
+
+### File Naming Convention
+- Prefix: `ezsnmp_`
+- Topic Slug: lowercase words separated by underscores (`_`)
+- Extension: `.rst`
+- Example: `ezsnmp_working_with_mibs_guide.rst`
+
+### Draft Header Structure
+Each draft includes an overline/underline title, field list metadata, and a table of contents directive:
+
+```rst
+==============================================================
+<Article Title>
+==============================================================
+
+:Date: YYYY-MM-DD
+:Author: Written by Gemini 3.8 Flash
+:Co-Author: Carlos Santos
+:Estimated Reading Time: 5 minutes
+:Category: Python, Networking, SNMP
+:Tags: python, snmp, mibs, net-snmp, ezsnmp, network-monitoring
+
+.. contents:: Table of Contents
+   :depth: 2
+   :local:
+
+<Article Body...>
 ```
 
 ---
 
-## 2. Gemini Spark Agent Upload Specification (`Pending/`)
+## 3. Detecting Pending Drafts
 
-The Gemini Spark Agent runs on a recurring schedule (e.g. daily) and deposits a new draft into `Pending/`.
+A draft is considered **PENDING** if:
+`ezsnmp_<topic>.rst` exists **WITHOUT** a corresponding `ezsnmp_<topic> - POSTED.rst` marker in `Auto Blog Posts/`.
 
-### Accepted Formats
-- Markdown (`.md` or `.markdown`)
-- reStructuredText (`.rst`)
-- Plain text (`.txt`)
-- Google Doc (exported to text/markdown)
-
-### Recommended Frontmatter / Header in Drafts
-```yaml
----
-title: "Article Title"
-tags: ["Python", "SNMP", "ezsnmp", "Performance"]
-target_repo: "carlkidcrypto/ezsnmp"
-reading_time_minutes: 5
-summary: "Teaser summary for search engines and blog cards."
----
-```
-
----
-
-## 3. Detecting & Ingesting Drafts
-
-When running the skill:
-1. Search local Google Drive mount locations:
-   - `~/Library/CloudStorage/GoogleDrive-*/My Drive/Blog/Pending/`
-   - `/Volumes/GoogleDrive/My Drive/Blog/Pending/`
-   - Path in environment variable `$GOOGLE_DRIVE_BLOG_DIR/Pending/`
-2. Pick the newest file in `Pending/`.
-3. Parse the title, summary, tags, and body.
-4. Transform into the standard Sphinx `.rst` format under `source/blog/<slug>.rst`.
-5. Update `source/blog/index.rst`.
-
----
-
-## 4. Talking Back to Gemini Spark Agent (`Feedback/`)
-
-Once a post is ingested and a GitHub Pull Request is opened, the skill communicates back to the Gemini Spark Agent by:
-
-### Step 1: Move Draft to `Processed/`
-Move the file:
+To inspect all drafts programmatically:
 ```bash
-mv "Blog/Pending/<draft-name>" "Blog/Processed/<draft-name>"
+python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py --list
 ```
 
-### Step 2: Write Feedback Document to `Feedback/`
-Create `Blog/Feedback/<slug>-feedback.md` (and optionally `<slug>-status.json`):
+---
 
-```markdown
-# Blog Post Review & Publication Feedback
+## 4. Ingesting & Formatting Drafts for Sphinx / Furo
 
-- **Original Draft**: `<draft-filename>`
-- **Slug**: `<slug>`
-- **Publication Target**: `source/blog/<slug>.rst`
-- **GitHub PR**: [PR #<PR_ID>](https://github.com/carlkidcrypto/carlkidcrypto.github.io/pull/<PR_ID>)
-- **Branch**: `feature/blog-<slug>`
-- **Status**: `PR_CREATED` (or `MERGED` once merged to main)
-- **Timestamp**: `2026-10-28T22:50:00Z`
+When ingesting a draft into `carlkidcrypto.github.io`:
 
-## Changes Applied During Ingestion
-- Converted markdown headings and code blocks to standard Sphinx reStructuredText format.
-- Added SEO `.. meta::` tags and OpenGraph card metadata.
-- Verified Furo theme compliance (ensured zero `.. contents::` directives).
-- Verified code snippets with Python 3.12/3.13.
+1. **Convert File Slug**:
+   Replace underscores `_` with hyphens `-`:
+   `ezsnmp_working_with_mibs_guide.rst` -> `source/blog/ezsnmp-working-with-mibs-guide.rst`
 
-## Reviewer & Copilot Feedback (For Future Agent Prompts)
-- Avoid referencing non-existent library attributes (e.g. `ezsnmp.version`).
-- Emphasize process pools over raw threads for Net-SNMP due to shared C state.
-- Ensure all installation instructions clarify binary wheels vs. source builds.
+2. **Add SEO & OpenGraph Metadata**:
+   Generate an opening `.. meta::` directive containing `:description:`, `:keywords:`, `:author:`, OpenGraph (`og:`), and Twitter card metadata.
 
-## Recommended Next Topics for Gemini Spark Agent
-- PurpleAir API data logger real-time MQTT streaming.
-- Dockerizing Python network pollers with lightweight Alpine vs Debian images.
-- Migrating legacy Net-SNMP configuration files to modern SNMPv3 USM users.
+3. **Format Title**:
+   Ensure title overline and underline match the length of the title line.
+
+4. **Convert Metadata to Furo Theme Note Box**:
+   Remove the raw `:Date:`, `:Author:`, `:Tags:`, etc., and replace with:
+   ```rst
+   .. note::
+
+      * **Published:** <Month Day, Year>
+      * **Authors:** Written by Gemini 3.8 Flash, Co-Authored & Reviewed by `Carlos Santos (@carlkidcrypto) <https://github.com/carlkidcrypto>`_
+      * **Estimated Reading Time:** <N> minutes
+      * **Tags:** `Tag1` • `Tag2` • `Tag3`
+   ```
+
+5. **Strip `.. contents::`**:
+   The **Furo** theme renders the table of contents in the right sidebar automatically.
+   **Crucial Rule**: Remove any `.. contents::` directives and their options (`:depth:`, `:local:`); otherwise, Furo displays a red error banner and repository audit scripts will fail.
+
+6. **Register in `source/blog/index.rst`**:
+   - Add the slug under `.. toctree::` (newest posts at top).
+   - Add a `.. grid-item-card::` under `All Posts` with emoji, title, teaser summary, date, reading time, and tags.
+
+Use the helper script to perform steps 1–6 automatically:
+```bash
+python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py --ingest ezsnmp_working_with_mibs_guide.rst
 ```
 
-### Step 3: Optional JSON Status
-For programmatic consumption by the Gemini Spark Agent:
-```json
-{
-  "slug": "ezsnmp-performance-tuning",
-  "status": "PR_CREATED",
-  "pr_url": "https://github.com/carlkidcrypto/carlkidcrypto.github.io/pull/19",
-  "branch": "feature/blog-ezsnmp-performance-tuning",
-  "timestamp": "2026-10-28T22:50:00Z",
-  "published_date": "October 29, 2026",
-  "corrections_made": [
-    "Removed in-page table of contents for Furo theme compatibility",
-    "Updated version lookup to importlib.metadata"
-  ]
-}
+---
+
+## 5. Talking Back to the Gemini Spark Agent (`- POSTED.rst`)
+
+Once a draft is audited, verified, and a GitHub Pull Request is opened, communicate status back to the Gemini Spark Agent by creating a `<draft_stem> - POSTED.rst` marker file directly in `Auto Blog Posts/`.
+
+### Feedback File Format
+Create `Auto Blog Posts/<draft_stem> - POSTED.rst`:
+
+```rst
+================================================================================
+<draft_stem> - POSTED
+================================================================================
+
+This blog post has been audited, verified, and submitted for publication.
+
+Review & Pull Request
+---------------------
+* PR: https://github.com/carlkidcrypto/carlkidcrypto.github.io/pull/<PR_ID>
+* Review Status: All code snippets 100% verified against local daemon
+* CI Status: Audit passed (0 errors) & Sphinx build passing (0 warnings)
+
+Publication Target
+------------------
+* Published Date: <Month Day, Year>
+* Site URL: https://carlkidcrypto.github.io/blog/<slug>.html
+* Repository Path: source/blog/<slug>.rst
+* Merge Date Automation: Automated via .github/scripts/stamp_blog_dates.py on merge to main
 ```
 
-This feedback loop ensures the Gemini Spark Agent continuously adapts to repository requirements, theme constraints, and reviewer recommendations over time.
+Use the helper script to create this marker automatically:
+```bash
+python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py \
+  --mark-posted ezsnmp_working_with_mibs_guide.rst \
+  --pr https://github.com/carlkidcrypto/carlkidcrypto.github.io/pull/<PR_ID> \
+  --review-status "All code snippets 100% verified against local daemon"
+```
+
+---
+
+## 6. The Master Topic Tracker (`ezsnmp Blog Topic Tracker.gdoc`)
+
+The Google Doc **`ezsnmp Blog Topic Tracker.gdoc`** (`doc_id: 1DPS_bQRZrWZ5GueoiltqldvqHm0frbUX4OtOxVv1tsw`) serves as the master planning agenda.
+
+- **Purpose**: Tracks proposed titles, topic status, technical areas covered (e.g., MIBs, SNMPv3, concurrency, telemetry), and upcoming post schedules.
+- **Accessing via Antigravity**: Use the official Google Docs plugin (`antigravity-plugins-official/plugin/gdocs`) or inspect local Google Drive sync state.

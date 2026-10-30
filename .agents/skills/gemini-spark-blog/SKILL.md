@@ -9,8 +9,8 @@ description: >-
 # Gemini Spark Daily Blog Publishing Skill
 
 This skill documents the automated/pair-programming procedure to ingest daily
-blog post drafts produced by the **Gemini Spark Agent** in Google Drive, transform
-them into publication-ready Sphinx articles for [carlkidcrypto.github.io](https://carlkidcrypto.github.io),
+blog post drafts produced by the **Gemini Spark Agent** in Google Drive (`Auto Blog Posts`),
+transform them into publication-ready Sphinx articles for [carlkidcrypto.github.io](https://carlkidcrypto.github.io),
 validate code snippets and theme compliance, open a GitHub Pull Request, and
 communicate review status and feedback back to the Gemini Spark Agent via Google Drive.
 
@@ -20,54 +20,51 @@ communicate review status and feedback back to the Gemini Spark Agent via Google
 
 ```mermaid
 flowchart LR
-    A["Gemini Spark Agent<br/>(Daily Generator)"] -->|"Uploads draft"| B["Google Drive<br/>(/Pending or /Drafts)"]
+    A["Gemini Spark Agent<br/>(Daily Generator)"] -->|"Uploads draft (.rst)"| B["Google Drive<br/>(Auto Blog Posts)"]
     B -->|"Ingest & format"| C["Antigravity Agent<br/>(Sphinx / Furo)"]
-    C -->|"1. Format .rst<br/>2. Update index.rst<br/>3. Verify & audit"| D["carlkidcrypto.github.io<br/>(Git Branch & PR)"]
+    C -->|"1. Format source/blog/<slug>.rst<br/>2. Update source/blog/index.rst<br/>3. Audit & Sphinx test"| D["carlkidcrypto.github.io<br/>(Git Branch & PR)"]
     D -->|"Copilot & Human Review"| E["GitHub Pages<br/>(Deployed)"]
-    C -->|"Write feedback, status & PR link"| F["Google Drive<br/>(/Feedback & /Processed)"]
-    F -->|"Iterate & improve"| A
+    C -->|"Create <topic> - POSTED.rst"| B
+    B -->|"Feedback & status loop"| A
 ```
 
 ---
 
 ## Step 1: Discover Pending Posts in Google Drive
 
-When Google Drive for Desktop is installed on macOS, it synchronizes cloud folders
-locally under one of the standard mount paths:
+Google Drive for Desktop synchronizes cloud folders locally under:
+```bash
+~/Library/CloudStorage/GoogleDrive-<email>/My Drive/Auto Blog Posts/
+```
+Or set `GOOGLE_DRIVE_BLOG_DIR` to point to a custom path.
 
-1. **Standard macOS CloudStorage path**:
-   ```bash
-   ~/Library/CloudStorage/GoogleDrive-<email>/My Drive/
-   ```
-2. **Alternative volumes path**:
-   ```bash
-   /Volumes/GoogleDrive/My Drive/
-   ```
-3. **Environment Override**:
-   Set `GOOGLE_DRIVE_BLOG_DIR` to point directly to the blog sync directory.
-
-### Directory Convention on Google Drive
-
-The Gemini Spark Agent uses the following folder layout:
+### Folder Layout on Google Drive
 ```text
-Google Drive/Blog/
-├── Pending/     # Gemini Spark Agent deposits new unreviewed drafts here (.md / .rst / .txt / Docs)
-├── Processed/   # Moved here once a PR is opened or post is merged
-└── Feedback/    # Status logs, PR links, and review notes returned to Gemini Spark Agent
+Auto Blog Posts/
+├── ezsnmp Blog Topic Tracker.gdoc                 # Master topic tracker & agenda
+├── ezsnmp_getting_started_guide.rst               # Ingested draft
+├── ezsnmp_getting_started_guide - POSTED.rst      # Feedback marker created on PR
+├── ezsnmp_working_with_mibs_guide.rst             # PENDING (unprocessed)
+└── ...
 ```
 
-To list or inspect pending drafts, run the included helper:
+To list all pending and posted drafts, run the included helper script:
 ```bash
 python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py --list
 ```
-Or check the local mount directly using shell commands.
 
 ---
 
-## Step 2: Format for Sphinx & Furo Theme
+## Step 2: Ingest & Format for Sphinx / Furo Theme
 
-Convert the draft into a Sphinx reStructuredText file located at:
-`source/blog/<slug>.rst`
+Run the ingestion tool to automatically convert the draft into Sphinx reStructuredText format and register it in the blog index:
+
+```bash
+python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py --ingest <draft_filename_or_slug>
+```
+
+This transforms `Auto Blog Posts/ezsnmp_<topic>.rst` into:
+`source/blog/ezsnmp-<topic>.rst`
 
 ### Mandatory Post Structure
 
@@ -94,7 +91,7 @@ Every blog post must follow this exact format:
 
 .. note::
 
-   * **Published:** <Month Day, Year> (or 'Pending' if awaiting merge)
+   * **Published:** <Month Day, Year>
    * **Authors:** Written by Gemini 3.8 Flash, Co-Authored & Reviewed by `Carlos Santos (@carlkidcrypto) <https://github.com/carlkidcrypto>`_
    * **Estimated Reading Time:** <N> minutes
    * **Tags:** `Tag1` • `Tag2` • `Tag3`
@@ -124,9 +121,9 @@ See [references/blog_format_guide.md](./references/blog_format_guide.md) for ful
 
 ---
 
-## Step 3: Register Article in `source/blog/index.rst`
+## Step 3: Verify Registration in `source/blog/index.rst`
 
-Every new post must be registered in two locations within `source/blog/index.rst`:
+The helper script registers the new post in `source/blog/index.rst`:
 
 1. **In the `.. toctree::` directive**:
    ```rst
@@ -141,7 +138,7 @@ Every new post must be registered in two locations within `source/blog/index.rst
    ```
 2. **In the `All Posts` card grid (`.. grid-item-card::`)**:
    ```rst
-   .. grid-item-card:: <Relevant Emoji> <Article Title>
+   .. grid-item-card:: 📖 <Article Title>
       :link: <new-slug>
       :link-type: doc
 
@@ -196,7 +193,7 @@ Common pitfalls to check:
    - Adds technical blog post: '<Article Title>' (\`source/blog/<slug>.rst\`).
    - Updates \`source/blog/index.rst\` with toctree registration and responsive grid card.
    - Passed \`audit_blog_posts.py\` and \`sphinx-build -W\` with zero warnings.
-   
+
    Co-authored-by: Gemini 3.8 Flash <gemini@google.com>"
    ```
 
@@ -204,16 +201,35 @@ Common pitfalls to check:
 
 ## Step 6: Communicate Back to Gemini Spark Agent via Google Drive
 
-To close the loop with the Gemini Spark Agent:
+Once the PR is created, create the `<draft_stem> - POSTED.rst` marker in Google Drive to close the feedback loop:
 
-1. **Move/Archive the Draft**:
-   Move the original file from `Blog/Pending/<draft-filename>` to `Blog/Processed/<draft-filename>`.
-2. **Write Status & Review Feedback**:
-   Create a feedback document in `Blog/Feedback/<slug>-feedback.md` containing:
-   - **Status**: `PR_CREATED` or `MERGED`
-   - **PR Link**: `https://github.com/carlkidcrypto/carlkidcrypto.github.io/pull/<PR_ID>`
-   - **Published Date**: The date stamped or planned
-   - **Edits Applied**: Any corrections made during ingest (e.g., Furo TOC fixes, metadata additions, code snippet fixes)
-   - **Review Findings**: Any feedback from Copilot or human reviews on GitHub for the Gemini Spark Agent to incorporate into future drafts.
+```bash
+python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py \
+  --mark-posted <draft_filename> \
+  --pr https://github.com/carlkidcrypto/carlkidcrypto.github.io/pull/<PR_ID> \
+  --review-status "All code snippets 100% verified against local daemon"
+```
 
-See [references/google_drive_protocol.md](./references/google_drive_protocol.md) for the exact feedback schema and folder conventions.
+This creates `Auto Blog Posts/<draft_stem> - POSTED.rst`:
+```rst
+================================================================================
+<draft_stem> - POSTED
+================================================================================
+
+This blog post has been audited, verified, and submitted for publication.
+
+Review & Pull Request
+---------------------
+* PR: https://github.com/carlkidcrypto/carlkidcrypto.github.io/pull/<PR_ID>
+* Review Status: All code snippets 100% verified against local daemon
+* CI Status: Audit passed (0 errors) & Sphinx build passing (0 warnings)
+
+Publication Target
+------------------
+* Published Date: October 14, 2026
+* Site URL: https://carlkidcrypto.github.io/blog/<slug>.html
+* Repository Path: source/blog/<slug>.rst
+* Merge Date Automation: Automated via .github/scripts/stamp_blog_dates.py on merge to main
+```
+
+See [references/google_drive_protocol.md](./references/google_drive_protocol.md) for full protocol specifications.
