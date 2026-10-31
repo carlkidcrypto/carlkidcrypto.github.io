@@ -89,7 +89,7 @@ peers, and verify accepted prefix counts:
 .. code-block:: python
 
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     BGP_STATE_MAP = {
         1: "IDLE",
@@ -111,29 +111,29 @@ peers, and verify accepted prefix counts:
 
         try:
             # 1. Bulk-walk BGP peer table columns
-            state_vars = session.bulkwalk("bgpPeerState", max_repetitions=25)
-            as_vars = session.bulkwalk("bgpPeerRemoteAs", max_repetitions=25)
-            uptime_vars = session.bulkwalk(
+            state_vars = session.bulk_walk("bgpPeerState", max_repetitions=25)
+            as_vars = session.bulk_walk("bgpPeerRemoteAs", max_repetitions=25)
+            uptime_vars = session.bulk_walk(
                 "bgpPeerFsmEstablishedTime", max_repetitions=25
             )
 
-            as_map = {v.oid_index: v.value for v in as_vars}
-            uptime_map = {v.oid_index: int(v.value) for v in uptime_vars}
+            as_map = {v.index: v.value for v in as_vars}
+            uptime_map = {v.index: int(v.value) for v in uptime_vars}
 
             # 2. Collect accepted prefix counts (CISCO-BGP4-MIB)
-            prefix_vars = session.bulkwalk(
+            prefix_vars = session.bulk_walk(
                 "cbgpPeerAcceptedPrefixes", max_repetitions=25
             )
             # Index format: [peer_ip].[afi].[safi]
             prefix_map = {}
             for v in prefix_vars:
-                peer_ip = ".".join(v.oid_index.split(".")[:4])
+                peer_ip = ".".join(v.index.split(".")[:4])
                 prefix_map[peer_ip] = int(v.value)
 
             peer_report = []
 
             for var in state_vars:
-                peer_ip = var.oid_index
+                peer_ip = var.index
                 state_code = int(var.value)
                 state_name = BGP_STATE_MAP.get(state_code, "UNKNOWN")
                 remote_as = as_map.get(peer_ip, "Unknown")
@@ -163,7 +163,7 @@ peers, and verify accepted prefix counts:
 
             return peer_report
 
-        except EasySNMPError as exc:
+        except GenericError as exc:
             print(f"[{hostname}] BGP audit failed: {exc}")
             return []
 
