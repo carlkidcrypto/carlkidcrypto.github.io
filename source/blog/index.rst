@@ -31,6 +31,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-custom-agent-extensions-agentx
    ezsnmp-vlan-management-qinq-automation
    ezsnmp-realtime-telemetry-polars-duckdb
    ezsnmp-set-operations-device-configuration
@@ -51,6 +53,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Building Custom SNMP Agent Extensions with Python and ezsnmp
+      :link: ezsnmp-custom-agent-extensions-agentx
+      :link-type: doc
+
+      While most network engineers interact with SNMP purely as client consumers (running ``GET``, ``WALK``, or ``SET`` queries against network gear), systems...
+
+      +++
+      📅 *October 27, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Snmpd` `Agentx`
 
    .. grid-item-card:: 📖 Automating VLAN Management & Q-in-Q Tagging with ezsnmp
       :link: ezsnmp-vlan-management-qinq-automation
