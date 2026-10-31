@@ -36,6 +36,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-bgp-routing-telemetry
    ezsnmp-dynamic-inventory-sync-netbox
    ezsnmp-testing-ci-cd-pytest
    ezsnmp-hardware-optical-dom-monitoring
@@ -61,6 +63,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 BGP Routing Telemetry: Peering States & Prefix Counts in ezsnmp
+      :link: ezsnmp-bgp-routing-telemetry
+      :link-type: doc
+
+      The Border Gateway Protocol (BGP-4) serves as the routing foundation for the global internet, cloud direct connects, and modern data center spine-leaf Clos...
+
+      +++
+      📅 *November 1, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Bgp` `Bgp4-Mib`
 
    .. grid-item-card:: 📖 Dynamic Inventory Sync: Populating NetBox & Nautobot via ezsnmp
       :link: ezsnmp-dynamic-inventory-sync-netbox
