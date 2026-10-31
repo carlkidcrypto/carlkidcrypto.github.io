@@ -122,7 +122,7 @@ prefix:
 .. code-block:: python
 
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     def poll_secure_switch_tls(hostname: str):
         """Query metrics over TLS (TCP port 10161) using X.509 mTLS."""
@@ -140,13 +140,13 @@ prefix:
 
         try:
             # Poll system metrics over encrypted TCP stream
-            sys_descr = session.get("sysDescr.0")
-            uptime = session.get("sysUpTime.0")
+            sys_descr = session.get("sysDescr.0")[0]
+            uptime = session.get("sysUpTime.0")[0]
             print(f"[{hostname}] TLS Connection Established!")
             print(f"  Description: {sys_descr.value}")
             print(f"  Uptime     : {uptime.value}")
 
-        except EasySNMPError as exc:
+        except GenericError as exc:
             print(f"[{hostname}] TLS Polling Failed: {exc}")
 
     def poll_secure_switch_dtls(hostname: str):
@@ -163,11 +163,11 @@ prefix:
         )
 
         try:
-            results = session.bulkwalk("ifDescr", max_repetitions=25)
+            results = session.bulk_walk("ifDescr", max_repetitions=25)
             print(
                 f"[{hostname}] DTLS Walk Retrieved {len(results)} Interfaces."
             )
-        except EasySNMPError as exc:
+        except GenericError as exc:
             print(f"[{hostname}] DTLS Polling Failed: {exc}")
 
     if __name__ == "__main__":

@@ -102,7 +102,7 @@ query optical receive/transmit power, and evaluate link safety margins:
 .. code-block:: python
 
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     def audit_optical_sensors(hostname: str, community: str = "public"):
         session = Session(
@@ -115,29 +115,29 @@ query optical receive/transmit power, and evaluate link safety margins:
 
         try:
             # 1. Map physical sensor IDs to human-readable names
-            name_vars = session.bulkwalk("entPhysicalName", max_repetitions=25)
-            sensor_names = {v.oid_index: v.value for v in name_vars}
+            name_vars = session.bulk_walk("entPhysicalName", max_repetitions=25)
+            sensor_names = {v.index: v.value for v in name_vars}
 
             # 2. Bulk-walk sensor telemetry columns
-            type_vars = session.bulkwalk("entSensorType", max_repetitions=25)
-            scale_vars = session.bulkwalk("entSensorScale", max_repetitions=25)
-            prec_vars = session.bulkwalk(
+            type_vars = session.bulk_walk("entSensorType", max_repetitions=25)
+            scale_vars = session.bulk_walk("entSensorScale", max_repetitions=25)
+            prec_vars = session.bulk_walk(
                 "entSensorPrecision", max_repetitions=25
             )
-            val_vars = session.bulkwalk("entSensorValue", max_repetitions=25)
-            status_vars = session.bulkwalk(
+            val_vars = session.bulk_walk("entSensorValue", max_repetitions=25)
+            status_vars = session.bulk_walk(
                 "entSensorStatus", max_repetitions=25
             )
 
-            scales = {v.oid_index: int(v.value) for v in scale_vars}
-            precisions = {v.oid_index: int(v.value) for v in prec_vars}
-            values = {v.oid_index: int(v.value) for v in val_vars}
-            statuses = {v.oid_index: int(v.value) for v in status_vars}
+            scales = {v.index: int(v.value) for v in scale_vars}
+            precisions = {v.index: int(v.value) for v in prec_vars}
+            values = {v.index: int(v.value) for v in val_vars}
+            statuses = {v.index: int(v.value) for v in status_vars}
 
             optical_report = []
 
             for v in type_vars:
-                idx = v.oid_index
+                idx = v.index
                 sensor_type = int(v.value)
                 name = sensor_names.get(idx, f"Sensor-{idx}")
 
@@ -165,7 +165,7 @@ query optical receive/transmit power, and evaluate link safety margins:
 
             return optical_report
 
-        except EasySNMPError as exc:
+        except GenericError as exc:
             print(f"[{hostname}] Optical telemetry audit failed: {exc}")
             return []
 

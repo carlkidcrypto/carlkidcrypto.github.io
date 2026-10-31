@@ -87,7 +87,7 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
 
     import pynetbox
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     NETBOX_URL = "https://netbox.internal.net"
     NETBOX_TOKEN = "0123456789abcdef0123456789abcdef01234567"
@@ -110,37 +110,37 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
             sys_descr = session.get("sysDescr.0").value
 
             # 2. Extract Chassis Serial from ENTITY-MIB
-            class_vars = session.bulkwalk(
+            class_vars = session.bulk_walk(
                 "entPhysicalClass", max_repetitions=25
             )
-            serial_vars = session.bulkwalk(
+            serial_vars = session.bulk_walk(
                 "entPhysicalSerialNum", max_repetitions=25
             )
-            name_vars = session.bulkwalk("entPhysicalName", max_repetitions=25)
+            name_vars = session.bulk_walk("entPhysicalName", max_repetitions=25)
 
-            serials = {v.oid_index: v.value for v in serial_vars}
-            names = {v.oid_index: v.value for v in name_vars}
+            serials = {v.index: v.value for v in serial_vars}
+            names = {v.index: v.value for v in name_vars}
 
             chassis_serial = "UNKNOWN"
             for var in class_vars:
                 # Class 3 = chassis
                 if var.value == "3":
-                    chassis_serial = serials.get(var.oid_index, "UNKNOWN")
+                    chassis_serial = serials.get(var.index, "UNKNOWN")
                     break
 
             # 3. Collect interface MAC addresses from IF-MIB
-            if_names = session.bulkwalk("ifName", max_repetitions=25)
-            if_macs = session.bulkwalk("ifPhysAddress", max_repetitions=25)
+            if_names = session.bulk_walk("ifName", max_repetitions=25)
+            if_macs = session.bulk_walk("ifPhysAddress", max_repetitions=25)
             mac_map = {
-                v.oid_index: ":".join(
+                v.index: ":".join(
                     f"{b:02x}" for b in v.value.encode("latin1")
                 )
                 for v in if_macs if len(v.value) == 6
             }
 
             interfaces = {
-                v.value: mac_map.get(v.oid_index, "")
-                for v in if_names if v.oid_index in mac_map
+                v.value: mac_map.get(v.index, "")
+                for v in if_names if v.index in mac_map
             }
 
             return {
@@ -150,7 +150,7 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
                 "interfaces": interfaces
             }
 
-        except EasySNMPError as exc:
+        except GenericError as exc:
             print(f"[{hostname}] Discovery failed: {exc}")
             return {}
 

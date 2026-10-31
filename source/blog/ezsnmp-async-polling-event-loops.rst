@@ -79,7 +79,7 @@ GET, WALK, and BULKWALK operations alongside concurrency throttling via
     import asyncio
     from concurrent.futures import ThreadPoolExecutor
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError, EasySNMPTimeoutError
+    from ezsnmp.exceptions import GenericError, TimeoutError
 
     class AsyncSNMPClient:
         """Asynchronous wrapper for ezsnmp Session operations."""
@@ -154,9 +154,9 @@ simultaneously while bounding local socket and thread consumption:
                     "descr": sys_descr.value,
                     "uptime": uptime.value
                 }
-            except EasySNMPTimeoutError:
+            except TimeoutError:
                 return {"device": device_name, "status": "TIMEOUT"}
-            except EasySNMPError as exc:
+            except GenericError as exc:
                 return {"device": device_name, "status": f"ERROR: {exc}"}
 
     async def main():
