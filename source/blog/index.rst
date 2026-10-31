@@ -33,6 +33,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-hardware-optical-dom-monitoring
    ezsnmp-snmpv3-tls-dtls-security
    ezsnmp-custom-agent-extensions-agentx
    ezsnmp-vlan-management-qinq-automation
@@ -55,6 +57,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Hardware Health & Optical Power Monitoring (DOM/DDM) in ezsnmp
+      :link: ezsnmp-hardware-optical-dom-monitoring
+      :link-type: doc
+
+      In modern high-speed data center fabrics and long-haul links (10G, 25G, 100G, and 400G), optical transceivers (SFP+, QSFP28, QSFP-DD) represent one of the...
+
+      +++
+      📅 *October 29, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Optical` `Dom`
 
    .. grid-item-card:: 📖 Modernizing SNMP Security: SNMPv3 over TLS and DTLS with ezsnmp
       :link: ezsnmp-snmpv3-tls-dtls-security
