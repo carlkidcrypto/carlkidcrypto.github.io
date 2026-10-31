@@ -159,7 +159,7 @@ python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py \
 
 ## 6. The Master Topic Tracker (`ezsnmp Blog Topic Tracker.gdoc`)
 
-The Google Doc **`ezsnmp Blog Topic Tracker.gdoc`** (`doc_id: 1DPS_bQRZrWZ5GueoiltqldvqHm0frbUX4OtOxVv1tsw`) serves as the master planning agenda.
+The Google Doc **`ezsnmp Blog Topic Tracker.gdoc`** (located in `Auto Blog Posts/`) serves as the master planning agenda.
 
 - **Purpose**: Tracks proposed titles, topic status, technical areas covered (e.g., MIBs, SNMPv3, concurrency, telemetry), and upcoming post schedules.
 - **Accessing via Antigravity**: Use the official Google Docs plugin (`antigravity-plugins-official/plugin/gdocs`) or inspect local Google Drive sync state.

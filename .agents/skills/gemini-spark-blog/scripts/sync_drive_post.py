@@ -235,6 +235,20 @@ def generate_sphinx_rst(parsed: dict, slug: str) -> str:
     tag_pills = " • ".join(f"`{t}`" for t in parsed["tags"])
     keywords = ", ".join(parsed["tags"] + ["Python", "ezsnmp", "Networking", "DevOps"])
 
+    body = parsed["body"]
+    # Normalize legacy easysnmp API patterns to modern ezsnmp
+    body = re.sub(r"\.bulkwalk\(", ".bulk_walk(", body)
+    body = re.sub(r"\.get_bulk\(", ".bulk_get(", body)
+    body = re.sub(r"\.oid_index\b", ".index", body)
+    body = re.sub(r"\.snmp_type\b", ".type", body)
+    for old_exc, new_exc in [
+        ("EasySNMPError", "GenericError"),
+        ("EasySNMPTimeoutError", "TimeoutError"),
+        ("EasySNMPConnectionError", "ConnectionError"),
+        ("EasySNMPNoSuchInstanceError", "NoSuchInstanceError"),
+    ]:
+        body = re.sub(rf"\b{old_exc}\b", new_exc, body)
+
     content = f""".. meta::
    :description: {parsed['summary']}
    :keywords: {keywords}
@@ -260,7 +274,7 @@ def generate_sphinx_rst(parsed: dict, slug: str) -> str:
    * **Estimated Reading Time:** {parsed['reading_time']} minutes
    * **Tags:** {tag_pills}
 
-{parsed['body']}
+{body}
 """
     return content
 
@@ -422,6 +436,20 @@ def main(argv: list[str] | None = None) -> int:
         out_rst.write_text(sphinx_rst, encoding="utf-8")
         print(f"  -> Generated: {out_rst.relative_to(REPO_ROOT)}")
 
+        # Validate code blocks in the generated post
+        try:
+            sys.path.insert(0, str(Path(__file__).resolve().parent))
+            from validate_blog_code import validate_post
+            issues = validate_post(out_rst)
+            if issues:
+                print(f"  ⚠️ Warning: {len(issues)} code validation issue(s) detected:")
+                for iss in issues:
+                    print(f"     [Line {iss.line_number}] {iss.severity}: {iss.message}")
+            else:
+                print("  -> Code Validation: 100% verified (syntax, ezsnmp API, and runtime execution)")
+        except Exception as exc:
+            print(f"  (Code validation skipped: {exc})")
+
         registered = register_in_index(
             slug=slug,
             title=parsed["title"],
@@ -433,10 +461,15 @@ def main(argv: list[str] | None = None) -> int:
         if registered:
             print(f"  -> Registered in: {INDEX_FILE.relative_to(REPO_ROOT)}")
 
+        try:
+            script_path = Path(__file__).resolve().relative_to(REPO_ROOT)
+        except ValueError:
+            script_path = Path(__file__).resolve()
+
         print("\nNext steps:")
         print(f"1. Audit: python3 .github/scripts/audit_blog_posts.py")
         print(f"2. Build: .venv/bin/sphinx-build -b html source _build/html -W")
-        print(f"3. Open PR and mark posted: python3 {Path(__file__).relative_to(REPO_ROOT)} --mark-posted {candidate.name} --pr <PR_URL>")
+        print(f"3. Open PR and mark posted: python3 {script_path} --mark-posted {candidate.name} --pr <PR_URL>")
         return 0
 
     if args.mark_posted:

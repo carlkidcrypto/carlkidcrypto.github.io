@@ -150,25 +150,39 @@ The helper script registers the new post in `source/blog/index.rst`:
 
 ---
 
-## Step 4: Verification & Audit
+## Step 4: Verification, Code Testing & Audit
 
-Before committing, run all verification checks locally:
+Before committing or opening a pull request, run all verification and test suites locally:
 
 ```bash
-# 1. Audit structural standards and Furo theme rules
+# 1. Test and validate all example code snippets in the blog post(s)
+# Validates Python syntax, ezsnmp API compliance, bash/YAML syntax, and executes mock test harness
+python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py --post <slug>
+
+# Or validate all posts across the repository:
+python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py
+
+# 2. Audit structural standards and Furo theme rules
 python3 .github/scripts/audit_blog_posts.py
 
-# 2. Build Sphinx site with warnings treated as errors
+# 3. Build Sphinx site with warnings treated as errors
 .venv/bin/sphinx-build -b html source _build/html -W
-
-# 3. Verify code snippets (if applicable)
-# Test Python snippets against real modules (e.g. ezsnmp, purpleair_api)
 ```
 
-Common pitfalls to check:
-- Never use hallucinated attributes (e.g. `ezsnmp.version` does not exist; use `from importlib.metadata import version; version('ezsnmp')`).
-- Highlight real multi-processing models when discussing Net-SNMP rather than unbounded threads.
-- Ensure all Sphinx target links resolve cleanly without broken references.
+### Code Testing & API Validation Standards
+
+All code blocks in published articles must pass rigorous automated validation:
+* **Python Syntax & Compilation**: Parsed with `ast.parse` and compiled with `compile(mode='exec')`.
+* **Modern ezsnmp API Standards**:
+  - **No Legacy Imports**: Reject `import easysnmp`. Must use `ezsnmp`.
+  - **Exception Hierarchy**: Use modern `ezsnmp.exceptions` classes (`GenericError`, `TimeoutError`, `ConnectionError`, `NoSuchInstanceError`). Never use legacy `EasySNMP*` names.
+  - **Standardized Method Names**: Use snake_case `session.bulk_walk()` and `session.bulk_get()` (never `.bulkwalk()` or `.get_bulk()`).
+  - **Result Attributes**: In ezsnmp Result objects, use `.index` and `.type` (never legacy `.oid_index` or `.snmp_type`).
+* **Runtime Test Execution**:
+  - `validate_blog_code.py` mounts a sandbox test harness with simulated mock MIB responses (`sysDescr`, `ifDescr`, `ifHCInOctets`, `pethMainPsePower`, `dot1qPvid`, `bgpPeerState`, etc.).
+  - Asserts complete runtime execution without `NameError`, `TypeError`, `AttributeError`, `KeyError`, or unhandled exceptions.
+* **Auto-Correction**:
+  - Run `python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py --fix` to automatically upgrade legacy API patterns in draft posts.
 
 ---
 

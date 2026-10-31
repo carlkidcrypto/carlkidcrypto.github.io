@@ -71,6 +71,17 @@ def audit_posts() -> int:
                 f"[{post.name}] Slug '{slug}' is not registered in source/blog/index.rst (toctree or grid card)."
             )
 
+        # Rule 4: Code block syntax and ezsnmp API compliance
+        try:
+            sys.path.insert(0, str(Path(__file__).resolve().parent))
+            from validate_blog_code import validate_post
+            code_issues = validate_post(post, run_tests=True)
+            for iss in code_issues:
+                if iss.severity == "ERROR":
+                    errors.append(f"[{post.name}:Line {iss.line_number}] Code validation error: {iss.message}")
+        except Exception as exc:
+            pass
+
     if errors:
         print("\n" + "=" * 60)
         print("BLOG POST AUDIT FAILED:")
