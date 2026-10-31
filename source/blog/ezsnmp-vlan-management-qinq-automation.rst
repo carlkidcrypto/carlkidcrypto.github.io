@@ -91,7 +91,7 @@ allocation report:
 .. code-block:: python
 
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     def decode_port_bitmask(raw_bytes: bytes) -> list[int]:
         """Decode an SNMP PortList octet string into active port numbers."""
@@ -115,19 +115,19 @@ allocation report:
 
         try:
             # 1. Collect Port Default VLAN IDs (Native VLANs)
-            pvid_vars = session.bulkwalk("dot1qPvid", max_repetitions=25)
-            pvids = {v.oid_index: v.value for v in pvid_vars}
+            pvid_vars = session.bulk_walk("dot1qPvid", max_repetitions=25)
+            pvids = {v.index: v.value for v in pvid_vars}
 
             # 2. Bulk-walk VLAN Egress and Untagged bitmasks
-            egress_vars = session.bulkwalk(
+            egress_vars = session.bulk_walk(
                 "dot1qVlanCurrentEgressPorts", max_repetitions=25
             )
-            untagged_vars = session.bulkwalk(
+            untagged_vars = session.bulk_walk(
                 "dot1qVlanCurrentUntaggedPorts", max_repetitions=25
             )
 
             untagged_map = {
-                v.oid_index: set(decode_port_bitmask(v.value.encode("latin1")))
+                v.index: set(decode_port_bitmask(v.value.encode("latin1")))
                 for v in untagged_vars
             }
 
@@ -135,10 +135,10 @@ allocation report:
 
             for var in egress_vars:
                 # OID format: [time_filter].[vlan_id]
-                vlan_id = var.oid_index.split(".")[-1]
+                vlan_id = var.index.split(".")[-1]
                 raw_bytes = var.value.encode("latin1")
                 egress_ports = decode_port_bitmask(raw_bytes)
-                untagged_ports = untagged_map.get(var.oid_index, set())
+                untagged_ports = untagged_map.get(var.index, set())
 
                 tagged_ports = [
                     p for p in egress_ports if p not in untagged_ports
@@ -152,7 +152,7 @@ allocation report:
 
             return pvids, vlan_report
 
-        except EasySNMPError as err:
+        except GenericError as err:
             print(f"[{hostname}] VLAN audit failed: {err}")
             return {}, []
 
