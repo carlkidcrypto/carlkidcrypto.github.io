@@ -84,7 +84,7 @@ interface traffic and operational status via ezsnmp:
         REGISTRY
     )
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     class NetworkDeviceCollector:
         """Custom Prometheus collector using ezsnmp for high-speed scrapes."""
@@ -122,20 +122,20 @@ interface traffic and operational status via ezsnmp:
                     )
 
                     # Bulk-walk interface descriptions and 64-bit counters
-                    descr_vars = session.bulkwalk("ifDescr", max_repetitions=25)
-                    in_vars = session.bulkwalk(
+                    descr_vars = session.bulk_walk("ifDescr", max_repetitions=25)
+                    in_vars = session.bulk_walk(
                         "ifHCInOctets", max_repetitions=25
                     )
-                    out_vars = session.bulkwalk(
+                    out_vars = session.bulk_walk(
                         "ifHCOutOctets", max_repetitions=25
                     )
 
                     # Index metrics by interface index
-                    in_map = {v.oid_index: v.value for v in in_vars}
-                    out_map = {v.oid_index: v.value for v in out_vars}
+                    in_map = {v.index: v.value for v in in_vars}
+                    out_map = {v.index: v.value for v in out_vars}
 
                     for d in descr_vars:
-                        idx = d.oid_index
+                        idx = d.index
                         iface_name = d.value
                         if idx in in_map:
                             rx_octets.add_metric(
@@ -148,7 +148,7 @@ interface traffic and operational status via ezsnmp:
 
                     device_up.add_metric([name], 1)
 
-                except EasySNMPError:
+                except GenericError:
                     # Record device as down if unreachable
                     device_up.add_metric([name], 0)
 
@@ -195,12 +195,12 @@ Collector via OTLP (gRPC or HTTP/protobuf):
         """Asynchronous observable callback triggered by the OTel SDK."""
         observations = []
         try:
-            results = session.bulkwalk("ifHCInOctets", max_repetitions=25)
+            results = session.bulk_walk("ifHCInOctets", max_repetitions=25)
             for var in results:
                 observations.append(
                     Observation(
                         value=int(var.value),
-                        attributes={"interface.index": var.oid_index}
+                        attributes={"interface.index": var.index}
                     )
                 )
         except Exception:

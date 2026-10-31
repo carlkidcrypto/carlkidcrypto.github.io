@@ -51,17 +51,17 @@ degradation.
 The ezsnmp Exception Hierarchy
 ==============================
 
-All exceptions raised by ezsnmp inherit from ``EasySNMPError``, allowing
+All exceptions raised by ezsnmp inherit from ``GenericError``, allowing
 broad fallback handling while enabling granular diagnostics:
 
 .. code-block:: text
 
-    EasySNMPError (base class)
-    ├── EasySNMPConnectionError       (Socket setup / EngineID discovery fail)
-    ├── EasySNMPTimeoutError          (All retries exhausted with no response)
-    ├── EasySNMPNoSuchNameError       (OID name not found on remote agent)
-    ├── EasySNMPNoSuchObjectError     (Requested MIB object unavailable)
-    ├── EasySNMPNoSuchInstanceError   (Object exists but specific index absent)
+    GenericError (base class)
+    ├── ConnectionError       (Socket setup / EngineID discovery fail)
+    ├── TimeoutError          (All retries exhausted with no response)
+    ├── NoSuchNameError       (OID name not found on remote agent)
+    ├── NoSuchObjectError     (Requested MIB object unavailable)
+    ├── NoSuchInstanceError   (Object exists but specific index absent)
     └── EasySNMPUndeterminedTypeError (Malformed ASN.1 type returned)
 
 
@@ -78,10 +78,10 @@ between network timeouts, reachability failures, and MIB-level errors:
 
     from ezsnmp import Session
     from ezsnmp.exceptions import (
-        EasySNMPConnectionError,
-        EasySNMPTimeoutError,
-        EasySNMPNoSuchInstanceError,
-        EasySNMPError,
+        ConnectionError,
+        TimeoutError,
+        NoSuchInstanceError,
+        GenericError,
     )
 
     def safe_poll_scalar(host: str, community: str, oid: str):
@@ -97,22 +97,22 @@ between network timeouts, reachability failures, and MIB-level errors:
             var = session.get(oid)
             return var.value
 
-        except EasySNMPTimeoutError:
+        except TimeoutError:
             # Host did not respond within (timeout * (retries + 1))
             print(f"[{host}] Timeout: Check packet routing and UDP port 161.")
             return None
 
-        except EasySNMPConnectionError as err:
+        except ConnectionError as err:
             # Socket initialization or EngineID handshake failed
             print(f"[{host}] Connection error: {err}")
             return None
 
-        except EasySNMPNoSuchInstanceError:
+        except NoSuchInstanceError:
             # OID is recognized, but specific table index is absent
             print(f"[{host}] Metric {oid} is not instantiated on this device.")
             return None
 
-        except EasySNMPError as err:
+        except GenericError as err:
             # General SNMP protocol or ASN.1 parsing error
             print(f"[{host}] Unexpected SNMP protocol failure: {err}")
             return None
@@ -191,11 +191,11 @@ Production Best Practices
   switches and 300ms WAN routers in the same worker queue. Partition workers
   so slow devices cannot starve fast telemetry pipelines.
 * **Log Root Causes Explicitly**: Capture error messages from
-  ``EasySNMPError`` to distinguish between bad community strings, dropped
+  ``GenericError`` to distinguish between bad community strings, dropped
   packets, and unsupported MIB definitions.
 * **Reuse Sessions with Care**: While reusing ``Session`` objects speeds up
   polling via socket caching, recreate the ``Session`` instance if you encounter
-  persistent ``EasySNMPConnectionError`` faults following an agent restart.
+  persistent ``ConnectionError`` faults following an agent restart.
 
 
 Migration Notes: Easy SNMP vs ezsnmp
