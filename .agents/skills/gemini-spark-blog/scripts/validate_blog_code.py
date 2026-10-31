@@ -158,7 +158,8 @@ def validate_python_syntax_and_api(block: CodeBlock) -> List[ValidationIssue]:
 
     # 2. Compilation check
     try:
-        compile(block.code, filename=f"{block.post_path.name}:{block.line_number}", mode="exec")
+        flags = ast.PyCF_ALLOW_TOP_LEVEL_AWAIT if sys.version_info >= (3, 8) else 0
+        compile(block.code, filename=f"{block.post_path.name}:{block.line_number}", mode="exec", flags=flags)
     except Exception as e:
         issues.append(
             ValidationIssue(
@@ -460,15 +461,15 @@ class MockSession:
                 MockResult("entPhysicalSerialNum", "1", "FOC1234ABCD", "OCTETSTR"),
             )
         return (
-            MockResult(oid_name, "1", "val1", "OCTETSTR"),
-            MockResult(oid_name, "2", "val2", "OCTETSTR"),
+            MockResult(oid_name, "1", "100", "INTEGER"),
+            MockResult(oid_name, "2", "200", "INTEGER"),
         )
 
     def bulk_get(self, oids: Any, non_repeaters: int = 0, max_repetitions: int = 10) -> Tuple[MockResult, ...]:
         return self.bulk_walk(oids, max_repetitions=max_repetitions)
 
-    def set(self, oids: Any) -> bool:
-        return True
+    def set(self, *args: Any, **kwargs: Any) -> Tuple[MockResult, ...]:
+        return (MockResult("sysLocation.0", "0", "updated", "OCTETSTR"),)
 
 
 class DummyPool:
@@ -498,9 +499,14 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
         return issues
 
     # Pre-populate Session and Result
+    import asyncio
+    sandbox_globals.setdefault("asyncio", asyncio)
     sandbox_globals.setdefault("Session", MockSession)
     sandbox_globals.setdefault("Result", MockResult)
     sandbox_globals.setdefault("DEVICE_INVENTORY", ["192.168.1.1", "192.168.1.2"])
+    class DummyDataFrame:
+        def write_parquet(self, *a: Any, **k: Any) -> None: pass
+    sandbox_globals.setdefault("telemetry_df", DummyDataFrame())
 
     # Install ezsnmp mock into sys.modules during execution
     import types
@@ -543,18 +549,51 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     old_sleep = time.sleep
     old_pool = getattr(multiprocessing, "Pool", None)
     old_ppe = getattr(concurrent.futures, "ProcessPoolExecutor", None)
-    time.sleep = lambda s: None
+
+    sleep_count = 0
+    def mock_sleep(s: Any) -> None:
+        nonlocal sleep_count
+        sleep_count += 1
+        if sleep_count >= 2:
+            raise KeyboardInterrupt("Simulated test loop exit")
+
+    time.sleep = mock_sleep
     multiprocessing.Pool = DummyPool
     concurrent.futures.ProcessPoolExecutor = concurrent.futures.ThreadPoolExecutor
 
-    # Redirect stdout during snippet execution to keep test output clean
+    # Redirect stdout and feed mock stdin to keep test execution non-blocking
     import io
     old_stdout = sys.stdout
+    old_stdin = sys.stdin
     sys.stdout = io.StringIO()
+    sys.stdin = io.StringIO("PING\nget\n.1.3.6.1.4.1.99999.1.1.0\n\n")
+
+    # Mock external network bindings
+    try:
+        import prometheus_client
+        prometheus_client.start_http_server = lambda *a, **k: None
+    except Exception:
+        pass
+
+    import subprocess
+    old_popen = subprocess.Popen
+
+    class DummyProc:
+        def __init__(self, *a: Any, **k: Any):
+            self.returncode = 0
+        def terminate(self) -> None: pass
+        def wait(self, *a: Any, **k: Any) -> int: return 0
+        def poll(self) -> int: return 0
+
+    subprocess.Popen = DummyProc  # type: ignore
 
     try:
-        compiled = compile(block.code, filename=f"{block.post_path.name}:{block.line_number}", mode="exec")
+        flags = ast.PyCF_ALLOW_TOP_LEVEL_AWAIT if sys.version_info >= (3, 8) else 0
+        compiled = compile(block.code, filename=f"{block.post_path.name}:{block.line_number}", mode="exec", flags=flags)
         exec(compiled, sandbox_globals)
+    except KeyboardInterrupt:
+        # Graceful exit for continuous telemetry loops
+        pass
     except (ImportError, ModuleNotFoundError) as e:
         # If external optional package like pynetbox or opentelemetry is missing in test environment, skip execution
         pass
@@ -569,6 +608,8 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
         )
     finally:
         sys.stdout = old_stdout
+        sys.stdin = old_stdin
+        subprocess.Popen = old_popen
         time.sleep = old_sleep
         if old_pool is not None:
             multiprocessing.Pool = old_pool
