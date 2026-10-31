@@ -152,8 +152,8 @@ When Net-SNMP returns an error code (such as ``STAT_TIMEOUT``,
 ``SNMPERR_GENERR``, or USM authentication failures), ezsnmp's translation
 layer maps the status code directly to specific Python exception types:
 
-* ``STAT_TIMEOUT`` -> ``EasySNMPTimeoutError``
-* ``SNMPERR_BAD_ADDRESS`` -> ``EasySNMPConnectionError``
+* ``STAT_TIMEOUT`` -> ``TimeoutError``
+* ``SNMPERR_BAD_ADDRESS`` -> ``ConnectionError``
 * Malformed ASN.1 response -> ``EasySNMPUndeterminedTypeError``
 
 This ensures network engineers can wrap ezsnmp operations in standard
