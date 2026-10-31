@@ -35,6 +35,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-dynamic-inventory-sync-netbox
    ezsnmp-testing-ci-cd-pytest
    ezsnmp-hardware-optical-dom-monitoring
    ezsnmp-snmpv3-tls-dtls-security
@@ -59,6 +61,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Dynamic Inventory Sync: Populating NetBox & Nautobot via ezsnmp
+      :link: ezsnmp-dynamic-inventory-sync-netbox
+      :link-type: doc
+
+      Modern NetDevOps workflows center on a digital Source of Truth (SoT) such as **NetBox** or **Nautobot**. These platforms define the intended state of device...
+
+      +++
+      📅 *October 31, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Netbox` `Nautobot`
 
    .. grid-item-card:: 📖 Testing SNMP Automation Pipelines with pytest and ezsnmp
       :link: ezsnmp-testing-ci-cd-pytest
