@@ -82,7 +82,7 @@ link adjacency map:
 
     from collections import defaultdict
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     def discover_lldp_topology(hostname: str, community: str = "public"):
         """Extract physical Layer-2 neighbors using ezsnmp bulkwalk."""
@@ -97,21 +97,21 @@ link adjacency map:
         try:
             # 1. Map local port numbers to human-readable interface names
             local_ports = {}
-            if_descr_vars = session.bulkwalk("ifDescr", max_repetitions=25)
+            if_descr_vars = session.bulk_walk("ifDescr", max_repetitions=25)
             for var in if_descr_vars:
-                local_ports[var.oid_index] = var.value
+                local_ports[var.index] = var.value
 
             # 2. Bulk-walk LLDP remote table columns
-            remote_sys_vars = session.bulkwalk(
+            remote_sys_vars = session.bulk_walk(
                 "lldpRemSysName", max_repetitions=25
             )
-            remote_port_vars = session.bulkwalk(
+            remote_port_vars = session.bulk_walk(
                 "lldpRemPortId", max_repetitions=25
             )
 
             # 3. Index remote metrics by index tuple
-            remote_systems = {v.oid_index: v.value for v in remote_sys_vars}
-            remote_ports = {v.oid_index: v.value for v in remote_port_vars}
+            remote_systems = {v.index: v.value for v in remote_sys_vars}
+            remote_ports = {v.index: v.value for v in remote_port_vars}
 
             adjacencies = []
 
@@ -134,7 +134,7 @@ link adjacency map:
 
             return adjacencies
 
-        except EasySNMPError as exc:
+        except GenericError as exc:
             print(f"[{hostname}] Topology discovery failed: {exc}")
             return []
 
