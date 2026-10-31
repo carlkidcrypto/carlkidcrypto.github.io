@@ -104,7 +104,7 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
 .. code-block:: python
 
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     DETECTION_MAP = {
         1: "DISABLED",
@@ -128,30 +128,30 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
 
         try:
             # 1. Query Chassis Total Capacity and Current Consumption (Watts)
-            total_power_vars = session.bulkwalk("pethMainPsePower")
-            used_power_vars = session.bulkwalk("pethMainPseConsumptionPower")
+            total_power_vars = session.bulk_walk("pethMainPsePower")
+            used_power_vars = session.bulk_walk("pethMainPseConsumptionPower")
 
             total_watts = sum(int(v.value) for v in total_power_vars)
             used_watts = sum(int(v.value) for v in used_power_vars)
             util_pct = (used_watts / total_watts * 100) if total_watts else 0
 
             # 2. Collect per-port PoE detection states and priorities
-            status_vars = session.bulkwalk(
+            status_vars = session.bulk_walk(
                 "pethPsePortDetectionStatus", max_repetitions=25
             )
-            prio_vars = session.bulkwalk(
+            prio_vars = session.bulk_walk(
                 "pethPsePortPowerPriority", max_repetitions=25
             )
-            draw_vars = session.bulkwalk(
+            draw_vars = session.bulk_walk(
                 "cpeExtPsePortPwrConsumed", max_repetitions=25
             )
 
-            prio_map = {v.oid_index: int(v.value) for v in prio_vars}
-            draw_map = {v.oid_index: int(v.value) for v in draw_vars}
+            prio_map = {v.index: int(v.value) for v in prio_vars}
+            draw_map = {v.index: int(v.value) for v in draw_vars}
 
             active_ports = []
             for v in status_vars:
-                idx = v.oid_index
+                idx = v.index
                 status_code = int(v.value)
                 if status_code == 3:  # deliveringPower
                     draw_mw = draw_map.get(idx, 0)
@@ -172,7 +172,7 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
                 "active_ports": active_ports,
             }
 
-        except EasySNMPError as exc:
+        except GenericError as exc:
             print(f"[{hostname}] PoE audit failed: {exc}")
             return None
 
