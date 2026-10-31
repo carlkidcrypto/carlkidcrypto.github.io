@@ -80,7 +80,7 @@ The following example updates device metadata and verifies the change:
 .. code-block:: python
 
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPError
+    from ezsnmp.exceptions import GenericError
 
     # Note: Use SNMPv3 in production for encrypted write operations
     session = Session(
@@ -94,14 +94,14 @@ The following example updates device metadata and verifies the change:
     try:
         # Update system location using octet string type ('s')
         new_location = "Building-A:Datacenter:Rack-04"
-        session.set('sysLocation.0', new_location, 's')
+        session.set(['sysLocation.0', 's', new_location])
         print(f"Location updated successfully to: {new_location}")
 
         # Verify the update via immediate GET
-        verified_val = session.get('sysLocation.0').value
+        verified_val = session.get('sysLocation.0')[0].value
         print(f"Verified on device: {verified_val}")
 
-    except EasySNMPError as exc:
+    except GenericError as exc:
         print(f"SNMP SET failed: {exc}")
 
 2. Toggling Interface Administrative Status (Port Quarantine)
@@ -127,8 +127,8 @@ port using standard integer enums:
         target_oid = f"ifAdminStatus.{if_index}"
         int_value = state_map[state]
 
-        # Explicitly pass integer type ('i')
-        session.set(target_oid, int_value, 'i')
+        # Explicitly pass integer type ('i') as an OID-type-value triple
+        session.set([target_oid, 'i', int_value])
         print(
             f"Interface index {if_index} set to {state.upper()} ({int_value})."
         )
@@ -144,10 +144,10 @@ untouched:
 
 .. code-block:: python
 
-    # Atomic multi-variable update in a single UDP packet
+    # Atomic multi-variable update in a single UDP packet using flat triple list
     updates = [
-        ('sysContact.0', 'netops@example.com', 's'),
-        ('sysLocation.0', 'Seattle-DC2-Row3', 's'),
+        'sysContact.0', 's', 'netops@example.com',
+        'sysLocation.0', 's', 'Seattle-DC2-Row3',
     ]
 
     session.set(updates)
