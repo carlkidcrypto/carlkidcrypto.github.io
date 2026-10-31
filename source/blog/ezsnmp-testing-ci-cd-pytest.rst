@@ -136,7 +136,7 @@ scalar queries, walks, and error handling:
 
     import pytest
     from ezsnmp import Session
-    from ezsnmp.exceptions import EasySNMPTimeoutError
+    from ezsnmp.exceptions import TimeoutError
 
     def test_snmp_get_scalar(snmp_daemon):
         """Verify successful retrieval of scalar system metadata."""
@@ -150,7 +150,7 @@ scalar queries, walks, and error handling:
 
         sys_location = session.get("sysLocation.0")
         assert sys_location.value == "TestLab-Rack42"
-        assert sys_location.snmp_type == "OCTETSTR"
+        assert sys_location.type == "OCTETSTR"
 
     def test_snmp_batch_get(snmp_daemon):
         """Verify multi-OID batch queries execute cleanly."""
@@ -168,7 +168,7 @@ scalar queries, walks, and error handling:
         assert val_map["sysName"] == "switch-test-01"
 
     def test_snmp_timeout_fault_injection():
-        """Verify client raises EasySNMPTimeoutError on silent drops."""
+        """Verify client raises TimeoutError on silent drops."""
         # Query an unreachable blackhole address
         session = Session(
             hostname="192.0.2.1:161",  # RFC 5737 TEST-NET address
@@ -178,7 +178,7 @@ scalar queries, walks, and error handling:
             retries=1
         )
 
-        with pytest.raises(EasySNMPTimeoutError):
+        with pytest.raises(TimeoutError):
             session.get("sysDescr.0")
 
 
