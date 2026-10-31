@@ -32,6 +32,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-snmpv3-tls-dtls-security
    ezsnmp-custom-agent-extensions-agentx
    ezsnmp-vlan-management-qinq-automation
    ezsnmp-realtime-telemetry-polars-duckdb
@@ -53,6 +55,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Modernizing SNMP Security: SNMPv3 over TLS and DTLS with ezsnmp
+      :link: ezsnmp-snmpv3-tls-dtls-security
+      :link-type: doc
+
+      For decades, network engineers securing SNMP relied on the User-based Security Model (USM) introduced in SNMPv3. While USM provided cryptographic hashing...
+
+      +++
+      📅 *October 28, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Snmpv3` `Tls`
 
    .. grid-item-card:: 📖 Building Custom SNMP Agent Extensions with Python and ezsnmp
       :link: ezsnmp-custom-agent-extensions-agentx
