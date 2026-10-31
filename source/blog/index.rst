@@ -37,6 +37,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-enterprise-poe-power-auditing
    ezsnmp-bgp-routing-telemetry
    ezsnmp-dynamic-inventory-sync-netbox
    ezsnmp-testing-ci-cd-pytest
@@ -63,6 +65,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Auditing Enterprise PoE Budgets & Power Delivery with ezsnmp
+      :link: ezsnmp-enterprise-poe-power-auditing
+      :link-type: doc
+
+      Power over Ethernet (PoE) has evolved far beyond powering standard desk VoIP phones. In modern enterprise campus networks and smart facilities, edge...
+
+      +++
+      📅 *November 2, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Poe` `Power-Over-Ethernet`
 
    .. grid-item-card:: 📖 BGP Routing Telemetry: Peering States & Prefix Counts in ezsnmp
       :link: ezsnmp-bgp-routing-telemetry
