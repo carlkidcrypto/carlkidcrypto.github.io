@@ -82,14 +82,14 @@ bandwidth rates via Polars, and executes analytical SQL in DuckDB:
     ) -> list[dict]:
         """Collect current 64-bit octet counters across all switch ports."""
         timestamp = time.time()
-        in_vars = session.bulkwalk("ifHCInOctets", max_repetitions=25)
-        out_vars = session.bulkwalk("ifHCOutOctets", max_repetitions=25)
+        in_vars = session.bulk_walk("ifHCInOctets", max_repetitions=25)
+        out_vars = session.bulk_walk("ifHCOutOctets", max_repetitions=25)
 
-        out_map = {v.oid_index: int(v.value) for v in out_vars}
+        out_map = {v.index: int(v.value) for v in out_vars}
         records = []
 
         for v in in_vars:
-            idx = v.oid_index
+            idx = v.index
             if idx in out_map:
                 records.append({
                     "device": hostname,
