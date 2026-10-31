@@ -25,6 +25,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-cpp17-native-architecture
    ezsnmp-advanced-table-navigation
    ezsnmp-resilient-polling-error-handling
    ezsnmp-async-polling-event-loops
@@ -39,6 +41,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 C++17 Under the Hood: Inside ezsnmp's Native Architecture
+      :link: ezsnmp-cpp17-native-architecture
+      :link-type: doc
+
+      Python extensions interfacing with legacy C libraries are notoriously difficult to maintain. The official Net-SNMP library—while mature, highly optimized,...
+
+      +++
+      📅 *October 21, 2026* • ⏱️ *5 min read* • `Python` `Cpp` `C++17` `Snmp`
 
    .. grid-item-card:: 📖 Navigating Complex SNMP Tables with ezsnmp: Advanced Patterns
       :link: ezsnmp-advanced-table-navigation
