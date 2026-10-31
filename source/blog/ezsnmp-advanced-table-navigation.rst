@@ -103,9 +103,9 @@ single pass and reconstruct a coherent, indexed dictionary of devices rows.
 
         for col in columns:
             # Utilize Net-SNMP GETBULK acceleration for each column
-            results = session.bulkwalk(col, max_repetitions=25)
+            results = session.bulk_walk(col, max_repetitions=25)
             for var in results:
-                table[var.oid_index][var.oid] = var.value
+                table[var.index][var.oid] = var.value
 
         return table
 
@@ -136,12 +136,12 @@ or IP manipulation tools:
         session = Session(hostname=hostname, community=community, version=2)
 
         # Walk ipRouteMask from RFC1213-MIB
-        routes = session.bulkwalk("ipRouteMask")
+        routes = session.bulk_walk("ipRouteMask")
         route_table = []
 
         for item in routes:
             # oid_index contains the destination IPv4 address
-            dest_ip = item.oid_index
+            dest_ip = item.index
             netmask = item.value
             try:
                 cidr = f"{dest_ip}/{netmask}"
