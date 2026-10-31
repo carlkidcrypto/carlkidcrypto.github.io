@@ -53,7 +53,7 @@ When you query an OID using ezsnmp, you can pass either:
 2. **Tuple Notation**: ``session.get(('sysDescr', '0'))``
 3. **Numeric Dot Notation**: ``session.get('.1.3.6.1.2.1.1.1.0')``
 
-Returned objects are instances of ``SNMPVariable``, which unpack the MIB
+Returned objects are instances of ``Result``, which unpack the MIB
 attributes automatically:
 
 .. code-block:: python
@@ -62,11 +62,11 @@ attributes automatically:
 
     session = Session(hostname='192.168.1.1', community='public', version=2)
 
-    var = session.get('sysUpTime.0')
+    var = session.get('sysUpTime.0')[0]
     print(f"Symbolic OID : {var.oid}")        # 'sysUpTime'
-    print(f"OID Index    : {var.oid_index}")  # '0'
+    print(f"Index        : {var.index}")      # '0'
     print(f"Value        : {var.value}")      # '12345678'
-    print(f"SNMP Type    : {var.snmp_type}")  # 'TICKS'
+    print(f"Type         : {var.type}")       # 'TICKS'
 
 
 Loading Custom Enterprise MIBs
@@ -118,7 +118,7 @@ instantiating an ezsnmp ``Session``:
     )
 
     # Query custom vendor metric by symbol name
-    cpu_usage = session.get('cpmCPUTotal5minRev.1')
+    cpu_usage = session.get('cpmCPUTotal5minRev.1')[0]
     print(f"CPU Utilization (5m): {cpu_usage.value}%")
 
 3. Configuring via snmp.conf
@@ -166,7 +166,7 @@ imposes a minor CPU cost during high-volume polling.
 * **During Development & Ad-Hoc Scripts**: Use symbolic strings (e.g.
   ``session.walk('ifDescr')``) for readability.
 * **In Production Polling Engines (>10,000 queries/sec)**: Query numeric OIDs
-  directly (e.g. ``session.bulkwalk('.1.3.6.1.2.1.2.2.1.2')``). Numeric OIDs
+  directly (e.g. ``session.bulk_walk('.1.3.6.1.2.1.2.2.1.2')``). Numeric OIDs
   bypass the Net-SNMP string lookup table entirely, maximizing packet throughput
   and cutting latency.
 
