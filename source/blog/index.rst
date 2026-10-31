@@ -30,6 +30,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-vlan-management-qinq-automation
    ezsnmp-realtime-telemetry-polars-duckdb
    ezsnmp-set-operations-device-configuration
    ezsnmp-network-topology-discovery-lldp-cdp
@@ -49,6 +51,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Automating VLAN Management & Q-in-Q Tagging with ezsnmp
+      :link: ezsnmp-vlan-management-qinq-automation
+      :link-type: doc
+
+      In enterprise campus environments, data center fabrics, and carrier Ethernet networks, Virtual Local Area Networks (VLANs, IEEE 802.1Q) partition physical...
+
+      +++
+      📅 *October 26, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Vlan` `Q-In-Q`
 
    .. grid-item-card:: 📖 Real-Time Network Telemetry with ezsnmp, Polars, and DuckDB
       :link: ezsnmp-realtime-telemetry-polars-duckdb
