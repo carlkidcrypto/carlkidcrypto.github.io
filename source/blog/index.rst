@@ -28,6 +28,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-set-operations-device-configuration
    ezsnmp-network-topology-discovery-lldp-cdp
    ezsnmp-custom-observability-exporters
    ezsnmp-cpp17-native-architecture
@@ -45,6 +47,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 SNMP Set Operations & Device Configuration with ezsnmp
+      :link: ezsnmp-set-operations-device-configuration
+      :link-type: doc
+
+      While the vast majority of network monitoring relies on read-only operations (``GET`` and ``WALK``), the Simple Network Management Protocol was designed...
+
+      +++
+      📅 *October 24, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Snmpset` `Configuration`
 
    .. grid-item-card:: 📖 Automating Network Topology Discovery: LLDP and CDP with ezsnmp
       :link: ezsnmp-network-topology-discovery-lldp-cdp
