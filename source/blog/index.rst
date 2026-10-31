@@ -29,6 +29,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-realtime-telemetry-polars-duckdb
    ezsnmp-set-operations-device-configuration
    ezsnmp-network-topology-discovery-lldp-cdp
    ezsnmp-custom-observability-exporters
@@ -47,6 +49,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Real-Time Network Telemetry with ezsnmp, Polars, and DuckDB
+      :link: ezsnmp-realtime-telemetry-polars-duckdb
+      :link-type: doc
+
+      Modern network engineers increasingly require sub-interval telemetry: polling switch fabrics, optical links, and data center core routers at 1- to 5-second...
+
+      +++
+      📅 *October 25, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Polars` `Duckdb`
 
    .. grid-item-card:: 📖 SNMP Set Operations & Device Configuration with ezsnmp
       :link: ezsnmp-set-operations-device-configuration
