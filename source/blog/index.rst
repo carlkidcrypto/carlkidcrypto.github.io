@@ -26,6 +26,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-custom-observability-exporters
    ezsnmp-cpp17-native-architecture
    ezsnmp-advanced-table-navigation
    ezsnmp-resilient-polling-error-handling
@@ -41,6 +43,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Building Custom Observability Exporters with ezsnmp
+      :link: ezsnmp-custom-observability-exporters
+      :link-type: doc
+
+      In modern Site Reliability Engineering (SRE) and cloud infrastructure, network metrics belong alongside application telemetry in centralized platforms like...
+
+      +++
+      📅 *October 22, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Prometheus` `Opentelemetry`
 
    .. grid-item-card:: 📖 C++17 Under the Hood: Inside ezsnmp's Native Architecture
       :link: ezsnmp-cpp17-native-architecture
