@@ -21,6 +21,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+
+   ezsnmp-working-with-mibs-guide
    ezsnmp-cross-platform-installation-troubleshooting
    ezsnmp-high-throughput-multithreading
    ezsnmp-snmpv3-deep-dive
@@ -31,6 +33,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Working with MIBs in ezsnmp: OID Translation & Enterprise MIBs
+      :link: ezsnmp-working-with-mibs-guide
+      :link-type: doc
+
+      Behind every SNMP query lies an Object Identifier (OID)—a dotted-decimal tree sequence like ``.1.3.6.1.2.1.1.1.0``. While network daemons communicate...
+
+      +++
+      📅 *October 17, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Mibs` `Net-Snmp`
 
    .. grid-item-card:: 🛠️ Cross-Platform Installation & Troubleshooting ezsnmp Builds
       :link: ezsnmp-cross-platform-installation-troubleshooting
