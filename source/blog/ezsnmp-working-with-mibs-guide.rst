@@ -50,7 +50,7 @@ How ezsnmp Resolves OIDs
 When you query an OID using ezsnmp, you can pass either:
 
 1. **Symbolic Strings**: ``session.get('sysDescr.0')``
-2. **Tuple Notation**: ``session.get(('sysDescr', '0'))``
+2. **Multiple OIDs via List**: ``session.get(['sysDescr.0', 'sysUpTime.0'])``
 3. **Numeric Dot Notation**: ``session.get('.1.3.6.1.2.1.1.1.0')``
 
 Returned objects are instances of ``Result``, which unpack the MIB
@@ -179,8 +179,11 @@ If migrating MIB-heavy scripts from legacy ``easysnmp``:
 * **UTF-8 and Binary Handling**: ``ezsnmp`` provides cleaner C++17 type
   coercion for OCTET STRING values, eliminating Python 3 decoding crashes
   when devices return raw binary MAC addresses or non-ASCII characters.
-* **Drop-in Imports**: Existing session calls querying symbolic OIDs remain
-  100% compatible.
+* **Symbolic OID Queries & Result Access**: While querying symbolic OIDs
+  remains supported, consuming results requires updating to the modern API:
+  ``session.get()`` returns a tuple of ``Result`` objects, and attributes are
+  accessed via ``.index`` and ``.type`` (rather than legacy ``.oid_index`` and
+  ``.snmp_type``). Bulk walks use ``session.bulk_walk()`` instead of ``.bulkwalk()``.
 
 
 Useful Links & Community

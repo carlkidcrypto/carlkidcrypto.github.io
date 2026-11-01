@@ -67,10 +67,41 @@ class ValidationIssue:
 # ---------------------------------------------------------------------------
 
 def extract_code_blocks(post_path: Path) -> List[CodeBlock]:
-    """Extract code blocks from an RST file with accurate line numbers."""
+    """Extract code blocks from RST or Markdown files with accurate line numbers."""
     content = post_path.read_text(encoding="utf-8")
     lines = content.splitlines()
     blocks: List[CodeBlock] = []
+
+    if post_path.suffix.lower() == ".md":
+        in_fence = False
+        fence_lang = ""
+        fence_lineno = 0
+        fence_lines: List[str] = []
+        for idx, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped.startswith("```"):
+                if not in_fence:
+                    in_fence = True
+                    fence_lineno = idx + 1
+                    fence_lang = stripped.lstrip("`").strip().lower()
+                    fence_lines = []
+                else:
+                    in_fence = False
+                    raw_code = "\n".join(fence_lines)
+                    code = textwrap.dedent(raw_code).strip()
+                    if code and fence_lang:
+                        blocks.append(
+                            CodeBlock(
+                                post_path=post_path,
+                                line_number=fence_lineno,
+                                language=fence_lang,
+                                code=code,
+                                raw_code=raw_code,
+                            )
+                        )
+            elif in_fence:
+                fence_lines.append(line)
+        return blocks
 
     pattern = re.compile(r"^([ \t]*)\.\.\s+code-block::\s*(\w+)")
     i = 0
@@ -90,21 +121,35 @@ def extract_code_blocks(post_path: Path) -> List[CodeBlock]:
                 break
 
             # The block must be indented more than the directive
-            block_lines: List[str] = []
+            raw_block_lines: List[str] = []
             while i < len(lines):
                 line = lines[i]
                 if not line.strip():
-                    block_lines.append("")
+                    raw_block_lines.append("")
                     i += 1
                     continue
                 # Check indentation
                 curr_indent = len(line) - len(line.lstrip(" "))
                 base_indent = len(indent_str)
                 if curr_indent > base_indent:
-                    block_lines.append(line)
+                    raw_block_lines.append(line)
                     i += 1
                 else:
                     break
+
+            # Strip directive options (e.g. :linenos:, :caption:, etc.)
+            block_lines: List[str] = []
+            in_options = True
+            for b_line in raw_block_lines:
+                s_line = b_line.strip()
+                if in_options:
+                    if not s_line:
+                        in_options = False
+                        continue
+                    if re.match(r"^:[a-zA-Z0-9_-]+:.*$", s_line):
+                        continue
+                    in_options = False
+                block_lines.append(b_line)
 
             raw_code = "\n".join(block_lines)
             code = textwrap.dedent(raw_code).strip()
@@ -195,7 +240,7 @@ def validate_python_syntax_and_api(block: CodeBlock) -> List[ValidationIssue]:
                         message="Legacy 'from easysnmp import ...' detected. Use 'from ezsnmp import ...' instead.",
                     )
                 )
-            elif node.module == "ezsnmp.exceptions":
+            elif node.module in ("ezsnmp.exceptions", "ezsnmp"):
                 for alias in node.names:
                     if alias.name in LEGACY_EXCEPTION_MAP:
                         target = LEGACY_EXCEPTION_MAP[alias.name]
@@ -205,11 +250,22 @@ def validate_python_syntax_and_api(block: CodeBlock) -> List[ValidationIssue]:
                                 line_number=block.line_number + node.lineno - 1,
                                 severity="ERROR",
                                 message=(
-                                    f"Outdated exception 'from ezsnmp.exceptions import {alias.name}'. "
+                                    f"Outdated exception 'from {node.module} import {alias.name}'. "
                                     f"In ezsnmp, use '{target}'."
                                 ),
                             )
                         )
+        elif isinstance(node, ast.Name):
+            if node.id in LEGACY_EXCEPTION_MAP:
+                target = LEGACY_EXCEPTION_MAP[node.id]
+                issues.append(
+                    ValidationIssue(
+                        post_path=block.post_path,
+                        line_number=block.line_number + node.lineno - 1,
+                        severity="ERROR",
+                        message=f"Legacy exception '{node.id}' detected. In ezsnmp, use '{target}'.",
+                    )
+                )
 
         # Check method calls on Session: bulkwalk -> bulk_walk, get_bulk -> bulk_get
         elif isinstance(node, ast.Call):
@@ -590,13 +646,31 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     try:
         flags = ast.PyCF_ALLOW_TOP_LEVEL_AWAIT if sys.version_info >= (3, 8) else 0
         compiled = compile(block.code, filename=f"{block.post_path.name}:{block.line_number}", mode="exec", flags=flags)
-        exec(compiled, sandbox_globals)
+        CO_COROUTINE = 0x0080
+        if getattr(compiled, "co_flags", 0) & CO_COROUTINE:
+            coro = eval(compiled, sandbox_globals)
+            if inspect.iscoroutine(coro):
+                asyncio.run(coro)
+        else:
+            exec(compiled, sandbox_globals)
     except KeyboardInterrupt:
         # Graceful exit for continuous telemetry loops
         pass
     except (ImportError, ModuleNotFoundError) as e:
-        # If external optional package like pynetbox or opentelemetry is missing in test environment, skip execution
-        pass
+        err_msg = str(e)
+        mod_name = getattr(e, "name", "") or ""
+        if mod_name.startswith("ezsnmp") or "ezsnmp" in err_msg or "EasySNMP" in err_msg:
+            issues.append(
+                ValidationIssue(
+                    post_path=block.post_path,
+                    line_number=block.line_number,
+                    severity="ERROR",
+                    message=f"Invalid ezsnmp symbol or import: {type(e).__name__}: {e}",
+                )
+            )
+        else:
+            # If external optional package like pynetbox or opentelemetry is missing in test environment, skip execution
+            pass
     except Exception as e:
         issues.append(
             ValidationIssue(
@@ -654,41 +728,57 @@ def auto_fix_code_block(code: str) -> str:
 
 
 def auto_fix_post_file(post_path: Path) -> Tuple[bool, int]:
-    """Fix legacy API references across code blocks and explanatory prose."""
+    """Fix legacy API references across code blocks, preserving comparison tables and historical prose."""
     content = post_path.read_text(encoding="utf-8")
     original = content
     changes_count = 0
 
-    # Replace legacy exception names in ezsnmp context
-    for old_exc, new_exc in LEGACY_EXCEPTION_MAP.items():
-        if old_exc in content:
-            content = content.replace(old_exc, new_exc)
-            changes_count += 1
-
-    # Replace legacy method names in code
-    if ".bulkwalk(" in content:
-        content = content.replace(".bulkwalk(", ".bulk_walk(")
-        changes_count += 1
-    if ".get_bulk(" in content:
-        content = content.replace(".get_bulk(", ".bulk_get(")
-        changes_count += 1
-
-    # In ezsnmp Result descriptions and code, replace oid_index / snmp_type
-    # (avoiding the Getting Started migration table comparing the two)
     lines = content.splitlines()
     new_lines = []
-    in_migration_table = False
-    for line in lines:
-        if "Migration Notes" in line or "Migration Guide" in line:
-            in_migration_table = True
-        if in_migration_table and line.startswith("==="):
-            # End of migration notes section
-            pass
+    in_migration_section = False
+    in_table = False
+    in_code_block = False
 
-        if not in_migration_table:
-            # Replace code usages
-            line = re.sub(r"\.oid_index\b", ".index", line)
-            line = re.sub(r"\.snmp_type\b", ".type", line)
+    for line in lines:
+        stripped = line.strip()
+
+        # Track migration comparison section
+        if "Migration Notes" in line or "Migration Guide" in line or "Modern API Differences" in line:
+            in_migration_section = True
+        elif in_migration_section and (line.startswith("===") or line.startswith("---")) and not line.startswith("   "):
+            # Check if entering next major section
+            if any(h in line for h in ["Useful Links", "Production Best", "Conclusion"]):
+                in_migration_section = False
+
+        if stripped.startswith(".. list-table::") or stripped.startswith("+---") or stripped.startswith("+==="):
+            in_table = True
+        elif in_table and stripped == "" and not line.startswith(" "):
+            in_table = False
+
+        if re.match(r"^\s*\.\.\s+code-block::", line):
+            in_code_block = True
+        elif in_code_block and stripped and not line.startswith("   "):
+            in_code_block = False
+
+        # Only apply fixes to code blocks or outside comparison tables
+        if not in_table:
+            # Replace legacy method names in code
+            if in_code_block:
+                if ".bulkwalk(" in line:
+                    line = line.replace(".bulkwalk(", ".bulk_walk(")
+                    changes_count += 1
+                if ".get_bulk(" in line:
+                    line = line.replace(".get_bulk(", ".bulk_get(")
+                    changes_count += 1
+                line = re.sub(r"\.oid_index\b", ".index", line)
+                line = re.sub(r"\.snmp_type\b", ".type", line)
+
+            # Fix exception names only when not in a migration table comparing the two
+            if not in_migration_section:
+                for old_exc, new_exc in LEGACY_EXCEPTION_MAP.items():
+                    if old_exc in line:
+                        line = line.replace(old_exc, new_exc)
+                        changes_count += 1
 
         new_lines.append(line)
 

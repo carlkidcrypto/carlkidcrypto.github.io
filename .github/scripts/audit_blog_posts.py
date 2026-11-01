@@ -66,7 +66,7 @@ def audit_posts() -> int:
             errors.append(f"[{post.name}] Missing '* **Authors:**' in metadata block.")
 
         # Rule 3: Registration in index.rst
-        if slug not in index_content:
+        if not re.search(rf"\b{re.escape(slug)}\b", index_content):
             errors.append(
                 f"[{post.name}] Slug '{slug}' is not registered in source/blog/index.rst (toctree or grid card)."
             )
@@ -80,7 +80,7 @@ def audit_posts() -> int:
                 if iss.severity == "ERROR":
                     errors.append(f"[{post.name}:Line {iss.line_number}] Code validation error: {iss.message}")
         except Exception as exc:
-            pass
+            errors.append(f"[{post.name}] Validator execution failed: {type(exc).__name__}: {exc}")
 
     if errors:
         print("\n" + "=" * 60)

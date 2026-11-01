@@ -165,41 +165,56 @@ def parse_draft(draft_path: Path) -> dict:
         raw_tags = tags_m.group(1).split(",")
         tags = [t.strip().title() for t in raw_tags if t.strip()]
 
-    # Clean body: strip field list (:Date:, :Tags:, etc.) and in-page .. contents::
+    # Clean body: strip opening title block, field list (:Date:, :Tags:, etc.) and in-page .. contents::
     body_lines: list[str] = []
+    i = 0
+    # Step 1: skip opening title block (optional overline, title, underline)
+    if i < len(lines) and re.match(r"^[=\-~#`^]{4,}$", lines[i].strip()):
+        i += 1  # overline
+    if i < len(lines) and lines[i].strip() and not lines[i].strip().startswith(":"):
+        i += 1  # title
+    if i < len(lines) and re.match(r"^[=\-~#`^]{4,}$", lines[i].strip()):
+        i += 1  # underline
+
+    # Step 2: skip field list metadata and .. contents::
     skip_contents = False
-    past_header = False
-
-    for line in lines:
+    while i < len(lines):
+        line = lines[i]
         stripped = line.strip()
-        # Skip title banner at top
-        if not past_header:
-            if stripped.startswith(":") and stripped.endswith(":"):
-                continue
-            if re.match(r'^:[A-Za-z -]+:.*$', stripped):
-                continue
-            if stripped == "":
-                continue
-            if stripped.startswith(".. contents::"):
-                skip_contents = True
-                continue
-            if skip_contents:
-                if stripped.startswith(":") or stripped == "":
-                    continue
-                skip_contents = False
-            # Check if we hit the first section heading
-            past_header = True
-
-        if skip_contents:
-            if stripped.startswith(":") or stripped == "":
-                continue
-            skip_contents = False
-
+        if not stripped:
+            i += 1
+            continue
+        if re.match(r"^:[A-Za-z0-9 _-]+:.*$", stripped):
+            i += 1
+            continue
         if stripped.startswith(".. contents::"):
             skip_contents = True
+            i += 1
             continue
+        if skip_contents:
+            if stripped.startswith(":") or (line.startswith("   ") and not stripped.startswith(("=", "-", "~", "..", "*", "#"))):
+                i += 1
+                continue
+            skip_contents = False
+        # Body start reached
+        break
 
+    # Step 3: collect body lines, also stripping any mid-body .. contents::
+    skip_contents = False
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+        if stripped.startswith(".. contents::"):
+            skip_contents = True
+            i += 1
+            continue
+        if skip_contents:
+            if stripped.startswith(":") or (line.startswith("   ") and stripped):
+                i += 1
+                continue
+            skip_contents = False
         body_lines.append(line)
+        i += 1
 
     clean_body = "\n".join(body_lines).strip()
 
@@ -236,18 +251,48 @@ def generate_sphinx_rst(parsed: dict, slug: str) -> str:
     keywords = ", ".join(parsed["tags"] + ["Python", "ezsnmp", "Networking", "DevOps"])
 
     body = parsed["body"]
-    # Normalize legacy easysnmp API patterns to modern ezsnmp
-    body = re.sub(r"\.bulkwalk\(", ".bulk_walk(", body)
-    body = re.sub(r"\.get_bulk\(", ".bulk_get(", body)
-    body = re.sub(r"\.oid_index\b", ".index", body)
-    body = re.sub(r"\.snmp_type\b", ".type", body)
-    for old_exc, new_exc in [
-        ("EasySNMPError", "GenericError"),
-        ("EasySNMPTimeoutError", "TimeoutError"),
-        ("EasySNMPConnectionError", "ConnectionError"),
-        ("EasySNMPNoSuchInstanceError", "NoSuchInstanceError"),
-    ]:
-        body = re.sub(rf"\b{old_exc}\b", new_exc, body)
+    # Normalize legacy easysnmp API patterns in code blocks and prose while preserving comparison tables
+    body_lines = body.splitlines()
+    norm_lines = []
+    in_table = False
+    in_migration_section = False
+    in_code = False
+
+    for b_line in body_lines:
+        s_line = b_line.strip()
+        if "Migration Notes" in b_line or "Migration Guide" in b_line or "Modern API Differences" in b_line:
+            in_migration_section = True
+        elif in_migration_section and (b_line.startswith("===") or b_line.startswith("---")) and not b_line.startswith("   "):
+            if any(h in b_line for h in ["Useful Links", "Production Best", "Conclusion"]):
+                in_migration_section = False
+
+        if s_line.startswith(".. list-table::") or s_line.startswith("+---") or s_line.startswith("+==="):
+            in_table = True
+        elif in_table and s_line == "" and not b_line.startswith(" "):
+            in_table = False
+
+        if re.match(r"^\s*\.\.\s+code-block::", b_line):
+            in_code = True
+        elif in_code and s_line and not b_line.startswith("   "):
+            in_code = False
+
+        if not in_table:
+            if in_code:
+                b_line = re.sub(r"\.bulkwalk\(", ".bulk_walk(", b_line)
+                b_line = re.sub(r"\.get_bulk\(", ".bulk_get(", b_line)
+                b_line = re.sub(r"\.oid_index\b", ".index", b_line)
+                b_line = re.sub(r"\.snmp_type\b", ".type", b_line)
+            if not in_migration_section:
+                for old_exc, new_exc in [
+                    ("EasySNMPError", "GenericError"),
+                    ("EasySNMPTimeoutError", "TimeoutError"),
+                    ("EasySNMPConnectionError", "ConnectionError"),
+                    ("EasySNMPNoSuchInstanceError", "NoSuchInstanceError"),
+                ]:
+                    b_line = re.sub(rf"\b{old_exc}\b", new_exc, b_line)
+        norm_lines.append(b_line)
+
+    body = "\n".join(norm_lines)
 
     content = f""".. meta::
    :description: {parsed['summary']}
@@ -295,7 +340,7 @@ def register_in_index(
     content = INDEX_FILE.read_text(encoding="utf-8")
 
     # 1. Add to toctree
-    if slug not in content:
+    if not re.search(rf"^\s*{re.escape(slug)}\s*$", content, re.MULTILINE):
         toctree_pattern = r'(\.\. toctree::\s*\n\s*:maxdepth:\s*\d+\s*\n\s*:caption:\s*Articles:\s*\n)'
         match = re.search(toctree_pattern, content)
         if match:
@@ -305,7 +350,7 @@ def register_in_index(
             print("Warning: Could not locate .. toctree:: block in index.rst")
 
     # 2. Add grid card
-    if f":link: {slug}" not in content:
+    if not re.search(rf":link:\s*{re.escape(slug)}\s*$", content, re.MULTILINE):
         card_tags = " ".join(f"`{t}`" for t in tags[:4])
         card_snippet = f"""   .. grid-item-card:: 📖 {title}
       :link: {slug}
