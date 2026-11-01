@@ -85,7 +85,8 @@ single pass and reconstruct a coherent, indexed dictionary of devices rows.
             community=community,
             version=2,
             timeout=2,
-            retries=1
+            retries=1,
+            set_max_repeaters_to_num=25
         )
 
         # Columns to retrieve from IF-MIB
@@ -99,13 +100,16 @@ single pass and reconstruct a coherent, indexed dictionary of devices rows.
         ]
 
         # Reconstruct rows: table[index][column_name] = value
+        # Note: Independent walks per column collect data sequentially;
+        # in environments with rapid interface churn, verify row completeness.
         table = defaultdict(dict)
 
         for col in columns:
             # Utilize Net-SNMP GETBULK acceleration for each column
-            results = session.bulk_walk(col, max_repetitions=25)
+            results = session.bulk_walk(col)
             for var in results:
-                table[var.index][var.oid] = var.value
+                # Key by requested column name since var.oid may include the MIB prefix (e.g. IF-MIB::ifDescr)
+                table[var.index][col] = var.value
 
         return table
 
@@ -186,11 +190,12 @@ defaults or wrap results in typed data transfer objects (DTOs):
 Production Best Practices
 =========================
 
-* **Tune max_repetitions for bulkwalk**: The default ``max_repetitions`` in
-  Net-SNMP is often conservative. Setting ``max_repetitions=25..50`` packs
-  more OIDs into each UDP response packet, drastically reducing round-trips.
-* **Beware of SNMP Agent Buffer Limits**: Setting ``max_repetitions`` too high
-  (e.g., >100) on older hardware can trigger ``TooBig`` PDU errors or silent
+* **Tune Repetitions on Session Constructor**: The default repetition count
+  in Net-SNMP can be conservative. Setting ``set_max_repeaters_to_num=25..50``
+  in the ``Session`` constructor packs more OIDs into each UDP response packet,
+  drastically reducing network round-trips.
+* **Beware of SNMP Agent Buffer Limits**: Setting ``set_max_repeaters_to_num``
+  too high (e.g., >100) on older hardware can trigger ``TooBig`` PDU errors or silent
   packet drops. Benchmark with your vendor hardware.
 * **Prefer 64-bit High-Capacity Counters**: On gigabit and 10G+ interfaces,
   legacy 32-bit counters (``ifInOctets``) wrap in seconds. Always target 64-bit
@@ -208,8 +213,10 @@ variable binding chains were not consistently freed across cyclic walks.
 * **RAII Lifecycle in C++17**: ``ezsnmp`` re-engineers internal pointer
   management with modern C++17 RAII wrappers, ensuring all Net-SNMP PDU chains
   and variable structs are released immediately after each walk.
-* **Seamless Compatibility**: The Python-level ``walk()`` and ``bulkwalk()``
-  method signatures remain 100% drop-in compatible.
+* **Modern Method & Attribute Signatures**: Use ``session.bulk_walk()`` instead
+  of ``.bulkwalk()``, configure repeater bounds via ``set_max_repeaters_to_num``
+  on ``Session`` initialization, and access result data using ``.index`` and
+  ``.type`` on returned ``Result`` objects.
 
 
 Useful Links & Community
