@@ -422,7 +422,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--pr", type=str, help="Pull Request URL when marking as posted")
     parser.add_argument("--review-status", type=str, default="All code snippets 100% verified against local daemon", help="Review status text")
     parser.add_argument("--drive-dir", type=str, help="Explicit path to Google Drive 'Auto Blog Posts' directory")
+    parser.add_argument("--rebase-stack", action="store_true", help="Rebase all stacked PR branches onto main")
+    parser.add_argument("--push", action="store_true", help="When rebasing stack, push rebased branches with --force-with-lease")
     args = parser.parse_args(argv)
+
+    if args.rebase_stack:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from rebase_stack import rebase_stack
+        rebase_stack(REPO_ROOT, push=args.push, dry_run=False)
+        return 0
 
     drive_dir = Path(args.drive_dir) if args.drive_dir else find_google_drive_blog_dir()
 
