@@ -38,6 +38,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-traffic-flow-netflow-ipfix-auditing
    ezsnmp-enterprise-poe-power-auditing
    ezsnmp-bgp-routing-telemetry
    ezsnmp-dynamic-inventory-sync-netbox
@@ -65,6 +67,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Traffic Flow Auditing: Monitoring NetFlow & IPFIX with ezsnmp
+      :link: ezsnmp-traffic-flow-netflow-ipfix-auditing
+      :link-type: doc
+
+      Audit Cisco NetFlow and IPFIX flow exporter health with ezsnmp. Detect silent packet drops, buffer exhaustion, and collector unreachability across transit routers.
+
+      +++
+      📅 *October 31, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Netflow` `Ipfix`
 
    .. grid-item-card:: 📖 Auditing Enterprise PoE Budgets & Power Delivery with ezsnmp
       :link: ezsnmp-enterprise-poe-power-auditing
