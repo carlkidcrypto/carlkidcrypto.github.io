@@ -575,6 +575,7 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     class NoSuchInstanceError(GenericError): pass
     class NoSuchNameError(GenericError): pass
     class NoSuchObjectError(GenericError): pass
+    class UndeterminedTypeError(GenericError): pass
 
     mock_exceptions.GenericError = GenericError
     mock_exceptions.TimeoutError = TimeoutError
@@ -582,6 +583,7 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     mock_exceptions.NoSuchInstanceError = NoSuchInstanceError
     mock_exceptions.NoSuchNameError = NoSuchNameError
     mock_exceptions.NoSuchObjectError = NoSuchObjectError
+    mock_exceptions.UndeterminedTypeError = UndeterminedTypeError
 
     mock_ezsnmp.Session = MockSession
     mock_ezsnmp.Result = MockResult
@@ -591,6 +593,7 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     mock_ezsnmp.ConnectionError = ConnectionError
     mock_ezsnmp.NoSuchInstanceError = NoSuchInstanceError
     mock_ezsnmp.NoSuchObjectError = NoSuchObjectError
+    mock_ezsnmp.UndeterminedTypeError = UndeterminedTypeError
 
     # Patch sys.modules
     old_ezsnmp = sys.modules.get("ezsnmp")
@@ -643,6 +646,17 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
 
     subprocess.Popen = DummyProc  # type: ignore
 
+    # Mock importlib.metadata.version for ezsnmp package version lookups
+    import importlib.metadata
+    old_version_fn = getattr(importlib.metadata, "version", None)
+    def mock_version(pkg_name: str) -> str:
+        if pkg_name == "ezsnmp":
+            return "2.5.0"
+        if old_version_fn is not None:
+            return old_version_fn(pkg_name)
+        return "1.0.0"
+    importlib.metadata.version = mock_version  # type: ignore
+
     try:
         flags = ast.PyCF_ALLOW_TOP_LEVEL_AWAIT if sys.version_info >= (3, 8) else 0
         compiled = compile(block.code, filename=f"{block.post_path.name}:{block.line_number}", mode="exec", flags=flags)
@@ -659,13 +673,25 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     except (ImportError, ModuleNotFoundError) as e:
         err_msg = str(e)
         mod_name = getattr(e, "name", "") or ""
-        if mod_name.startswith("ezsnmp") or "ezsnmp" in err_msg or "EasySNMP" in err_msg:
+        if isinstance(e, importlib.metadata.PackageNotFoundError):
+            # In CI environments where ezsnmp isn't installed as a distribution wheel
+            pass
+        elif "cannot import name" in err_msg and ("ezsnmp" in err_msg or "EasySNMP" in err_msg):
             issues.append(
                 ValidationIssue(
                     post_path=block.post_path,
                     line_number=block.line_number,
                     severity="ERROR",
                     message=f"Invalid ezsnmp symbol or import: {type(e).__name__}: {e}",
+                )
+            )
+        elif (mod_name.startswith("ezsnmp") or "ezsnmp" in err_msg) and "No package metadata" not in err_msg:
+            issues.append(
+                ValidationIssue(
+                    post_path=block.post_path,
+                    line_number=block.line_number,
+                    severity="ERROR",
+                    message=f"Invalid ezsnmp import: {type(e).__name__}: {e}",
                 )
             )
         else:
@@ -681,6 +707,8 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
             )
         )
     finally:
+        if old_version_fn is not None:
+            importlib.metadata.version = old_version_fn  # type: ignore
         sys.stdout = old_stdout
         sys.stdin = old_stdin
         subprocess.Popen = old_popen
