@@ -94,7 +94,13 @@ between network timeouts, reachability failures, and MIB-level errors:
         )
 
         try:
-            var = session.get(oid)
+            results = session.get(oid)
+            if not results:
+                return None
+            var = results[0]
+            if var.type in ("NOSUCHOBJECT", "NOSUCHINSTANCE"):
+                print(f"[{host}] Metric {oid} is not instantiated on this device.")
+                return None
             return var.value
 
         except TimeoutError:
@@ -126,8 +132,10 @@ Net-SNMP calculates total wait time per query using:
 
     Total Elapsed Time = timeout_seconds * (retries + 1)
 
-* **Default Net-SNMP settings** (5s timeout, 5 retries) cause a single dead
-  device to block a thread for **30 seconds**.
+* **ezsnmp Library Defaults**: By default, ezsnmp configures ``timeout=1`` and
+  ``retries=3``, giving a default wait budget of approximately **4 seconds**.
+* **Uncalibrated Defaults Risk**: Specifying a legacy 5s timeout with 5 retries
+  causes a single dead device to block a thread for up to **30 seconds**.
 * **Recommended Production Settings**:
   - **Campus LAN / Datacenter**: ``timeout=1``, ``retries=1`` (Max wait: 2s).
   - **High-Latency WAN / VPN**: ``timeout=2``, ``retries=2`` (Max wait: 6s).
@@ -137,7 +145,7 @@ Net-SNMP calculates total wait time per query using:
 ----------------------------------------------------
 
 When a switch goes offline, repeatedly attempting high-frequency polls wastes
-worker thread capacity. Implement a simple circuit breaker:
+worker thread capacity. Implement a simple circuit breaker using monotonic clocks:
 
 .. code-block:: python
 
@@ -146,14 +154,14 @@ worker thread capacity. Implement a simple circuit breaker:
     class DeviceCircuitBreaker:
         """Temporarily skip polling devices that consistently time out."""
 
-        def __init__(self, failure_threshold: int = 3, cooldown: int = 120):
+        def __init__(self, failure_threshold: int = 3, cooldown: float = 120.0):
             self.failure_threshold = failure_threshold
             self.cooldown = cooldown
             self.failures: dict[str, int] = {}
             self.tripped_until: dict[str, float] = {}
 
         def is_available(self, host: str) -> bool:
-            now = time.time()
+            now = time.monotonic()
             if host in self.tripped_until:
                 if now < self.tripped_until[host]:
                     return False
@@ -166,7 +174,7 @@ worker thread capacity. Implement a simple circuit breaker:
             count = self.failures.get(host, 0) + 1
             self.failures[host] = count
             if count >= self.failure_threshold:
-                self.tripped_until[host] = time.time() + self.cooldown
+                self.tripped_until[host] = time.monotonic() + self.cooldown
                 print(
                     f"[{host}] Circuit tripped! "
                     f"Pausing polls for {self.cooldown}s."
@@ -179,9 +187,10 @@ worker thread capacity. Implement a simple circuit breaker:
 4. Handling Partial Table Walks Gracefully
 ------------------------------------------
 
-When polling large tabular datasets via ``walk`` or ``bulkwalk``, an agent
-restart mid-stream can truncate responses. Always inspect the returned list
-length and verify index continuity before persisting metrics.
+When polling large tabular datasets via ``walk`` or ``bulk_walk``, an agent
+restart mid-stream can truncate responses. Always inspect the returned tuple
+length and validate metrics against table-specific expectations (rather than
+assuming index continuity, as legitimate tables frequently contain index gaps).
 
 
 Production Best Practices
@@ -207,9 +216,10 @@ versions:
 * **Clean Exception Wrapping**: ``ezsnmp`` updates internal C++ error traps,
   ensuring C-level Net-SNMP error messages are reliably translated into
   Python-catchable exceptions rather than uncatchable aborts.
-* **Elimination of Random Segfaults**: Malformed ASN.1 response packets from
-  buggy embedded SNMP agents are safely trapped, raising
-  ``EasySNMPUndeterminedTypeError`` instead of terminating the interpreter.
+* **Modern Exception Hierarchy**: Outdated names are replaced with standard
+  library-like types (``GenericError``, ``TimeoutError``, ``ConnectionError``,
+  ``NoSuchInstanceError``, and ``UndeterminedTypeError``), providing clear
+  diagnostic messages without requiring legacy prefixes.
 
 
 Useful Links & Community
