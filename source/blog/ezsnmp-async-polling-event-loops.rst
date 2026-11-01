@@ -248,3 +248,10 @@ Useful Links & Community
 
 .. _Carlos Santos Blog Updates:
  https://github.com/carlkidcrypto/carlkidcrypto.github.io/tree/feature/updates
+
+----
+
+.. warning::
+
+   AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.
+

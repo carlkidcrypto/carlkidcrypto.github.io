@@ -183,6 +183,15 @@ All code blocks in published articles must pass rigorous automated validation:
   - Asserts complete runtime execution without `NameError`, `TypeError`, `AttributeError`, `KeyError`, or unhandled exceptions.
 * **Auto-Correction**:
   - Run `python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py --fix` to automatically upgrade legacy API patterns in draft posts.
+* **Mandatory AI Disclaimer Footer**:
+  - Ensure every article concludes with the standard warning admonition:
+    ```rst
+    ----
+
+    .. warning::
+
+       AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.
+    ```
 
 ---
 

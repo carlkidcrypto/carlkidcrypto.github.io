@@ -82,6 +82,12 @@ def audit_posts() -> int:
         except Exception as exc:
             errors.append(f"[{post.name}] Validator execution failed: {type(exc).__name__}: {exc}")
 
+        # Rule 5: Mandatory AI disclaimer footer
+        if not re.search(r'\.\.\s+warning::\s*\n\s+.*(?:misinformation|mistakes)', content, re.IGNORECASE):
+            errors.append(
+                f"[{post.name}] Missing AI disclaimer footer ('.. warning:: AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.')."
+            )
+
     if errors:
         print("\n" + "=" * 60)
         print("BLOG POST AUDIT FAILED:")

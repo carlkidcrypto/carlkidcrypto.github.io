@@ -413,3 +413,10 @@ Useful Links & Community
 * **PyPI Distribution**: `ezsnmp Package on PyPI <https://pypi.org/project/ezsnmp/>`_
 * **Official Documentation**: `ezsnmp Documentation <https://carlkidcrypto.github.io/ezsnmp/>`_
 * **Carlos Santos Blog**: `carlkidcrypto Blog <https://carlkidcrypto.github.io/blog/>`_
+
+----
+
+.. warning::
+
+   AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.
+

@@ -294,6 +294,18 @@ def generate_sphinx_rst(parsed: dict, slug: str) -> str:
 
     body = "\n".join(norm_lines)
 
+    # Ensure mandatory AI-generated content warning footer is present
+    ai_disclaimer = """
+
+----
+
+.. warning::
+
+   AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.
+"""
+    if "misinformation or mistakes" not in body:
+        body = body.rstrip() + ai_disclaimer
+
     content = f""".. meta::
    :description: {parsed['summary']}
    :keywords: {keywords}
