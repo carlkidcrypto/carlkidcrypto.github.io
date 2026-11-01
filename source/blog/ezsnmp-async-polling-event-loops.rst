@@ -54,12 +54,14 @@ Under Python 3.10+, ``asyncio.to_thread()`` delegates blocking synchronous
 functions to a background thread pool while returning a native awaitable
 coroutine.
 
-Key architectural advantages with ezsnmp:
+Key architectural considerations with ezsnmp:
 
-* **True Concurrency**: Because ezsnmp yields the GIL during network waits,
-  threads run in parallel across CPU cores without blocking other tasks.
-* **Fine-Grained Locking**: ezsnmp's modern C++17 session mutexes eliminate
-  the global lock contention that plagued legacy libraries.
+* **GIL Release**: Because ezsnmp yields the GIL during network waits,
+  threads run concurrently without blocking the Python event loop.
+* **Global Net-SNMP State**: Net-SNMP maintains process-global C state protected
+  by internal mutexes. While ezsnmp ensures crash-safe operation, scaling beyond
+  four threads per process causes lock contention; multi-process workers or
+  bounded concurrency are recommended for high-volume pipelines.
 * **Clean Async Syntax**: Native ``await`` integration inside FastAPI routes,
   Tornado handlers, or background worker daemons.
 
@@ -91,6 +93,7 @@ GET, WALK, and BULKWALK operations alongside concurrency throttling via
             version: int = 2,
             timeout: int = 2,
             retries: int = 1,
+            max_repetitions: int = 25,
             executor: ThreadPoolExecutor | None = None
         ):
             self.session = Session(
@@ -98,36 +101,35 @@ GET, WALK, and BULKWALK operations alongside concurrency throttling via
                 community=community,
                 version=version,
                 timeout=timeout,
-                retries=retries
+                retries=retries,
+                set_max_repeaters_to_num=max_repetitions
             )
             self._executor = executor
+            self._lock = asyncio.Lock()
 
         async def get(self, oids: str | list[str]):
             """Execute a non-blocking SNMP GET."""
-            loop = asyncio.get_running_loop()
-            return await loop.run_in_executor(
-                self._executor, self.session.get, oids
-            )
+            async with self._lock:
+                loop = asyncio.get_running_loop()
+                return await loop.run_in_executor(
+                    self._executor, self.session.get, oids
+                )
 
-        async def walk(self, oids: str | list[str]):
-            """Execute a non-blocking SNMP WALK."""
-            loop = asyncio.get_running_loop()
-            return await loop.run_in_executor(
-                self._executor, self.session.walk, oids
-            )
+        async def walk(self, oid: str):
+            """Execute a non-blocking SNMP WALK on a single root OID."""
+            async with self._lock:
+                loop = asyncio.get_running_loop()
+                return await loop.run_in_executor(
+                    self._executor, self.session.walk, oid
+                )
 
-        async def bulkwalk(
-            self, oids: str | list[str], max_repetitions: int = 25
-        ):
+        async def bulk_walk(self, oids: str | list[str]):
             """Execute a non-blocking GETBULK walk."""
-            loop = asyncio.get_running_loop()
-            return await loop.run_in_executor(
-                self._executor,
-                self.session.bulkwalk,
-                oids,
-                0,
-                max_repetitions
-            )
+            async with self._lock:
+                loop = asyncio.get_running_loop()
+                return await loop.run_in_executor(
+                    self._executor, self.session.bulk_walk, oids
+                )
 
 2. Polling Multiple Devices Concurrently
 ----------------------------------------
@@ -160,12 +162,16 @@ simultaneously while bounding local socket and thread consumption:
                 return {"device": device_name, "status": f"ERROR: {exc}"}
 
     async def main():
-        # Dedicated thread pool for SNMP I/O operations
-        with ThreadPoolExecutor(max_workers=50) as snmp_pool:
+        # Dedicated bounded thread pool for SNMP I/O operations
+        # Note: Net-SNMP uses process-global locks; keep worker counts <= 4
+        # per process to avoid lock contention, or use ProcessPoolExecutor.
+        snmp_pool = ThreadPoolExecutor(max_workers=4)
+        loop = asyncio.get_running_loop()
+        try:
             targets = [
-                f"switch-{i:03d}.internal" for i in range(1, 101)
+                f"switch-{i:03d}.internal" for i in range(1, 21)
             ]
-            sem = asyncio.Semaphore(30)  # Bound concurrent in-flight requests
+            sem = asyncio.Semaphore(4)  # Bound concurrent in-flight requests
 
             clients = [
                 AsyncSNMPClient(host, executor=snmp_pool)
@@ -180,6 +186,8 @@ simultaneously while bounding local socket and thread consumption:
             results = await asyncio.gather(*tasks)
             online = sum(1 for r in results if r["status"] == "ONLINE")
             print(f"Polling completed: {online}/{len(targets)} nodes online.")
+        finally:
+            await loop.run_in_executor(None, snmp_pool.shutdown, True)
 
     if __name__ == "__main__":
         asyncio.run(main())
@@ -222,8 +230,9 @@ Migration Notes: Easy SNMP vs ezsnmp
   that could cause memory faults when driven concurrently by multi-threaded
   asyncio executors.
 * **ezsnmp Stability**: ``ezsnmp``'s modernized C++17 foundation enforces
-  thread isolation across distinct ``Session`` instances, providing reliable
-  execution in high-concurrency event loops.
+  internal mutex synchronization around Net-SNMP's global C state, preventing
+  segmentation faults and memory corruption in concurrent event loops. High-scale
+  architectures should distribute workers across multiple Python processes.
 
 
 Useful Links & Community
