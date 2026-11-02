@@ -183,6 +183,15 @@ All code blocks in published articles must pass rigorous automated validation:
   - Asserts complete runtime execution without `NameError`, `TypeError`, `AttributeError`, `KeyError`, or unhandled exceptions.
 * **Auto-Correction**:
   - Run `python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py --fix` to automatically upgrade legacy API patterns in draft posts.
+* **Mandatory AI Disclaimer Footer**:
+  - Ensure every article concludes with the standard warning admonition:
+    ```rst
+    ----
+
+    .. warning::
+
+       AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.
+    ```
 
 ---
 
@@ -247,3 +256,44 @@ Publication Target
 ```
 
 See [references/google_drive_protocol.md](./references/google_drive_protocol.md) for full protocol specifications.
+
+---
+
+## Step 7: Stacked PR Merging & Rebase Protocol
+
+When pull requests are stacked sequentially (e.g., PR #20 stacked on PR #19, PR #21 stacked on PR #20), merging an upstream PR on GitHub creates a new squashed or rebased commit on `main`. Because the commit hashes change, naive rebasing (`git rebase main`) causes merge conflicts by attempting to replay the already-merged upstream commits.
+
+### The Mathematical Rebase Scheme (`git rebase --onto`)
+To seamlessly rebase stacked PRs without conflicts:
+1. **Transplant the new root PR onto `main`**:
+   ```bash
+   git checkout <next_root_branch>
+   git rebase --onto main <old_merged_head> <next_root_branch>
+   gh pr edit <next_root_pr> --base main
+   ```
+2. **Cascade down the remaining stack**:
+   For each child branch $k$ stacked on parent $k-1$:
+   ```bash
+   git checkout <child_branch>
+   git rebase --onto <parent_branch> <old_parent_sha> <child_branch>
+   ```
+3. **Push with Lease**:
+   ```bash
+   git push --force-with-lease origin <branch>
+   ```
+
+### Automated Rebase Tool
+Use the included automated rebasing tool to rebase the entire remaining stack with a single command:
+
+```bash
+# Preview the rebase plan:
+python3 .agents/skills/gemini-spark-blog/scripts/rebase_stack.py --dry-run
+
+# Execute rebase across all stacked branches and force-push:
+python3 .agents/skills/gemini-spark-blog/scripts/rebase_stack.py --push
+
+# Alternatively via the sync helper:
+python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py --rebase-stack --push
+```
+
+See [references/stacked_pr_merging_guide.md](./references/stacked_pr_merging_guide.md) for full technical details.

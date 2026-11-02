@@ -135,3 +135,17 @@ Before publishing, verify against the common issues identified in Copilot/human 
 - **Concurrency Models**: Clarify that Net-SNMP C library maintains global C state, so multi-processing (`ProcessPoolExecutor`) provides thread-safe process isolation, whereas high-concurrency multi-threading (>4 threads) can risk race conditions.
 - **Packaging & Builds**: When explaining C-extensions, distinguish between pre-built binary wheels (which bundle compiled DLLs on Windows) versus source distributions (`sdist`), which require SWIG and compilers.
 - **Code Snippet Reproducibility**: All code samples should be syntactically valid and runnable against real or mock endpoints.
+
+---
+
+## 6. Mandatory AI Disclaimer Footer
+
+Every blog post authored or co-authored with Gemini must conclude with the following warning admonition at the bottom of the article:
+
+```rst
+----
+
+.. warning::
+
+   AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.
+```
