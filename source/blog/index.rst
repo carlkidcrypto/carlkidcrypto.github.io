@@ -23,6 +23,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-resilient-polling-error-handling
    ezsnmp-async-polling-event-loops
    ezsnmp-working-with-mibs-guide
    ezsnmp-cross-platform-installation-troubleshooting
@@ -35,6 +37,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Resilient SNMP Polling with ezsnmp: Timeouts, Retries & Errors
+      :link: ezsnmp-resilient-polling-error-handling
+      :link-type: doc
+
+      Simple Network Management Protocol (SNMP) runs over User Datagram Protocol (UDP), an inherently connectionless transport. In laboratory setups, polling runs...
+
+      +++
+      📅 *October 19, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Reliability` `Error-Handling`
 
    .. grid-item-card:: 📖 Asynchronous Polling with ezsnmp: Integrating into asyncio
       :link: ezsnmp-async-polling-event-loops
