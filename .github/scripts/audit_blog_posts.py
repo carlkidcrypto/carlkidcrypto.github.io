@@ -88,6 +88,24 @@ def audit_posts() -> int:
                 f"[{post.name}] Missing AI disclaimer footer ('.. warning:: AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.')."
             )
 
+        # Rule 6: Prohibit legacy EasySNMP* exception names in ezsnmp architecture, diagrams, or code
+        for line_no, line in enumerate(content.splitlines(), start=1):
+            if re.search(r'\bEasySNMP\w*Error\b', line):
+                # Allow strictly in migration comparison tables (lines starting with '- ``EasySNMP')
+                # or comments showing legacy code ('# from easysnmp import' / '# Legacy easysnmp')
+                s_line = line.strip()
+                if (
+                    s_line.startswith("- ``EasySNMP")
+                    or s_line.startswith("# from easysnmp")
+                    or s_line.startswith("# Legacy easysnmp")
+                ):
+                    continue
+                errors.append(
+                    f"[{post.name}:Line {line_no}] Invalid legacy exception in '{line.strip()}'. "
+                    f"ezsnmp does NOT prefix exceptions with 'EasySNMP' (e.g. 'EasySNMPUndeterminedTypeError' does not exist). "
+                    f"Use the modern exception from ezsnmp.exceptions (e.g. 'UndeterminedTypeError', 'GenericError', 'TimeoutError')."
+                )
+
     if errors:
         print("\n" + "=" * 60)
         print("BLOG POST AUDIT FAILED:")

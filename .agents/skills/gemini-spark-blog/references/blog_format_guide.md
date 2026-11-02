@@ -131,6 +131,7 @@ Add a `.. grid-item-card::` under the `All Posts` section:
 
 Before publishing, verify against the common issues identified in Copilot/human reviews:
 
+- **Exception Hierarchy**: Use modern `ezsnmp.exceptions` classes (`GenericError`, `ConnectionError`, `TimeoutError`, `NoSuchInstanceError`, `NoSuchNameError`, `NoSuchObjectError`, `PacketError`, `ParseError`, `UndeterminedTypeError`, `UnknownObjectIDError`). Never use legacy `EasySNMP*` names (e.g. `EasySNMPUndeterminedTypeError` does not exist in ezsnmp—the class is `UndeterminedTypeError`).
 - **Library Versioning**: Do not call `ezsnmp.version` (attribute does not exist). Use `from importlib.metadata import version; version('ezsnmp')`.
 - **Concurrency Models**: Clarify that Net-SNMP C library maintains global C state, so multi-processing (`ProcessPoolExecutor`) provides thread-safe process isolation, whereas high-concurrency multi-threading (>4 threads) can risk race conditions.
 - **Packaging & Builds**: When explaining C-extensions, distinguish between pre-built binary wheels (which bundle compiled DLLs on Windows) versus source distributions (`sdist`), which require SWIG and compilers.
