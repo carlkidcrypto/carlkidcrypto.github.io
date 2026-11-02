@@ -288,6 +288,12 @@ def generate_sphinx_rst(parsed: dict, slug: str) -> str:
                     ("EasySNMPTimeoutError", "TimeoutError"),
                     ("EasySNMPConnectionError", "ConnectionError"),
                     ("EasySNMPNoSuchInstanceError", "NoSuchInstanceError"),
+                    ("EasySNMPNoSuchNameError", "NoSuchNameError"),
+                    ("EasySNMPNoSuchObjectError", "NoSuchObjectError"),
+                    ("EasySNMPUndeterminedTypeError", "UndeterminedTypeError"),
+                    ("EasySNMPUnknownObjectIDError", "UnknownObjectIDError"),
+                    ("EasySNMPPacketError", "PacketError"),
+                    ("EasySNMPParseError", "ParseError"),
                 ]:
                     b_line = re.sub(rf"\b{old_exc}\b", new_exc, b_line)
         norm_lines.append(b_line)

@@ -180,6 +180,10 @@ LEGACY_EXCEPTION_MAP = {
     "EasySNMPNoSuchInstanceError": "NoSuchInstanceError",
     "EasySNMPNoSuchNameError": "NoSuchNameError",
     "EasySNMPNoSuchObjectError": "NoSuchObjectError",
+    "EasySNMPUndeterminedTypeError": "UndeterminedTypeError",
+    "EasySNMPUnknownObjectIDError": "UnknownObjectIDError",
+    "EasySNMPPacketError": "PacketError",
+    "EasySNMPParseError": "ParseError",
 }
 
 

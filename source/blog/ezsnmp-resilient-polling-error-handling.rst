@@ -62,7 +62,7 @@ broad fallback handling while enabling granular diagnostics:
     ├── NoSuchNameError       (OID name not found on remote agent)
     ├── NoSuchObjectError     (Requested MIB object unavailable)
     ├── NoSuchInstanceError   (Object exists but specific index absent)
-    └── EasySNMPUndeterminedTypeError (Malformed ASN.1 type returned)
+    └── UndeterminedTypeError (Malformed ASN.1 type returned)
 
 
 Core Resiliency Patterns

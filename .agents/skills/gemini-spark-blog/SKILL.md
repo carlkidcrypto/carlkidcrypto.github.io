@@ -175,7 +175,18 @@ All code blocks in published articles must pass rigorous automated validation:
 * **Python Syntax & Compilation**: Parsed with `ast.parse` and compiled with `compile(mode='exec')`.
 * **Modern ezsnmp API Standards**:
   - **No Legacy Imports**: Reject `import easysnmp`. Must use `ezsnmp`.
-  - **Exception Hierarchy**: Use modern `ezsnmp.exceptions` classes (`GenericError`, `TimeoutError`, `ConnectionError`, `NoSuchInstanceError`). Never use legacy `EasySNMP*` names.
+  - **Exception Hierarchy**: Use modern `ezsnmp.exceptions` classes exclusively. Net-SNMP error translation produces exactly 10 exceptions (all inheriting from `GenericError`):
+    - `GenericError` (base class for all ezsnmp errors)
+    - `ConnectionError` (socket setup / EngineID discovery failures)
+    - `TimeoutError` (all retries exhausted with no response)
+    - `NoSuchInstanceError` (object exists but specific index absent)
+    - `NoSuchNameError` (OID name not found on remote agent)
+    - `NoSuchObjectError` (requested MIB object unavailable)
+    - `PacketError` (packet processing or formatting errors)
+    - `ParseError` (parsing SNMP messages or arguments)
+    - `UndeterminedTypeError` (returned ASN.1 type cannot be determined)
+    - `UnknownObjectIDError` (unknown or unresolvable OID symbol)
+    **CRITICAL**: `ezsnmp` does NOT prefix exceptions with `EasySNMP`. For example, `EasySNMPUndeterminedTypeError` DOES NOT EXIST in the repository—the correct class name is `UndeterminedTypeError`. Never use legacy `EasySNMP*` names in prose, diagrams, or code.
   - **Standardized Method Names**: Use snake_case `session.bulk_walk()` and `session.bulk_get()` (never `.bulkwalk()` or `.get_bulk()`).
   - **Result Attributes**: In ezsnmp Result objects, use `.index` and `.type` (never legacy `.oid_index` or `.snmp_type`).
 * **Runtime Test Execution**:
