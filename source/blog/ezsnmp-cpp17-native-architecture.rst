@@ -154,7 +154,7 @@ layer maps the status code directly to specific Python exception types:
 
 * ``STAT_TIMEOUT`` -> ``TimeoutError``
 * ``SNMPERR_BAD_ADDRESS`` -> ``ConnectionError``
-* Malformed ASN.1 response -> ``EasySNMPUndeterminedTypeError``
+* Malformed ASN.1 response -> ``UndeterminedTypeError``
 
 This ensures network engineers can wrap ezsnmp operations in standard
 ``try...except`` blocks with full confidence in process stability.
