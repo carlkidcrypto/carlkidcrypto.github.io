@@ -340,3 +340,31 @@ python3 .agents/skills/gemini-spark-blog/scripts/sync_drive_post.py --rebase-sta
 ```
 
 See [references/stacked_pr_merging_guide.md](./references/stacked_pr_merging_guide.md) for full technical details.
+
+---
+
+## Step 8: Responding to PR Review Comments & Mail Items
+
+When review feedback, Copilot comments, or maintainer suggestions ("mail items") are addressed on open pull requests:
+
+1. **Targeted Implementation & Staging**:
+   - Implement the requested fixes in the affected files.
+   - Run tests and code audits (`python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py`).
+   - Use targeted staging only (`git add <file1> <file2>`).
+   - Commit changes:
+     ```bash
+     git commit -m "fix(blog): <description of fix>"
+     ```
+   - If working on stacked PR branches, rebase and push downstream branches using `rebase_stack.py --push`.
+
+2. **Mandatory Threaded Replies on GitHub**:
+   - **Always** reply to each review comment thread on GitHub.
+   - Every reply **must** include:
+     1. The exact commit hash in which the fix was committed.
+     2. A clear summary of how the issue was resolved.
+   - Post using GitHub CLI:
+     ```bash
+     gh api repos/carlkidcrypto/carlkidcrypto.github.io/pulls/<PR_NUM>/comments \
+       -F in_reply_to=<COMMENT_ID> \
+       -f body="Addressed in commit \`<COMMIT_HASH>\`: <DESCRIPTION>"
+     ```
