@@ -127,8 +127,8 @@ port using standard integer enums:
         target_oid = f"ifAdminStatus.{if_index}"
         int_value = state_map[state]
 
-        # Explicitly pass integer type ('i') as an OID-type-value triple
-        session.set([target_oid, 'i', int_value])
+        # Explicitly pass string representation of integer with 'i' type flag
+        session.set([target_oid, 'i', str(int_value)])
         print(
             f"Interface index {if_index} set to {state.upper()} ({int_value})."
         )
@@ -172,8 +172,10 @@ and modify network configurations.
 Error Handling & Diagnostic Codes
 =================================
 
-When an agent rejects a SET request, Net-SNMP maps the error code into
-specific Python exceptions:
+When an agent rejects a SET request, Net-SNMP captures the response PDU's
+nonzero ``errstat`` and ezsnmp translates it into a Python
+``ezsnmp.exceptions.PacketError``. The error message contains the specific SNMP
+diagnostic status returned by the remote agent:
 
 * **``notWritable`` / ``noAccess``**: The user or community string lacks
   write permissions for the target OID branch.
@@ -181,17 +183,33 @@ specific Python exceptions:
   acceptable range (e.g., passing 99 to an enum accepting only 1..3).
 * **``wrongType``**: The passed ASN.1 type flag does not match the MIB schema.
 
+Because all nonzero response error statuses raise ``PacketError``, inspect the
+exception message in your error handler to diagnose failure reasons:
+
+.. code-block:: python
+
+    from ezsnmp.exceptions import PacketError
+
+    try:
+        session.set(['sysContact.0', 's', 'netops@example.com'])
+    except PacketError as exc:
+        print(f"SET rejected by agent: {exc}")
+
 
 Migration Notes: Easy SNMP vs ezsnmp
 ====================================
 
-* **Python 3 Type Coercion**: Legacy ``easysnmp`` struggled with type conversion
-  between Python 3 strings and bytes, sometimes passing garbled buffers to
-  Net-SNMP. ``ezsnmp``'s C++17 layer safely coerces string, integer, and byte
-  types into valid Net-SNMP value structs.
-* **Thread-Safe Write Mutexes**: Modern session-level mutex locking ensures
-  multi-threaded write scripts do not collide when writing to shared session
-  handles.
+* **String-Encoded SET Parameter Vectors**: In ezsnmp, ``Session.set()`` passes
+  parameter triples as a SWIG ``std::vector<std::string>``. All submitted values—
+  including integers, booleans, and IP addresses—must be passed as string
+  representations (e.g. ``[oid, 'i', '1']``) paired with their corresponding ASN.1
+  type specifier, avoiding type ambiguities across Python 3 and native C++.
+* **Explicit Session Synchronization**: While ezsnmp protects global Net-SNMP
+  initialization, ``SessionBase::set()`` rebuilds internal argument vectors per
+  call and does not provide an internal per-session mutex. When writing to a shared
+  ``Session`` across multiple threads or coroutines, explicitly serialize calls
+  using a mutex (such as ``threading.Lock`` or ``asyncio.Lock``) or allocate an
+  isolated ``Session`` instance per thread or worker process.
 
 
 Useful Links & Community

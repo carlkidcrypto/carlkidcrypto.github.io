@@ -579,7 +579,10 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     class NoSuchInstanceError(GenericError): pass
     class NoSuchNameError(GenericError): pass
     class NoSuchObjectError(GenericError): pass
+    class PacketError(GenericError): pass
+    class ParseError(GenericError): pass
     class UndeterminedTypeError(GenericError): pass
+    class UnknownObjectIDError(GenericError): pass
 
     mock_exceptions.GenericError = GenericError
     mock_exceptions.TimeoutError = TimeoutError
@@ -587,7 +590,10 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     mock_exceptions.NoSuchInstanceError = NoSuchInstanceError
     mock_exceptions.NoSuchNameError = NoSuchNameError
     mock_exceptions.NoSuchObjectError = NoSuchObjectError
+    mock_exceptions.PacketError = PacketError
+    mock_exceptions.ParseError = ParseError
     mock_exceptions.UndeterminedTypeError = UndeterminedTypeError
+    mock_exceptions.UnknownObjectIDError = UnknownObjectIDError
 
     mock_ezsnmp.Session = MockSession
     mock_ezsnmp.Result = MockResult
@@ -597,7 +603,10 @@ def execute_test_harness(block: CodeBlock, sandbox_globals: Dict[str, Any]) -> L
     mock_ezsnmp.ConnectionError = ConnectionError
     mock_ezsnmp.NoSuchInstanceError = NoSuchInstanceError
     mock_ezsnmp.NoSuchObjectError = NoSuchObjectError
+    mock_ezsnmp.PacketError = PacketError
+    mock_ezsnmp.ParseError = ParseError
     mock_ezsnmp.UndeterminedTypeError = UndeterminedTypeError
+    mock_ezsnmp.UnknownObjectIDError = UnknownObjectIDError
 
     # Patch sys.modules
     old_ezsnmp = sys.modules.get("ezsnmp")
