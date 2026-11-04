@@ -103,12 +103,12 @@ interface traffic and operational status via ezsnmp:
             rx_octets = CounterMetricFamily(
                 "network_interface_receive_bytes_total",
                 "Total octets received on the interface (64-bit HC counter)",
-                labels=["device", "interface"]
+                labels=["device", "if_index", "interface"]
             )
             tx_octets = CounterMetricFamily(
                 "network_interface_transmit_bytes_total",
                 "Total octets transmitted on the interface (64-bit HC counter)",
-                labels=["device", "interface"]
+                labels=["device", "if_index", "interface"]
             )
 
             for name, ip in self.targets.items():
@@ -118,17 +118,14 @@ interface traffic and operational status via ezsnmp:
                         community="public",
                         version=2,
                         timeout=1,
-                        retries=1
+                        retries=1,
+                        set_max_repeaters_to_num=25
                     )
 
                     # Bulk-walk interface descriptions and 64-bit counters
-                    descr_vars = session.bulk_walk("ifDescr", max_repetitions=25)
-                    in_vars = session.bulk_walk(
-                        "ifHCInOctets", max_repetitions=25
-                    )
-                    out_vars = session.bulk_walk(
-                        "ifHCOutOctets", max_repetitions=25
-                    )
+                    descr_vars = session.bulk_walk("ifDescr")
+                    in_vars = session.bulk_walk("ifHCInOctets")
+                    out_vars = session.bulk_walk("ifHCOutOctets")
 
                     # Index metrics by interface index
                     in_map = {v.index: v.value for v in in_vars}
@@ -139,11 +136,11 @@ interface traffic and operational status via ezsnmp:
                         iface_name = d.value
                         if idx in in_map:
                             rx_octets.add_metric(
-                                [name, iface_name], float(in_map[idx])
+                                [name, str(idx), iface_name], float(in_map[idx])
                             )
                         if idx in out_map:
                             tx_octets.add_metric(
-                                [name, iface_name], float(out_map[idx])
+                                [name, str(idx), iface_name], float(out_map[idx])
                             )
 
                     device_up.add_metric([name], 1)
@@ -176,26 +173,44 @@ Integrating with OpenTelemetry (OTel)
 =====================================
 
 For teams standardizing on OpenTelemetry (OTel), you can pair ezsnmp with the
-OpenTelemetry Metrics SDK using an ``ObservableGauge``.
+OpenTelemetry Metrics SDK using an ``ObservableCounter``.
 
-Instead of managing an HTTP server, the OTel SDK triggers your ezsnmp polling
-callback periodically and pushes metric batches directly to the OpenTelemetry
-Collector via OTLP (gRPC or HTTP/protobuf):
+Instead of managing an HTTP scrape endpoint, the OTel SDK triggers your ezsnmp
+polling callback periodically and pushes metric batches directly to the
+OpenTelemetry Collector or console exporter via OTLP:
 
 .. code-block:: python
 
+    import time
     from opentelemetry import metrics
     from opentelemetry.metrics import CallbackOptions, Observation
+    from opentelemetry.sdk.metrics import MeterProvider
+    from opentelemetry.sdk.metrics.export import (
+        ConsoleMetricExporter,
+        PeriodicExportingMetricReader,
+    )
     from ezsnmp import Session
 
+    # 1. Initialize OpenTelemetry Metrics SDK with a periodic exporter
+    reader = PeriodicExportingMetricReader(
+        ConsoleMetricExporter(), export_interval_millis=15000
+    )
+    provider = MeterProvider(metric_readers=[reader])
+    metrics.set_meter_provider(provider)
+
     meter = metrics.get_meter("ezsnmp.network.telemetry")
-    session = Session(hostname="192.168.1.1", community="public", version=2)
+    session = Session(
+        hostname="192.168.1.1",
+        community="public",
+        version=2,
+        set_max_repeaters_to_num=25
+    )
 
     def observe_interface_traffic(options: CallbackOptions):
         """Asynchronous observable callback triggered by the OTel SDK."""
         observations = []
         try:
-            results = session.bulk_walk("ifHCInOctets", max_repetitions=25)
+            results = session.bulk_walk("ifHCInOctets")
             for var in results:
                 observations.append(
                     Observation(
@@ -207,12 +222,21 @@ Collector via OTLP (gRPC or HTTP/protobuf):
             pass
         return observations
 
-    meter.create_observable_gauge(
+    # 2. Register cumulative counter as an ObservableCounter
+    meter.create_observable_counter(
         name="network.interface.rx_bytes",
         callbacks=[observe_interface_traffic],
         description="Incoming octets per network interface",
         unit="By"
     )
+
+    if __name__ == "__main__":
+        print("OTel exporter running. Press Ctrl+C to exit.")
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            pass
 
 
 Production Best Practices
@@ -223,9 +247,11 @@ Production Best Practices
   labels to prevent metric index bloat.
 * **Reuse Session Objects**: In long-running exporter daemons, cache ``Session``
   instances by IP to bypass Net-SNMP UDP socket re-allocation on every scrape.
-* **Tune Max Repetitions**: Set ``max_repetitions=25..50`` in ``bulkwalk``
-  to retrieve dozens of metrics per packet, keeping scrape durations
-  under 500ms even across high-density switch stacks.
+* **Tune Repetitions on Session Constructor**: Configure
+  ``set_max_repeaters_to_num=25..50`` on the ``Session`` constructor when using
+  ``bulk_walk()`` to retrieve dozens of metrics per packet. Always measure scrape
+  latency across your target device inventory rather than assuming fixed sub-second
+  scrape times.
 
 
 Migration Notes: Easy SNMP vs ezsnmp
