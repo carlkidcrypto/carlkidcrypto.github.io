@@ -110,24 +110,21 @@ query optical receive/transmit power, and evaluate link safety margins:
             community=community,
             version=2,
             timeout=2,
-            retries=1
+            retries=1,
+            set_max_repeaters_to_num=25
         )
 
         try:
             # 1. Map physical sensor IDs to human-readable names
-            name_vars = session.bulk_walk("entPhysicalName", max_repetitions=25)
+            name_vars = session.bulk_walk("entPhysicalName")
             sensor_names = {v.index: v.value for v in name_vars}
 
             # 2. Bulk-walk sensor telemetry columns
-            type_vars = session.bulk_walk("entSensorType", max_repetitions=25)
-            scale_vars = session.bulk_walk("entSensorScale", max_repetitions=25)
-            prec_vars = session.bulk_walk(
-                "entSensorPrecision", max_repetitions=25
-            )
-            val_vars = session.bulk_walk("entSensorValue", max_repetitions=25)
-            status_vars = session.bulk_walk(
-                "entSensorStatus", max_repetitions=25
-            )
+            type_vars = session.bulk_walk("entSensorType")
+            scale_vars = session.bulk_walk("entSensorScale")
+            prec_vars = session.bulk_walk("entSensorPrecision")
+            val_vars = session.bulk_walk("entSensorValue")
+            status_vars = session.bulk_walk("entSensorStatus")
 
             scales = {v.index: int(v.value) for v in scale_vars}
             precisions = {v.index: int(v.value) for v in prec_vars}
@@ -193,8 +190,8 @@ Production Best Practices
   against manufacturer optical sensitivity thresholds. Low Rx power (< -15 dBm
   on standard 10GBASE-SR) indicates fiber degradation.
 * **Bulk Walk Optimization**: Physical sensor tables contain hundreds of
-  rows. Utilize ``bulkwalk`` with ``max_repetitions=25`` to retrieve the entire
-  sensor table in two round-trips.
+  rows. Utilize ``bulk_walk`` with ``set_max_repeaters_to_num=25..50`` on the
+  ``Session`` constructor to retrieve the sensor table in fewer UDP round-trips.
 
 
 Migration Notes: Easy SNMP vs ezsnmp
