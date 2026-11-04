@@ -55,19 +55,22 @@ Resource Acquisition Is Initialization (RAII) is the cornerstone of C++17
 resource safety. In ezsnmp, raw Net-SNMP C pointers are encapsulated within
 smart wrapper classes and unique pointer constructs with custom deleters.
 
-1. Safe PDU Lifecycles
-----------------------
+1. Safe PDU Lifecycles & Session RAII
+-------------------------------------
 
 When sending an SNMP request, Net-SNMP requires allocating a request PDU, which
-the library automatically frees upon transmission. However, the response PDU
-must be explicitly released by the caller via ``snmp_free_pdu()``.
+the library automatically frees upon transmission. The response PDU, however, is
+received as a raw C pointer and must be explicitly released by the caller via
+``snmp_free_pdu()``.
 
-If an intermediate parsing error or early return occurs in legacy C code, the
-response PDU leaks. In ezsnmp, custom RAII wrappers guarantee cleanup:
+In Net-SNMP's C API, early returns or exceptions during variable unpacking can
+bypass manual ``snmp_free_pdu()`` calls. Modern C++ designs encapsulate these
+lifecycles using RAII (Resource Acquisition Is Initialization), where destructors
+ensure deterministic cleanup:
 
 .. code-block:: cpp
 
-    // Conceptual RAII wrapper for Net-SNMP response PDUs
+    // Conceptual RAII wrapper pattern for Net-SNMP response PDUs
     struct PduDeleter {
         void operator()(netsnmp_pdu* pdu) const noexcept {
             if (pdu) {
@@ -78,12 +81,13 @@ response PDU leaks. In ezsnmp, custom RAII wrappers guarantee cleanup:
 
     using ScopedPdu = std::unique_ptr<netsnmp_pdu, PduDeleter>;
 
-    // Usage guarantees snmp_free_pdu is called on any return or exception
+    // Usage pattern ensuring snmp_free_pdu runs on return or exception
     ScopedPdu response_pdu(raw_response);
 
-Even if an unexpected C++ exception or Python error occurs while unpacking
-variable bindings, stack unwinding automatically calls the deleter, preventing
-memory leaks.
+In ezsnmp's architecture, native session handles and transport state are
+similarly bound to C++ object lifecycles—ensuring underlying sessions are
+deterministically closed via ``snmp_close()`` when destructed, rather than
+relying on manual cleanup pointers.
 
 
 Scoped GIL Release for True Multi-Core Scaling
@@ -117,29 +121,37 @@ While Net-SNMP waits for UDP packets from switches and routers, other Python
 threads execute bytecode unhindered.
 
 
-Fine-Grained Session Locking vs Global Mutexes
+Global Lock Boundaries and Session Concurrency
 ==============================================
 
-Early SNMP wrappers employed a single global mutex to protect Net-SNMP's
-shared internals, creating a massive bottleneck when multiple worker threads
-polled distinct devices concurrently.
+Net-SNMP maintains process-global C library state protected by internal mutexes
+around MIB parsing, session trees, and transport initialization. Because of these
+global C-level lock boundaries:
 
-ezsnmp replaces global serialization with **per-session fine-grained locking**:
+* **Session Mutex Scope**: A single ``ezsnmp.Session`` instance rebuilds its
+  internal argument vectors on each call and does not include internal per-session
+  mutexes. Sharing a single session instance across multiple threads requires
+  explicit synchronization (such as an ``asyncio.Lock`` or ``threading.Lock``).
+* **Global Mutex Contention**: Operations such as MIB parsing and session setup
+  acquire process-global locks in Net-SNMP. Polling dozens of devices concurrently
+  within a single process is best scaled using ``ProcessPoolExecutor`` or bounded
+  thread pools ($\le 4$ worker threads per Python process) to avoid lock contention.
+* **Process-Isolated Workers**: In multi-worker architectures, create a distinct
+  ``Session`` instance inside each worker process rather than sharing state across
+  threads:
 
-* **Thread-Isolated Sessions**: Each ``ezsnmp.Session`` instance maintains its
-  own ``std::mutex``.
-* **Concurrent Device Polling**: Worker threads targeting different hosts
-  execute concurrently without lock contention.
-* **Safe Session Reuse**: In multi-threaded daemons reusing shared sessions,
-  ``std::scoped_lock`` protects session state against concurrent mutation:
+.. code-block:: python
 
-.. code-block:: cpp
+    import threading
+    from ezsnmp import Session
 
-    // Modern C++17 deadlock-safe session locking
-    void Session::get(const std::vector<std::string>& oids) {
-        std::scoped_lock lock(session_mutex_);
-        // Thread-safe access to underlying netsnmp_session
-    }
+    # Explicit serialization when sharing a single Session across threads
+    session = Session(hostname="switch1.local", community="public", version=2)
+    session_lock = threading.Lock()
+
+    def thread_safe_get(oid):
+        with session_lock:
+            return session.get(oid)
 
 
 Structured Exception Translation
@@ -149,12 +161,13 @@ A primary design goal of ezsnmp is ensuring that C-level failures are reliably
 translated into Python-catchable exceptions rather than uncatchable aborts.
 
 When Net-SNMP returns an error code (such as ``STAT_TIMEOUT``,
-``SNMPERR_GENERR``, or USM authentication failures), ezsnmp's translation
-layer maps the status code directly to specific Python exception types:
+``SNMPERR_GENERR``, or USM authentication failures) or when invalid parameters
+are encountered, ezsnmp's translation layer maps native status codes and native
+exception classes directly to specific Python exception types:
 
 * ``STAT_TIMEOUT`` -> ``TimeoutError``
 * ``SNMPERR_BAD_ADDRESS`` -> ``ConnectionError``
-* Malformed ASN.1 response -> ``UndeterminedTypeError``
+* Unsupported SET type specifier -> ``UndeterminedTypeError``
 
 This ensures network engineers can wrap ezsnmp operations in standard
 ``try...except`` blocks with full confidence in process stability.
@@ -164,17 +177,20 @@ The Request Flow: From Python to C-API
 ======================================
 
 1. **Python Invocation**: User calls ``session.get(['sysDescr.0'])``.
-2. **C++ Dispatcher**: Python C-API passes arguments to the C++ ``Session``
-   wrapper.
+2. **C++ Dispatcher**: Python C-API / SWIG layer passes arguments to
+   ``SessionBase::get``.
 3. **PDU Assembly**: OID strings are resolved using Net-SNMP's MIB tree, and
    a request PDU is constructed.
 4. **GIL Release & I/O**: Scoped guard yields the GIL; Net-SNMP transmits the
    UDP datagram and awaits the response.
-5. **Memory Management**: Response PDU is wrapped in an RAII unique pointer.
-6. **Object Marshalling**: Variable bindings are transformed into native Python
-   ``SNMPVariable`` objects.
-7. **Clean Exit**: RAII guards free C memory buffers before returning control
-   to Python.
+5. **Memory Management**: Response PDU is processed, Net-SNMP variable bindings
+   are parsed into native C++ structures, and the response PDU is released with
+   ``snmp_free_pdu()``.
+6. **Object Marshalling**: Native C++ ``std::vector<Result>`` structures are
+   marshalled into Python through SWIG typemaps as a tuple of ``ezsnmp.Result``
+   objects.
+7. **Clean Exit**: Scoped buffers and destructors restore interpreter state
+   before returning results to Python.
 
 
 Conclusion & Migration Benefits
