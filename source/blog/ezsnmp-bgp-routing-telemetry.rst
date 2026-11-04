@@ -106,24 +106,21 @@ peers, and verify accepted prefix counts:
             community=community,
             version=2,
             timeout=2,
-            retries=1
+            retries=1,
+            set_max_repeaters_to_num=25
         )
 
         try:
             # 1. Bulk-walk BGP peer table columns
-            state_vars = session.bulk_walk("bgpPeerState", max_repetitions=25)
-            as_vars = session.bulk_walk("bgpPeerRemoteAs", max_repetitions=25)
-            uptime_vars = session.bulk_walk(
-                "bgpPeerFsmEstablishedTime", max_repetitions=25
-            )
+            state_vars = session.bulk_walk("bgpPeerState")
+            as_vars = session.bulk_walk("bgpPeerRemoteAs")
+            uptime_vars = session.bulk_walk("bgpPeerFsmEstablishedTime")
 
             as_map = {v.index: v.value for v in as_vars}
             uptime_map = {v.index: int(v.value) for v in uptime_vars}
 
             # 2. Collect accepted prefix counts (CISCO-BGP4-MIB)
-            prefix_vars = session.bulk_walk(
-                "cbgpPeerAcceptedPrefixes", max_repetitions=25
-            )
+            prefix_vars = session.bulk_walk("cbgpPeerAcceptedPrefixes")
             # Index format: [peer_ip].[afi].[safi]
             prefix_map = {}
             for v in prefix_vars:
@@ -186,10 +183,10 @@ Production Best Practices
   ``ESTABLISHED`` may have restarted seconds ago. Always verify
   ``bgpPeerFsmEstablishedTime``; an uptime under 300 seconds on a core transit
   peer indicates route flap dampening risks.
-* **Tune max_repetitions for Peering Scale**: Edge routers peering with
+* **Tune Repetitions on Session Constructor**: Edge routers peering with
   hundreds of full-table downstream clients contain extensive MIB tables.
-  Setting ``max_repetitions=25`` retrieves the entire peering state in one or
-  two round-trips.
+  Setting ``set_max_repeaters_to_num=25..50`` on the ``Session`` constructor
+  retrieves the peering state in fewer round-trips.
 * **Correlate Prefix Counts**: Sudden drops in ``cbgpPeerAcceptedPrefixes``
   (e.g., dropping from 900,000 global routes to zero) indicate upstream
   route filtering errors.
