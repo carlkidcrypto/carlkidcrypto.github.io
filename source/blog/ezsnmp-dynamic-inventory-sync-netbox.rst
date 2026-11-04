@@ -101,22 +101,19 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
             community=community,
             version=2,
             timeout=2,
-            retries=1
+            retries=1,
+            set_max_repeaters_to_num=25
         )
 
         try:
-            # 1. Query system metadata
-            sys_name = session.get("sysName.0").value
-            sys_descr = session.get("sysDescr.0").value
+            # 1. Query system metadata (unpack Result tuple from session.get)
+            sys_name = session.get("sysName.0")[0].value
+            sys_descr = session.get("sysDescr.0")[0].value
 
             # 2. Extract Chassis Serial from ENTITY-MIB
-            class_vars = session.bulk_walk(
-                "entPhysicalClass", max_repetitions=25
-            )
-            serial_vars = session.bulk_walk(
-                "entPhysicalSerialNum", max_repetitions=25
-            )
-            name_vars = session.bulk_walk("entPhysicalName", max_repetitions=25)
+            class_vars = session.bulk_walk("entPhysicalClass")
+            serial_vars = session.bulk_walk("entPhysicalSerialNum")
+            name_vars = session.bulk_walk("entPhysicalName")
 
             serials = {v.index: v.value for v in serial_vars}
             names = {v.index: v.value for v in name_vars}
@@ -129,8 +126,8 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
                     break
 
             # 3. Collect interface MAC addresses from IF-MIB
-            if_names = session.bulk_walk("ifName", max_repetitions=25)
-            if_macs = session.bulk_walk("ifPhysAddress", max_repetitions=25)
+            if_names = session.bulk_walk("ifName")
+            if_macs = session.bulk_walk("ifPhysAddress")
             mac_map = {
                 v.index: ":".join(
                     f"{b:02x}" for b in v.value.encode("latin1")
