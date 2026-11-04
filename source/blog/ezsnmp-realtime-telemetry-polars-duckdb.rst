@@ -26,9 +26,13 @@ Real-Time Network Telemetry with ezsnmp, Polars, and DuckDB
 The Rise of Embedded Columnar Analytics in Telemetry
 ====================================================
 
-Modern network engineers increasingly require sub-interval telemetry: polling
+Modern network engineers increasingly require high-frequency telemetry: polling
 switch fabrics, optical links, and data center core routers at 1- to 5-second
-frequencies to detect microbursts, packet buffer drops, and link saturation.
+frequencies to compute interval-average throughput and identify link saturation.
+While sub-second microbursts and packet buffer drops require dedicated hardware
+telemetry (such as packet queue watermarks or streaming sFlow/IPFIX), rapid SNMP
+polling offers a lightweight, ubiquitous mechanism for tracking utilization trends
+across multi-vendor topologies without proprietary agents.
 
 Traditionally, streaming high-frequency network metrics demanded complex
 external infrastructure: InfluxDB clusters, Kafka brokers, or dedicated
@@ -82,8 +86,8 @@ bandwidth rates via Polars, and executes analytical SQL in DuckDB:
     ) -> list[dict]:
         """Collect current 64-bit octet counters across all switch ports."""
         timestamp = time.time()
-        in_vars = session.bulk_walk("ifHCInOctets", max_repetitions=25)
-        out_vars = session.bulk_walk("ifHCOutOctets", max_repetitions=25)
+        in_vars = session.bulk_walk("ifHCInOctets")
+        out_vars = session.bulk_walk("ifHCOutOctets")
 
         out_map = {v.index: int(v.value) for v in out_vars}
         records = []
@@ -203,11 +207,14 @@ When monitoring high-speed networks, counter rollover handling is vital:
 Production Best Practices
 =========================
 
-* **Zero-Copy Arrow Interchange**: Polars and DuckDB share the Apache Arrow
-  in-memory standard. Converting a Polars DataFrame into DuckDB or exporting to
-  Parquet incurs zero serialization overhead.
-* **Batch Writes to Parquet**: In production daemons, flush completed Polars
-  DataFrames every minute to partitioned Parquet files on NVMe storage:
+* **In-Memory Arrow Interchange**: Polars and DuckDB share the Apache Arrow
+  in-memory standard, allowing zero-copy memory querying between Polars
+  DataFrames and DuckDB relational queries without serialization overhead.
+* **Batch Writes to Parquet**: When persisting data to disk via
+  ``telemetry_df.write_parquet(..., compression='zstd')``, column encoding and
+  compression consume CPU and disk I/O. Flush completed telemetry batches on
+  periodic intervals (e.g. every minute) to NVMe storage rather than on every
+  sampling tick:
 
   .. code-block:: python
 
@@ -216,9 +223,12 @@ Production Best Practices
           compression="zstd"
       )
 
-* **Multi-Device Polling Pools**: Combine ezsnmp's thread-safe C++17 session
-  primitives with ``concurrent.futures.ThreadPoolExecutor`` to poll dozens of
-  switches simultaneously before unifying into a single Polars DataFrame.
+* **Process Isolation for Multi-Device Polling**: Because Net-SNMP maintains
+  process-global state, avoid unrestricted thread pools when polling dozens of
+  switches simultaneously. Use ``concurrent.futures.ProcessPoolExecutor`` with an
+  isolated ``Session`` created inside each worker process. If using a thread pool,
+  bound concurrency to $\le 4$ worker threads per Python process to prevent
+  Net-SNMP lock contention and state corruption.
 
 
 Migration Notes: Easy SNMP vs ezsnmp
