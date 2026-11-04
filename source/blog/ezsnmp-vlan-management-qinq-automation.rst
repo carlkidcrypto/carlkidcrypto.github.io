@@ -93,8 +93,19 @@ allocation report:
     from ezsnmp import Session
     from ezsnmp.exceptions import GenericError
 
-    def decode_port_bitmask(raw_bytes: bytes) -> list[int]:
-        """Decode an SNMP PortList octet string into active port numbers."""
+    def parse_hex_or_bytes(val: str | bytes) -> bytes:
+        """Convert ezsnmp Hex-STRING representation or raw octets to bytes."""
+        if isinstance(val, bytes):
+            return val
+        cleaned = val.replace(" ", "").replace(":", "").replace("-", "")
+        try:
+            return bytes.fromhex(cleaned)
+        except ValueError:
+            return val.encode("latin1")
+
+    def decode_port_bitmask(raw_val: str | bytes) -> list[int]:
+        """Decode an SNMP PortList (Hex-STRING or octets) into active port numbers."""
+        raw_bytes = parse_hex_or_bytes(raw_val)
         active_ports = []
         for byte_idx, byte_val in enumerate(raw_bytes):
             for bit_idx in range(8):
@@ -110,24 +121,21 @@ allocation report:
             community=community,
             version=2,
             timeout=2,
-            retries=1
+            retries=1,
+            set_max_repeaters_to_num=25
         )
 
         try:
             # 1. Collect Port Default VLAN IDs (Native VLANs)
-            pvid_vars = session.bulk_walk("dot1qPvid", max_repetitions=25)
+            pvid_vars = session.bulk_walk("dot1qPvid")
             pvids = {v.index: v.value for v in pvid_vars}
 
             # 2. Bulk-walk VLAN Egress and Untagged bitmasks
-            egress_vars = session.bulk_walk(
-                "dot1qVlanCurrentEgressPorts", max_repetitions=25
-            )
-            untagged_vars = session.bulk_walk(
-                "dot1qVlanCurrentUntaggedPorts", max_repetitions=25
-            )
+            egress_vars = session.bulk_walk("dot1qVlanCurrentEgressPorts")
+            untagged_vars = session.bulk_walk("dot1qVlanCurrentUntaggedPorts")
 
             untagged_map = {
-                v.index: set(decode_port_bitmask(v.value.encode("latin1")))
+                v.index: set(decode_port_bitmask(v.value))
                 for v in untagged_vars
             }
 
@@ -136,8 +144,7 @@ allocation report:
             for var in egress_vars:
                 # OID format: [time_filter].[vlan_id]
                 vlan_id = var.index.split(".")[-1]
-                raw_bytes = var.value.encode("latin1")
-                egress_ports = decode_port_bitmask(raw_bytes)
+                egress_ports = decode_port_bitmask(var.value)
                 untagged_ports = untagged_map.get(var.index, set())
 
                 tagged_ports = [
@@ -195,9 +202,10 @@ provider tag is preserved across core hops.
 Production Best Practices
 =========================
 
-* **Safe Binary Handling with latin1**: Because SNMP ``PortList`` bitmasks
-  can contain arbitrary null bytes (``\x00``), always handle raw values with
-  binary-safe encoding (like ``latin1``) to prevent null-byte truncation.
+* **Hexadecimal & Binary Decoding**: Because SNMP ``PortList`` bitmasks can
+  be formatted as hexadecimal strings (e.g. ``'80 00 00 00'``) or raw octet sequences,
+  decode hex strings using ``bytes.fromhex()`` before evaluating bit positions to
+  ensure accurate port membership calculations.
 * **Correlate with ifDescr**: Use ``dot1dBasePortIfIndex`` to map internal
   bridge port numbers back to physical interface names (e.g.
   ``TenGigabitEthernet1/0/1``).
