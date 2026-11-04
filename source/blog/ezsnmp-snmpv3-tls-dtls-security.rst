@@ -159,11 +159,12 @@ prefix:
             security_level="authPriv",
             security_username="noc_automation",
             timeout=2,
-            retries=2
+            retries=2,
+            set_max_repeaters_to_num=25
         )
 
         try:
-            results = session.bulk_walk("ifDescr", max_repetitions=25)
+            results = session.bulk_walk("ifDescr")
             print(
                 f"[{hostname}] DTLS Walk Retrieved {len(results)} Interfaces."
             )
