@@ -123,7 +123,8 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
             community=community,
             version=2,
             timeout=2,
-            retries=1
+            retries=1,
+            set_max_repeaters_to_num=25
         )
 
         try:
@@ -136,15 +137,9 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
             util_pct = (used_watts / total_watts * 100) if total_watts else 0
 
             # 2. Collect per-port PoE detection states and priorities
-            status_vars = session.bulk_walk(
-                "pethPsePortDetectionStatus", max_repetitions=25
-            )
-            prio_vars = session.bulk_walk(
-                "pethPsePortPowerPriority", max_repetitions=25
-            )
-            draw_vars = session.bulk_walk(
-                "cpeExtPsePortPwrConsumed", max_repetitions=25
-            )
+            status_vars = session.bulk_walk("pethPsePortDetectionStatus")
+            prio_vars = session.bulk_walk("pethPsePortPowerPriority")
+            draw_vars = session.bulk_walk("cpeExtPsePortPwrConsumed")
 
             prio_map = {v.index: int(v.value) for v in prio_vars}
             draw_map = {v.index: int(v.value) for v in draw_vars}
