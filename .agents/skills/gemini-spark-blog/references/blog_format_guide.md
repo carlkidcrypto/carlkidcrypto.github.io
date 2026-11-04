@@ -135,8 +135,24 @@ Before publishing, verify against the common issues identified in Copilot and ag
 - **Method Signatures**:
   - `session.get()` takes single string OID or list of OIDs (never tuple notation `('sysDescr', '0')`). Always returns `tuple[Result, ...]`; unpack the scalar element (`session.get(...)[0].value`) before reading values.
   - `session.walk()` takes a single root OID string.
-  - `session.bulk_walk()` takes only OIDs; configure repetition counts via `Session(set_max_repeaters_to_num=25)` constructor.
-- **Result Attributes**: Use `.index` and `.type` on `Result` objects, never `.oid_index` or `.snmp_type`.
+  - `session.bulk_walk()` takes only OIDs; configure repetition counts via `Session(set_max_repeaters_to_num=25)` constructor (never pass `max_repetitions`, which raises `TypeError`).
+  - `session.set()` takes OID-type-value triples where values MUST be string representations (e.g. `[oid, 'i', str(int_val)]`), never native Python integers. All nonzero agent response error codes raise `ezsnmp.exceptions.PacketError`.
+- **Result Attributes & Types**:
+  - Use `.index` and `.type` on `Result` objects, never `.oid_index` or `.snmp_type`.
+  - C++ `SessionBase::get` returns `std::vector<Result>`, exposed through SWIG as a tuple of `ezsnmp.Result` instances (never legacy `SNMPVariable`).
+- **Binary & Hex Encoding (PortLists & MACs)**:
+  - SNMP `PortList` bitmasks and MAC addresses formatted as `Hex-STRING` text (e.g. `'80 00'`) must be normalized and decoded using `bytes.fromhex(val.replace(' ', ''))` before evaluating bit positions. Never pass raw hex text to `.encode('latin1')`.
+- **Topology Discovery (LLDP / CDP)**:
+  - LLDP remote tables use 3-part composite indices: `[time_mark].[local_port].[rem_idx]`. Extract full composite keys by examining `.oid` + `.index`.
+  - Local port numbers in LLDP tables do NOT always align with IF-MIB `ifIndex`. Map local ports using `lldpLocPortDesc`.
+  - In production crawlers, query both LLDP and CDP simultaneously and deduplicate link records.
+- **Metrics Exporters (Prometheus & OpenTelemetry)**:
+  - In Prometheus collectors, `ifDescr` is not unique across ports. Include `if_index` in the metric labels to prevent scrape rejection due to duplicate series.
+  - In OpenTelemetry Metrics, register cumulative monotonic byte counters (`ifHCInOctets`) as `ObservableCounter`, never `ObservableGauge`.
+  - Standalone OTel snippets must initialize `MeterProvider` with a periodic reader and keep the application alive to export metric batches.
+- **Telemetry Throughput vs Microbursts**:
+  - 1–5s SNMP polling measures interval-average utilization, not sub-second microbursts or packet buffer drops (which require queue watermarks or streaming sFlow/IPFIX).
+  - While in-memory Arrow queries between Polars and DuckDB are zero-copy, exporting via `.write_parquet(..., compression='zstd')` incurs serialization and compression overhead.
 - **SNMPv2 Result Types**: `NOSUCHOBJECT` and `NOSUCHINSTANCE` return as `Result.type` values, not raised Python exceptions. Check `var.type` explicitly.
 - **Timeouts & Deadlines**:
   - ezsnmp defaults to `timeout=1` and `retries=3` (~4s total wait budget). Avoid claiming 30-second default wait budgets unless explicit.
