@@ -49,7 +49,7 @@ Explore by Topic
       Developer tutorials for extracting real-time and historical air quality sensor telemetry, bounding box queries, and sensor group management.
 
       +++
-      📚 *IoT Sensing* • `PurpleAir` `IoT` `Air Quality`
+      📚 *1 Article* • `PurpleAir` `IoT` `Air Quality`
 
    .. grid-item-card:: 📊 PurpleAir Data Logger & TimescaleDB
       :link: category-purpleair-data-logger
@@ -69,16 +69,20 @@ Explore by Topic
       +++
       📚 *Smart Home* • `Matter` `Smart Home` `Apple Home`
 
-
-
-
-
-
 All Posts
 ---------
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Getting Started with the Python PurpleAir API Wrapper: Sensor Discovery, Keys & Rate Limits
+      :link: purpleair-api-getting-started-guide
+      :link-type: doc
+
+      Explore the official PurpleAir API Python wrapper (purpleair_api). Learn sensor discovery, read and write credential separation, bounding box queries, and resilient rate-limited polling.
+
+      +++
+      📅 *November 04, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `IoT` `Air-Quality`
 
    .. grid-item-card:: 📖 First-Hop Redundancy Monitoring: VRRP & HSRP with ezsnmp
       :link: ezsnmp-vrrp-hsrp-redundancy-monitoring
