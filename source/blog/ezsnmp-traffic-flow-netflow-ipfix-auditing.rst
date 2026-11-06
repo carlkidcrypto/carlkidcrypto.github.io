@@ -62,23 +62,24 @@ vendor extensions such as ``CISCO-NETFLOW-MIB``.
 
 1. IPFIX Exporter Statistics (RFC 6615)
 ---------------------------------------
-Under ``ipfixExporterTable`` (OID ``.1.3.6.1.2.1.193.1.4.1``):
+Under ``ipfixTransportSessionStatsTable`` (OID ``.1.3.6.1.2.1.193.1.2.1``):
 
-* **``ipfixExporterExportedMessages``**: Total IPFIX datagrams successfully
-  dispatched to collectors.
-* **``ipfixExporterDiscardedMessages``**: Total export datagrams dropped prior
-  to transmission due to internal buffer exhaustion or queue congestion.
+* **``ipfixTransportSessionMessages``**: Total IPFIX messages successfully
+  dispatched over the transport session to collectors.
+* **``ipfixTransportSessionDiscardedMessages``**: Total export messages dropped
+  prior to transmission due to internal buffer exhaustion or queue congestion.
 
 2. Cisco NetFlow Statistics (CISCO-NETFLOW-MIB)
 -----------------------------------------------
-Under ``cnfExportTable`` (OID ``.1.3.6.1.4.1.9.9.387.1.3.1``) and
-``cnfCaptureTable`` (OID ``.1.3.6.1.4.1.9.9.387.1.1.1``):
+Under scalar statistics ``cnfExportStatistics`` (OID ``.1.3.6.1.4.1.9.9.387.1.4``)
+and cache table ``cnfCICacheTable`` (OID ``.1.3.6.1.4.1.9.9.387.1.1.2``):
 
-* **``cnfExportPktsExported``**: Total NetFlow export UDP packets sent.
-* **``cnfExportPktsDropped``**: Export datagrams dropped due to lack of buffers.
-* **``cnfCaptureActiveFlows``**: Current active flow entries in memory cache.
-* **``cnfCaptureActiveTimeout``**: Maximum seconds an active flow is held
-  before being flushed to the collector (typically 60 seconds).
+* **``cnfESPktsExported.0``**: Total NetFlow export UDP packets sent.
+* **``cnfESPktsDropped.0``**: Export datagrams dropped due to lack of local buffers
+  or IP layer write failures.
+* **``cnfCIActiveFlows``**: Current active flow entries in memory cache.
+* **``cnfCIActiveTimeOut``**: Maximum duration in minutes an active flow is held
+  before periodic export (e.g. 1 minute for near real-time updates).
 
 
 Practical Implementation: Flow Exporter Health Monitor
@@ -92,6 +93,14 @@ calculate flow drop ratios, and alert on buffer starvation:
     from ezsnmp import Session
     from ezsnmp.exceptions import GenericError
 
+    def parse_numeric(val: str) -> int:
+        """Extract integer digits from SNMP string or integer responses."""
+        digits = "".join(c for c in str(val) if c.isdigit())
+        if not digits:
+            return 0
+        result = int(digits)
+        return -result if str(val).strip().startswith("-") else result
+
     def audit_flow_exporter(hostname: str, community: str = "public"):
         session = Session(
             hostname=hostname,
@@ -102,23 +111,34 @@ calculate flow drop ratios, and alert on buffer starvation:
         )
 
         try:
-            # 1. Query exported and dropped flow packets from CISCO-NETFLOW-MIB
-            exported_vars = session.bulk_walk("cnfExportPktsExported")
-            dropped_vars = session.bulk_walk("cnfExportPktsDropped")
-            active_vars = session.bulk_walk("cnfCaptureActiveFlows")
+            # 1. Query exported and dropped flow packets from CISCO-NETFLOW-MIB scalars
+            try:
+                cisco_scalars = session.get(["cnfESPktsExported.0", "cnfESPktsDropped.0"])
+                exported_pkts = parse_numeric(cisco_scalars[0].value)
+                dropped_pkts = parse_numeric(cisco_scalars[1].value)
+            except GenericError:
+                exported_pkts = 0
+                dropped_pkts = 0
 
-            exported_pkts = sum(int(v.value) for v in exported_vars)
-            dropped_pkts = sum(int(v.value) for v in dropped_vars)
-            active_flows = sum(int(v.value) for v in active_vars)
+            # Collect active cache flow count
+            try:
+                active_vars = session.bulk_walk("cnfCIActiveFlows")
+                active_flows = sum(parse_numeric(v.value) for v in active_vars)
+            except GenericError:
+                active_flows = 0
 
             total_pkts = exported_pkts + dropped_pkts
             drop_ratio = (
                 (dropped_pkts / total_pkts * 100.0) if total_pkts else 0.0
             )
 
-            # 2. Check for IPFIX standard discarded messages if present
-            ipfix_drops = session.bulk_walk("ipfixExporterDiscardedMessages")
-            discarded_messages = sum(int(v.value) for v in ipfix_drops)
+            # 2. Check for standard IPFIX transport session discarded messages
+            discarded_messages = 0
+            try:
+                ipfix_drops = session.bulk_walk("ipfixTransportSessionDiscardedMessages")
+                discarded_messages = sum(parse_numeric(v.value) for v in ipfix_drops)
+            except GenericError:
+                pass
 
             alert = drop_ratio > 0.05 or discarded_messages > 0
 
@@ -148,16 +168,20 @@ calculate flow drop ratios, and alert on buffer starvation:
             if result["alert"]:
                 print("  [ALERT] Elevated flow buffer drops detected!")
             else:
-                print("  [STATUS] Flow pipeline healthy (zero packet drops).")
+                print(
+                    f"  [STATUS] Exporter drop ratio within acceptable threshold "
+                    f"({result['drop_ratio_pct']:.4f}% <= 0.05%)."
+                )
 
 
 Production Best Practices
 =========================
 
-* **Enforce 60-Second Active Timeouts**: Long-lived TCP connections (such as
-  file backups or video streams) can remain open for hours. If the switch's
-  ``cnfCaptureActiveTimeout`` is set to 30 minutes, traffic spikes won't appear
-  in flow graphs until the connection closes. Enforce a 60-second timeout.
+* **Enforce 1-Minute Active Timeouts**: Active timeouts periodically export
+  flow telemetry for long-lived flows while the connection remains open. If
+  ``cnfCIActiveTimeOut`` is set to 30 minutes, flow telemetry experiences an
+  undesirable 30-minute export delay. Enforce a 1-minute timeout
+  (``cnfCIActiveTimeOut = 1``) to maintain near real-time traffic visibility.
 * **Correlate Flow Drops with Collector Outages**: When ``dropped_packets``
   spikes, inspect collector UDP socket buffer limits (``net.core.rmem_max``)
   and network path ACLs.

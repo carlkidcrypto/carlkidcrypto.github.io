@@ -72,7 +72,7 @@ All Posts
       :link: ezsnmp-traffic-flow-netflow-ipfix-auditing
       :link-type: doc
 
-      Audit Cisco NetFlow and IPFIX flow exporter health with ezsnmp. Detect silent packet drops, buffer exhaustion, and collector unreachability across transit routers.
+      Audit Cisco NetFlow and IPFIX flow exporter health with ezsnmp. Detect exporter-side packet drops, local queue buffer exhaustion, and cache sizing limits across transit routers.
 
       +++
       📅 *October 31, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Netflow` `Ipfix`
