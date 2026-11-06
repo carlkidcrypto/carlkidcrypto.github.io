@@ -45,6 +45,7 @@ ORDERED_STACK = [
     ("feature/blog-ezsnmp-ospf-isis-link-state-telemetry", 41),
     ("feature/blog-ezsnmp-network-time-ntp-ptp-telemetry", 42),
     ("feature/blog-ezsnmp-vrrp-hsrp-redundancy-monitoring", 43),
+    ("feature/blog-purpleair-api-getting-started-guide", 44),
 ]
 
 
