@@ -42,6 +42,7 @@ ORDERED_STACK = [
     ("feature/blog-ezsnmp-bgp-routing-telemetry", 36),
     ("feature/blog-ezsnmp-enterprise-poe-power-auditing", 37),
     ("feature/blog-ezsnmp-traffic-flow-netflow-ipfix-auditing", 39),
+    ("feature/blog-ezsnmp-ospf-isis-link-state-telemetry", 41),
 ]
 
 
