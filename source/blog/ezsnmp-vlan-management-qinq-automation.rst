@@ -122,6 +122,7 @@ allocation report:
             version=2,
             timeout=2,
             retries=1,
+            print_hex_strings=True,
             set_max_repeaters_to_num=25
         )
 
