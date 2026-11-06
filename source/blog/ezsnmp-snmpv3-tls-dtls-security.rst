@@ -87,15 +87,19 @@ Configure the certificate trust store and client certificate in
 
 .. code-block:: text
 
-    # Define trusted Certificate Authority (CA) directory
+    # Select Transport Security Model (TSM) for TLS/DTLS endpoints
     [snmp]
+    defSecurityModel tsm
+
+    # Define trusted Certificate Authority (CA) certificate
     trustCert /etc/ssl/certs/internal_root_ca.crt
 
-    # Client certificate and private key for mutual TLS
+    # Client certificate fingerprint for mutual TLS authentication
     clientCert 12:34:56:78:9A:BC:DE:F0:12:34:56:78:9A:BC:DE:F0:12:34:56:78
 
-    # Map remote server certificate to security name
-    certMap 10 12:34:56:78:9A:BC:DE:F0:... --sn noc_automation
+    # Map remote server certificate fingerprint to local security name
+    # Syntax: certMap PRIORITY FINGERPRINT TYPE ARGS...
+    certMap 10 12:34:56:78:9A:BC:DE:F0:12:34:56:78:9A:BC:DE:F0:12:34:56:78 --sn noc_automation
 
 2. Master Agent Endpoint (snmpd.conf)
 -------------------------------------
@@ -105,10 +109,13 @@ standard TLS and DTLS ports:
 
 .. code-block:: text
 
-    # Listen on standard SNMP over TLS/DTLS ports (RFC 6353)
-    [snmpd]
+    # Server certificates are registered in the [snmp] library context
+    [snmp]
     serverCert /etc/ssl/certs/switch_server.crt
-    snmpd.conf: master agentx
+
+    # Master agent listener bindings for RFC 6353 endpoints
+    [snmpd]
+    master agentx
     agentaddress tlstcp:10161,dtlsudp:10161
 
 
