@@ -62,8 +62,8 @@ Under ``bgpPeerTable`` (OID ``.1.3.6.1.2.1.15.3``):
 * **``bgpPeerState``**: FSM state integer:
   - ``idle(1)``: Session closed or administratively stopped.
   - ``connect(2)``: Waiting for TCP 3-way handshake.
-  - ``active(3)``: TCP handshake established, awaiting BGP Open message.
-  - ``opensent(4)``: Open message sent, awaiting peer response.
+  - ``active(3)``: Actively attempting to establish TCP connection with peer.
+  - ``opensent(4)``: TCP established, Open message sent, awaiting peer response.
   - ``openconfirm(5)``: Awaiting Keepalive or Notification.
   - ``established(6)``: Operational; routes actively exchanged.
 * **``bgpPeerRemoteAs``**: Autonomous System Number (ASN) of the peer.
@@ -100,6 +100,16 @@ peers, and verify accepted prefix counts:
         6: "ESTABLISHED",
     }
 
+    def extract_peer_ip(var) -> str:
+        """Extract the 4-octet IPv4 peer address from index or full OID."""
+        idx_parts = var.index.split(".")
+        if len(idx_parts) >= 4:
+            return ".".join(idx_parts[:4])
+        oid_parts = [p for p in var.oid.split(".") if p.isdigit()]
+        if len(oid_parts) >= 4:
+            return ".".join(oid_parts[-4:])
+        return var.index
+
     def audit_bgp_peers(hostname: str, community: str = "public"):
         session = Session(
             hostname=hostname,
@@ -107,30 +117,46 @@ peers, and verify accepted prefix counts:
             version=2,
             timeout=2,
             retries=1,
+            print_enums_numerically=True,
             set_max_repeaters_to_num=25
         )
 
         try:
-            # 1. Bulk-walk BGP peer table columns
+            # 1. Bulk-walk standard BGP4-MIB peer table columns
             state_vars = session.bulk_walk("bgpPeerState")
             as_vars = session.bulk_walk("bgpPeerRemoteAs")
             uptime_vars = session.bulk_walk("bgpPeerFsmEstablishedTime")
 
-            as_map = {v.index: v.value for v in as_vars}
-            uptime_map = {v.index: int(v.value) for v in uptime_vars}
+            # Reconstruct 4-octet peer IP suffix
+            as_map = {extract_peer_ip(v): v.value for v in as_vars}
+            uptime_map = {extract_peer_ip(v): int(v.value) for v in uptime_vars}
 
-            # 2. Collect accepted prefix counts (CISCO-BGP4-MIB)
-            prefix_vars = session.bulk_walk("cbgpPeerAcceptedPrefixes")
-            # Index format: [peer_ip].[afi].[safi]
+            # 2. Collect accepted prefix counts (CISCO-BGP4-MIB / Vendor MIBs)
+            # Index format: [peer_ip (4 octets)].[afi].[safi]
             prefix_map = {}
-            for v in prefix_vars:
-                peer_ip = ".".join(v.index.split(".")[:4])
-                prefix_map[peer_ip] = int(v.value)
+            try:
+                prefix_vars = session.bulk_walk("cbgpPeerAcceptedPrefixes")
+                for v in prefix_vars:
+                    parts = [p for p in v.index.split(".") if p]
+                    if len(parts) < 4:
+                        parts = [p for p in v.oid.split(".") if p.isdigit()]
+                    if len(parts) >= 6:
+                        peer_ip = ".".join(parts[-6:-2])
+                        afi, safi = parts[-2], parts[-1]
+                        family_key = f"{peer_ip}/AFI{afi}-SAFI{safi}"
+                        prefix_map[peer_ip] = int(v.value)
+                        prefix_map[family_key] = int(v.value)
+                    elif len(parts) >= 4:
+                        peer_ip = ".".join(parts[-4:])
+                        prefix_map[peer_ip] = int(v.value)
+            except GenericError:
+                # Gracefully handle non-Cisco devices without prefix extension MIB
+                pass
 
             peer_report = []
 
             for var in state_vars:
-                peer_ip = var.index
+                peer_ip = extract_peer_ip(var)
                 state_code = int(var.value)
                 state_name = BGP_STATE_MAP.get(state_code, "UNKNOWN")
                 remote_as = as_map.get(peer_ip, "Unknown")
@@ -198,9 +224,12 @@ Migration Notes: Easy SNMP vs ezsnmp
 Legacy ``easysnmp`` suffered from socket exhaustion and thread contention when
 querying high-density BGP tables across multiple border routers in parallel:
 
-* **Clean Thread Isolation in ezsnmp**: ``ezsnmp``'s modernized C++17
-  session locking eliminates global lock contention, enabling parallel worker
-  threads to poll dozens of border routers simultaneously.
+* **Process-Isolated Concurrency**: While ``ezsnmp``'s C++17 architecture
+  ensures deterministic RAII cleanup for variable binding chains, Net-SNMP
+  itself maintains process-global C state and output formatting locks. For
+  high-density BGP table crawls across dozens of border routers, use
+  ``concurrent.futures.ProcessPoolExecutor`` to eliminate global lock
+  contention.
 * **Memory Leak Elimination**: Net-SNMP variable binding chains generated
   during multi-thousand-row BGP table walks are safely released via C++17 RAII
   destructors.
