@@ -43,6 +43,7 @@ ORDERED_STACK = [
     ("feature/blog-ezsnmp-enterprise-poe-power-auditing", 37),
     ("feature/blog-ezsnmp-traffic-flow-netflow-ipfix-auditing", 39),
     ("feature/blog-ezsnmp-ospf-isis-link-state-telemetry", 41),
+    ("feature/blog-ezsnmp-network-time-ntp-ptp-telemetry", 42),
 ]
 
 
