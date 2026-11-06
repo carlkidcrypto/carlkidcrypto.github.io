@@ -92,7 +92,7 @@ Under ``pethPsePortTable`` (OID ``.1.3.6.1.2.1.105.1.1.1``):
 Vendor extensions like Cisco's ``cpeExtPsePortTable`` track precise wattage:
 
 * **``cpeExtPsePortPwrAllocated``**: Power reserved by the switch in milliwatts.
-* **``cpeExtPsePortPwrConsumed``**: Real-time power measured in milliwatts.
+* **``cpeExtPsePortPwrConsumption``**: Real-time power measured in milliwatts.
 
 
 Practical Implementation: Enterprise PoE Auditor
@@ -117,6 +117,20 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
 
     PRIORITY_MAP = {1: "CRITICAL", 2: "HIGH", 3: "LOW"}
 
+    def parse_numeric(val: str) -> int:
+        """Strip non-numeric characters (units like W, mW) and parse integer."""
+        digits = "".join(c for c in str(val) if c.isdigit() or c == "-")
+        return int(digits) if digits else 0
+
+    def extract_port_index(v) -> str:
+        """Extract two-component [group].[port] index from index or OID."""
+        if "." in v.index:
+            return v.index
+        parts = [p for p in v.oid.split(".") if p.isdigit()]
+        if len(parts) >= 2:
+            return f"{parts[-2]}.{parts[-1]}"
+        return v.index
+
     def audit_switch_poe(hostname: str, community: str = "public"):
         session = Session(
             hostname=hostname,
@@ -124,6 +138,7 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
             version=2,
             timeout=2,
             retries=1,
+            print_enums_numerically=True,
             set_max_repeaters_to_num=25
         )
 
@@ -132,25 +147,31 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
             total_power_vars = session.bulk_walk("pethMainPsePower")
             used_power_vars = session.bulk_walk("pethMainPseConsumptionPower")
 
-            total_watts = sum(int(v.value) for v in total_power_vars)
-            used_watts = sum(int(v.value) for v in used_power_vars)
+            total_watts = sum(parse_numeric(v.value) for v in total_power_vars)
+            used_watts = sum(parse_numeric(v.value) for v in used_power_vars)
             util_pct = (used_watts / total_watts * 100) if total_watts else 0
 
             # 2. Collect per-port PoE detection states and priorities
             status_vars = session.bulk_walk("pethPsePortDetectionStatus")
             prio_vars = session.bulk_walk("pethPsePortPowerPriority")
-            draw_vars = session.bulk_walk("cpeExtPsePortPwrConsumed")
 
-            prio_map = {v.index: int(v.value) for v in prio_vars}
-            draw_map = {v.index: int(v.value) for v in draw_vars}
+            # Collect vendor real-time consumption measurements
+            draw_map = {}
+            try:
+                draw_vars = session.bulk_walk("cpeExtPsePortPwrConsumption")
+                draw_map = {extract_port_index(v): parse_numeric(v.value) for v in draw_vars}
+            except GenericError:
+                pass
+
+            prio_map = {extract_port_index(v): parse_numeric(v.value) for v in prio_vars}
 
             active_ports = []
             for v in status_vars:
-                idx = v.index
-                status_code = int(v.value)
+                idx = extract_port_index(v)
+                status_code = parse_numeric(v.value)
                 if status_code == 3:  # deliveringPower
-                    draw_mw = draw_map.get(idx, 0)
-                    draw_watts = draw_mw / 1000.0
+                    draw_mw = draw_map.get(idx)
+                    draw_watts = (draw_mw / 1000.0) if draw_mw is not None else None
                     prio_code = prio_map.get(idx, 3)
 
                     active_ports.append({
@@ -182,8 +203,9 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
             print(f"  Active PoE Ports: {len(report['active_ports'])}\n")
 
             print("--- Delivering Power Ports (Top Consumers) ---")
+            measured_ports = [p for p in report["active_ports"] if p["watts"] is not None]
             top_ports = sorted(
-                report["active_ports"],
+                measured_ports,
                 key=lambda x: x["watts"],
                 reverse=True
             )[:5]
@@ -200,7 +222,7 @@ Production Best Practices
 
 * **Monitor Real-Time Consumption vs Allocation**: Reserve-based allocation
   can make a switch appear 95% full when actual draw is under 40%. Compare
-  ``cpeExtPsePortPwrAllocated`` against ``cpeExtPsePortPwrConsumed`` before
+  ``cpeExtPsePortPwrAllocated`` against ``cpeExtPsePortPwrConsumption`` before
   purchasing secondary power supplies.
 * **Assign Power Priorities Explicitly**: Ensure mission-critical endpoints
   (badge readers, security cameras) are tagged as ``critical(1)``. In the event
@@ -216,9 +238,12 @@ Migration Notes: Easy SNMP vs ezsnmp
 
 Legacy ``easysnmp`` struggled when querying high-density 48-port switch stacks:
 
-* **Clean Thread Isolation in ezsnmp**: ``ezsnmp``'s C++17 session mutexes
-  allow multi-threaded crawlers to audit hundreds of campus access switches
-  concurrently without lock contention.
+* **Process-Isolated Concurrency**: While ``ezsnmp``'s C++17 session
+  architecture ensures deterministic connection lifecycle management, Net-SNMP
+  itself maintains process-global C state and internal locks. For large-scale
+  PoE audits across hundreds of switches, use
+  ``concurrent.futures.ProcessPoolExecutor`` to eliminate global mutex
+  contention.
 * **Robust Numeric Conversions**: Direct C-to-Python integer handling prevents
   milliwatt truncation when converting 32-bit unsigned power integers.
 
