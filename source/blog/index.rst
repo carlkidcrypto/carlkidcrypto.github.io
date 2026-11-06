@@ -21,24 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   ezsnmp-ospf-isis-link-state-telemetry
    ezsnmp-traffic-flow-netflow-ipfix-auditing
    ezsnmp-enterprise-poe-power-auditing
    ezsnmp-bgp-routing-telemetry
@@ -67,6 +50,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 OSPF & IS-IS Link-State Telemetry: Neighbor Auditing in ezsnmp
+      :link: ezsnmp-ospf-isis-link-state-telemetry
+      :link-type: doc
+
+      Audit OSPF and IS-IS neighbor adjacencies, detect MTU-induced stuck sessions, and monitor LSA retransmission queues in real time using ezsnmp and Net-SNMP C bindings.
+
+      +++
+      📅 *November 01, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Ospf` `Is-Is`
 
    .. grid-item-card:: 📖 Traffic Flow Auditing: Monitoring NetFlow & IPFIX with ezsnmp
       :link: ezsnmp-traffic-flow-netflow-ipfix-auditing
