@@ -21,6 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+   ezsnmp-vrrp-hsrp-redundancy-monitoring
    ezsnmp-network-time-ntp-ptp-telemetry
    ezsnmp-ospf-isis-link-state-telemetry
    ezsnmp-traffic-flow-netflow-ipfix-auditing
@@ -51,6 +52,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 First-Hop Redundancy Monitoring: VRRP & HSRP with ezsnmp
+      :link: ezsnmp-vrrp-hsrp-redundancy-monitoring
+      :link-type: doc
+
+      Query VRRP and HSRP operational parameters, cross-reconcile HA gateway pairs, and detect split-brain dual-master anomalies in real time using ezsnmp.
+
+      +++
+      📅 *November 03, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Vrrp` `Hsrp`
 
    .. grid-item-card:: 📖 Network Time & Clock Synchronization Telemetry with ezsnmp
       :link: ezsnmp-network-time-ntp-ptp-telemetry
