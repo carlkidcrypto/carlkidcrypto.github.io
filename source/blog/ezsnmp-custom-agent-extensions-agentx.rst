@@ -80,7 +80,7 @@ To enable AgentX master mode in Net-SNMP, edit ``/etc/snmp/snmpd.conf``:
 
     # Bind AgentX to a secure local Unix domain socket
     agentXSocket /var/agentx/master
-    agentXPerms  0770 root snmp
+    agentXPerms  0770 0770 root snmp
 
 Restart the master daemon to apply changes:
 
@@ -119,6 +119,10 @@ serves custom application metrics:
         f"{BASE_OID}.3.0": ("string", lambda: "Service-Online-OK"),
     }
 
+    def oid_to_tuple(s: str) -> tuple[int, ...]:
+        """Convert a dotted OID string into an integer tuple for numeric comparison."""
+        return tuple(int(p) for p in s.strip(".").split(".") if p)
+
     def handle_pass_persist():
         while True:
             line = sys.stdin.readline()
@@ -128,6 +132,13 @@ serves custom application metrics:
 
             if cmd == "PING":
                 print("PONG", flush=True)
+
+            elif cmd == "set":
+                # pass_persist SET provides: OID, then TYPE and VALUE lines
+                _target_oid = sys.stdin.readline()
+                _val_type_and_val = sys.stdin.readline()
+                # Explicitly reject writes for this read-only metric provider
+                print("not-writable", flush=True)
 
             elif cmd == "get":
                 oid = sys.stdin.readline().strip()
@@ -141,8 +152,9 @@ serves custom application metrics:
 
             elif cmd == "getnext":
                 oid = sys.stdin.readline().strip()
-                sorted_oids = sorted(METRICS.keys())
-                match = next((o for o in sorted_oids if o > oid), None)
+                target_key = oid_to_tuple(oid)
+                sorted_oids = sorted(METRICS.keys(), key=oid_to_tuple)
+                match = next((o for o in sorted_oids if oid_to_tuple(o) > target_key), None)
                 if match:
                     val_type, val_fn = METRICS[match]
                     print(match)
@@ -161,9 +173,8 @@ Add the persistent script to ``/etc/snmp/snmpd.conf``:
 
 .. code-block:: text
 
-    # Pass persistent registration for our enterprise subtree
-    pass_persist .1.3.6.1.4.1.99999.1 \
-        /usr/bin/python3 /opt/custom_snmp_provider.py
+    # Pass persistent registration for our enterprise subtree (single physical line)
+    pass_persist .1.3.6.1.4.1.99999.1 /usr/bin/python3 /opt/custom_snmp_provider.py
 
 Reload ``snmpd``:
 
@@ -233,9 +244,12 @@ Migration Notes: Easy SNMP vs ezsnmp
 * **Subagent Stress Testing**: Testing high-frequency subagents requires running
   thousands of client queries in tight loops. Legacy ``easysnmp`` suffered from
   socket exhaustion and thread synchronization deadlocks during stress testing.
-* **C++17 Thread Safety in ezsnmp**: ``ezsnmp``'s modernized C++17 architecture
-  ensures clean connection lifecycle management, allowing load testing tools to
-  hammer custom subagents at thousands of queries per second.
+* **Concurrency Architecture in ezsnmp**: While ``ezsnmp``'s modernized C++17
+  architecture ensures deterministic connection lifecycle management, Net-SNMP
+  itself maintains process-global C state protected by internal mutexes. For
+  high-throughput subagent stress testing, isolate workers using
+  ``concurrent.futures.ProcessPoolExecutor`` rather than unbounded thread
+  pools to prevent global mutex contention.
 
 
 Useful Links & Community
