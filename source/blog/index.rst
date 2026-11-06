@@ -21,6 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+   purpleair-api-getting-started-guide
    ezsnmp-vrrp-hsrp-redundancy-monitoring
    ezsnmp-network-time-ntp-ptp-telemetry
    ezsnmp-ospf-isis-link-state-telemetry
@@ -52,6 +53,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Getting Started with the Python PurpleAir API Wrapper: Sensor Discovery, Keys & Rate Limits
+      :link: purpleair-api-getting-started-guide
+      :link-type: doc
+
+      Explore the official PurpleAir API Python wrapper (purpleair_api). Learn sensor discovery, read and write credential separation, bounding box queries, and resilient rate-limited polling.
+
+      +++
+      📅 *November 04, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `IoT` `Air-Quality`
 
    .. grid-item-card:: 📖 First-Hop Redundancy Monitoring: VRRP & HSRP with ezsnmp
       :link: ezsnmp-vrrp-hsrp-redundancy-monitoring
