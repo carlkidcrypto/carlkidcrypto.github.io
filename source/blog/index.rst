@@ -21,6 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+   purpleair-matterbridge-smart-home-integration
    purpleair-data-logger-timescaledb-postgresql-ingestion
    purpleair-api-getting-started-guide
    ezsnmp-vrrp-hsrp-redundancy-monitoring
@@ -54,6 +55,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Bridging PurpleAir Air Quality Sensors into Smart Home Matter Ecosystems
+      :link: purpleair-matterbridge-smart-home-integration
+      :link-type: doc
+
+      Bridge PurpleAir air quality telemetry into Apple Home, Home Assistant, and Matter smart homes using the official purpleair-matterbridge plugin and Docker with host networking.
+
+      +++
+      📅 *November 06, 2026* • ⏱️ *5 min read* • `PurpleAir` `Matter` `Smart-Home` `IoT`
 
    .. grid-item-card:: 📖 Automated TimescaleDB & PostgreSQL Ingestion for PurpleAir Sensors
       :link: purpleair-data-logger-timescaledb-postgresql-ingestion

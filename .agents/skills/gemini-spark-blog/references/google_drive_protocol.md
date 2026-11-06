@@ -163,3 +163,11 @@ The Google Doc **`ezsnmp Blog Topic Tracker.gdoc`** (located in `Auto Blog Posts
 
 - **Purpose**: Tracks proposed titles, topic status, technical areas covered (e.g., MIBs, SNMPv3, concurrency, telemetry), and upcoming post schedules.
 - **Accessing via Antigravity**: Use the official Google Docs plugin (`antigravity-plugins-official/plugin/gdocs`) or inspect local Google Drive sync state.
+
+---
+
+## 7. The Common Review Findings & Guidelines (`COMMON_REVIEW_FINDINGS_AND_GUIDELINES.rst`)
+
+Located directly in `Auto Blog Posts/`:
+- **Purpose**: A live catalog of common architectural findings, recurring review feedback, Net-SNMP threading and process isolation models, modern ezsnmp exception and method boundaries, PurpleAir ecosystem standards, Sphinx/Furo theme invariants, and the mandatory AI disclaimer footer.
+- **Workflow**: Both the Gemini Spark Agent (for post drafting) and the Antigravity Agent (for post auditing and review) continuously reference and update this file to eliminate review friction and prevent recurring errors across all published articles.
