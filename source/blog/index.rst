@@ -21,6 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+   ezsnmp-network-time-ntp-ptp-telemetry
    ezsnmp-ospf-isis-link-state-telemetry
    ezsnmp-traffic-flow-netflow-ipfix-auditing
    ezsnmp-enterprise-poe-power-auditing
@@ -50,6 +51,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Network Time & Clock Synchronization Telemetry with ezsnmp
+      :link: ezsnmp-network-time-ntp-ptp-telemetry
+      :link-type: doc
+
+      Inspect system NTP synchronization states, evaluate stratum levels, and alert on clock skew and dispersion across network fleets using ezsnmp and Net-SNMP C bindings.
+
+      +++
+      📅 *November 02, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Ntp` `Ptp`
 
    .. grid-item-card:: 📖 OSPF & IS-IS Link-State Telemetry: Neighbor Auditing in ezsnmp
       :link: ezsnmp-ospf-isis-link-state-telemetry
