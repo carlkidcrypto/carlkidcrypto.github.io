@@ -62,20 +62,21 @@ Under ``entPhysicalTable`` (OID ``.1.3.6.1.2.1.47.1.1.1``):
   ``Ethernet1/1 Rx Power Sensor``).
 * **``entPhysicalDescr``**: Detailed hardware description.
 
-2. Sensor Telemetry (ENTITY-SENSOR-MIB)
----------------------------------------
-Under ``entSensorValueTable`` (OID ``.1.3.6.1.2.1.99.1.1``):
+2. Sensor Telemetry (RFC 3433 ENTITY-SENSOR-MIB)
+------------------------------------------------
+Under ``entPhySensorTable`` (OID ``.1.3.6.1.2.1.99.1.1.1``):
 
-* **``entSensorType``**: The physical measurement unit:
-  - ``celsius(7)``: Temperature.
+* **``entPhySensorType``**: The physical measurement unit:
+  - ``celsius(8)``: Temperature (note: ``hertz`` is 7).
   - ``watts(6)``: Optical power in microWatts or milliWatts.
   - ``dBm(14)``: Optical decibels relative to one milliwatt.
-* **``entSensorScale``**: Exponent scaling factor (e.g. ``milli(8)``,
-  ``micro(7)``, ``units(9)``).
-* **``entSensorPrecision``**: Number of decimal places in the raw value.
-* **``entSensorValue``**: The raw signed integer sensor measurement.
-* **``entSensorStatus``**: Operational state: ``ok(1)``, ``unavailable(2)``,
-  ``nonoperational(3)``.
+* **``entPhySensorScale``**: Exponent scaling factor advancing in powers of
+  1,000 (e.g. ``micro(7)`` = :math:`10^{-6}`, ``milli(8)`` = :math:`10^{-3}`,
+  ``units(9)`` = :math:`10^{0}`).
+* **``entPhySensorPrecision``**: Number of decimal places in the raw value.
+* **``entPhySensorValue``**: The raw signed integer sensor measurement.
+* **``entPhySensorOperStatus``**: Operational state: ``ok(1)``,
+  ``unavailable(2)``, ``nonoperational(3)``.
 
 
 Calculating Real-World Sensor Values
@@ -86,11 +87,13 @@ precision are scaled. To reconstruct the true floating-point value:
 
 .. code-block:: text
 
-    True Value = (entSensorValue * 10^(entSensorScale - 9))
-                 / (10^entSensorPrecision)
+    Scale Exponent = (entPhySensorScale - 9) * 3
+    True Value = entPhySensorValue * 10^(Scale Exponent - entPhySensorPrecision)
 
-For example, a raw ``entSensorValue`` of ``-652`` with ``entSensorType=dBm(14)``
-and ``entSensorPrecision=2`` translates to **-6.52 dBm**.
+For example, a raw ``entPhySensorValue`` of ``-652`` with ``entPhySensorScale=units(9)``
+and ``entPhySensorPrecision=2`` yields :math:`-652 \times 10^{0 - 2} =` **-6.52 dBm**.
+Similarly, a reading of ``1500`` with ``milli(8)`` and ``precision=0`` yields
+:math:`1500 \times 10^{-3} =` **1.50 W**.
 
 
 Practical Implementation: Optical Health Auditor
@@ -104,6 +107,12 @@ query optical receive/transmit power, and evaluate link safety margins:
     from ezsnmp import Session
     from ezsnmp.exceptions import GenericError
 
+    # RFC 3433 sensor scale exponents advancing in powers of 1,000 (10^3)
+    SCALE_EXPONENTS = {
+        1: -24, 2: -21, 3: -18, 4: -15, 5: -12, 6: -9, 7: -6, 8: -3,
+        9: 0, 10: 3, 11: 6, 12: 9, 13: 12, 14: 15, 15: 18, 16: 21, 17: 24,
+    }
+
     def audit_optical_sensors(hostname: str, community: str = "public"):
         session = Session(
             hostname=hostname,
@@ -111,6 +120,7 @@ query optical receive/transmit power, and evaluate link safety margins:
             version=2,
             timeout=2,
             retries=1,
+            print_enums_numerically=True,
             set_max_repeaters_to_num=25
         )
 
@@ -119,12 +129,20 @@ query optical receive/transmit power, and evaluate link safety margins:
             name_vars = session.bulk_walk("entPhysicalName")
             sensor_names = {v.index: v.value for v in name_vars}
 
-            # 2. Bulk-walk sensor telemetry columns
-            type_vars = session.bulk_walk("entSensorType")
-            scale_vars = session.bulk_walk("entSensorScale")
-            prec_vars = session.bulk_walk("entSensorPrecision")
-            val_vars = session.bulk_walk("entSensorValue")
-            status_vars = session.bulk_walk("entSensorStatus")
+            # 2. Bulk-walk sensor telemetry columns (RFC 3433 standard)
+            # Falls back to vendor/Cisco entSensor* columns if MIB uses legacy names
+            try:
+                type_vars = session.bulk_walk("entPhySensorType")
+                scale_vars = session.bulk_walk("entPhySensorScale")
+                prec_vars = session.bulk_walk("entPhySensorPrecision")
+                val_vars = session.bulk_walk("entPhySensorValue")
+                status_vars = session.bulk_walk("entPhySensorOperStatus")
+            except GenericError:
+                type_vars = session.bulk_walk("entSensorType")
+                scale_vars = session.bulk_walk("entSensorScale")
+                prec_vars = session.bulk_walk("entSensorPrecision")
+                val_vars = session.bulk_walk("entSensorValue")
+                status_vars = session.bulk_walk("entSensorStatus")
 
             scales = {v.index: int(v.value) for v in scale_vars}
             precisions = {v.index: int(v.value) for v in prec_vars}
@@ -138,24 +156,27 @@ query optical receive/transmit power, and evaluate link safety margins:
                 sensor_type = int(v.value)
                 name = sensor_names.get(idx, f"Sensor-{idx}")
 
-                # Focus on optical power sensors (dBm = 14) and temperature (7)
-                if sensor_type in (7, 14) and statuses.get(idx) == 1:
+                # Focus on optical power sensors (dBm = 14) and temperature (celsius = 8)
+                if sensor_type in (8, 14) and statuses.get(idx) == 1:
                     raw_val = values.get(idx, 0)
+                    scale = scales.get(idx, 9)
                     precision = precisions.get(idx, 0)
 
-                    # Compute calibrated floating-point metric
-                    calibrated = raw_val / (10 ** precision)
+                    # Compute calibrated floating-point metric with scale exponent
+                    scale_exp = SCALE_EXPONENTS.get(scale, (scale - 9) * 3)
+                    calibrated = raw_val * (10 ** (scale_exp - precision))
                     unit = "dBm" if sensor_type == 14 else "C"
 
-                    # Flag dangerous optical signal attenuation
+                    # Flag optical signal attenuation based on optics class
                     warning = False
                     is_rx_power = sensor_type == 14 and "Rx" in name
-                    if is_rx_power and calibrated < -14.0:
+                    # Standard 10G-SR baseline warning floor (-12.0 dBm)
+                    if is_rx_power and calibrated < -12.0:
                         warning = True
 
                     optical_report.append({
                         "sensor": name,
-                        "value": calibrated,
+                        "value": round(calibrated, 2),
                         "unit": unit,
                         "warning": warning
                     })
