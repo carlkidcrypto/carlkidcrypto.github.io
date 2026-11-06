@@ -27,6 +27,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-network-topology-discovery-lldp-cdp
    ezsnmp-custom-observability-exporters
    ezsnmp-cpp17-native-architecture
    ezsnmp-advanced-table-navigation
@@ -43,6 +45,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Automating Network Topology Discovery: LLDP and CDP with ezsnmp
+      :link: ezsnmp-network-topology-discovery-lldp-cdp
+      :link-type: doc
+
+      Maintaining accurate, real-time physical network maps is an essential requirement for data center automation, root-cause failure analysis, and Source of...
+
+      +++
+      📅 *October 23, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Lldp` `Cdp`
 
    .. grid-item-card:: 📖 Building Custom Observability Exporters with ezsnmp
       :link: ezsnmp-custom-observability-exporters
