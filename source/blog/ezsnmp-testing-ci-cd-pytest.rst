@@ -148,9 +148,9 @@ scalar queries, walks, and error handling:
             retries=1
         )
 
-        sys_location = session.get("sysLocation.0")
+        sys_location = session.get("sysLocation.0")[0]
         assert sys_location.value == "TestLab-Rack42"
-        assert sys_location.type == "OCTETSTR"
+        assert sys_location.type == "STRING"
 
     def test_snmp_batch_get(snmp_daemon):
         """Verify multi-OID batch queries execute cleanly."""
@@ -161,7 +161,8 @@ scalar queries, walks, and error handling:
         )
 
         results = session.get(["sysLocation.0", "sysContact.0", "sysName.0"])
-        val_map = {v.oid: v.value for v in results}
+        # Strip potential MIB module qualifiers (e.g. SNMPv2-MIB::sysLocation)
+        val_map = {v.oid.split("::")[-1]: v.value for v in results}
 
         assert val_map["sysLocation"] == "TestLab-Rack42"
         assert val_map["sysContact"] == "ci-runner@example.internal"
@@ -204,10 +205,12 @@ request across multiple Python versions:
         steps:
           - uses: actions/checkout@v4
 
-          - name: Install Net-SNMP Tools & Headers
+          - name: Install Net-SNMP Tools, Headers & MIBs
             run: |
               sudo apt-get update
-              sudo apt-get install -y snmp snmpd libsnmp-dev
+              sudo apt-get install -y snmp snmpd libsnmp-dev snmp-mibs-downloader
+              sudo download-mibs
+              sudo sed -i 's/^mibs :/#mibs :/g' /etc/snmp/snmp.conf
 
           - name: Set up Python ${{ matrix.python-version }}
             uses: actions/setup-python@v5
