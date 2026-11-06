@@ -21,6 +21,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+   purpleair-data-logger-timescaledb-postgresql-ingestion
    purpleair-api-getting-started-guide
    ezsnmp-vrrp-hsrp-redundancy-monitoring
    ezsnmp-network-time-ntp-ptp-telemetry
@@ -53,6 +54,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Automated TimescaleDB & PostgreSQL Ingestion for PurpleAir Sensors
+      :link: purpleair-data-logger-timescaledb-postgresql-ingestion
+      :link-type: doc
+
+      Stream real-time and historical PurpleAir air quality telemetry into PostgreSQL with TimescaleDB hypertables, automated compression, continuous aggregates, and time_bucket analytical SQL rollups.
+
+      +++
+      📅 *November 05, 2026* • ⏱️ *5 min read* • `PurpleAir` `TimescaleDB` `PostgreSQL` `IoT`
 
    .. grid-item-card:: 📖 Getting Started with the Python PurpleAir API Wrapper: Sensor Discovery, Keys & Rate Limits
       :link: purpleair-api-getting-started-guide
