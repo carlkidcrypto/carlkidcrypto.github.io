@@ -34,6 +34,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   ezsnmp-testing-ci-cd-pytest
    ezsnmp-hardware-optical-dom-monitoring
    ezsnmp-snmpv3-tls-dtls-security
    ezsnmp-custom-agent-extensions-agentx
@@ -57,6 +59,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Testing SNMP Automation Pipelines with pytest and ezsnmp
+      :link: ezsnmp-testing-ci-cd-pytest
+      :link-type: doc
+
+      Developing network automation software—such as custom telemetry daemons, exporters, and configuration crawlers—presents a fundamental testing challenge:
+
+      +++
+      📅 *October 30, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Pytest` `Testing`
 
    .. grid-item-card:: 📖 Hardware Health & Optical Power Monitoring (DOM/DDM) in ezsnmp
       :link: ezsnmp-hardware-optical-dom-monitoring
