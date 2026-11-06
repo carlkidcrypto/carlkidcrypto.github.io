@@ -92,6 +92,21 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
     NETBOX_URL = "https://netbox.internal.net"
     NETBOX_TOKEN = "0123456789abcdef0123456789abcdef01234567"
 
+    def parse_mac_address(raw_val: str | bytes) -> str:
+        """Normalize raw octets or formatted hex strings to standard colon-separated MAC."""
+        if isinstance(raw_val, bytes):
+            return ":".join(f"{b:02x}" for b in raw_val)
+        cleaned = raw_val.replace(":", "").replace("-", "").replace(" ", "")
+        try:
+            raw_bytes = bytes.fromhex(cleaned)
+            if len(raw_bytes) == 6:
+                return ":".join(f"{b:02x}" for b in raw_bytes)
+        except ValueError:
+            pass
+        if len(raw_val) == 6:
+            return ":".join(f"{ord(c):02x}" for c in raw_val)
+        return ""
+
     def discover_device_inventory(
         hostname: str, community: str = "public"
     ) -> dict:
@@ -102,6 +117,7 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
             version=2,
             timeout=2,
             retries=1,
+            print_enums_numerically=True,
             set_max_repeaters_to_num=25
         )
 
@@ -120,19 +136,20 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
 
             chassis_serial = "UNKNOWN"
             for var in class_vars:
-                # Class 3 = chassis
-                if var.value == "3":
-                    chassis_serial = serials.get(var.index, "UNKNOWN")
-                    break
+                # Class 3 = chassis (numeric or symbolic)
+                if var.value in ("3", "chassis"):
+                    candidate = serials.get(var.index, "").strip()
+                    if candidate:
+                        chassis_serial = candidate
+                        break
 
             # 3. Collect interface MAC addresses from IF-MIB
             if_names = session.bulk_walk("ifName")
             if_macs = session.bulk_walk("ifPhysAddress")
             mac_map = {
-                v.index: ":".join(
-                    f"{b:02x}" for b in v.value.encode("latin1")
-                )
-                for v in if_macs if len(v.value) == 6
+                v.index: parse_mac_address(v.value)
+                for v in if_macs
+                if parse_mac_address(v.value)
             }
 
             interfaces = {
@@ -163,14 +180,20 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
         print(f"\n--- Audit Report: {device.name} ---")
 
         # Serial number drift detection
-        if device.serial != discovered["serial"]:
+        disc_serial = discovered.get("serial", "UNKNOWN")
+        if disc_serial in ("", "UNKNOWN"):
+            print(
+                f"  [INCONCLUSIVE] Chassis serial could not be discovered via SNMP;\n"
+                f"    preserving NetBox serial {device.serial} without overwriting."
+            )
+        elif device.serial != disc_serial:
             print(
                 f"  [DRIFT DETECTED] Serial mismatch!\n"
                 f"    NetBox Intent : {device.serial}\n"
-                f"    Actual Switch : {discovered['serial']}"
+                f"    Actual Switch : {disc_serial}"
             )
             # Reconcile serial if authorized
-            # device.serial = discovered["serial"]
+            # device.serial = disc_serial
             # device.save()
         else:
             print(f"  [OK] Serial number matches: {device.serial}")
@@ -199,10 +222,11 @@ Production Best Practices
 Migration Notes: Easy SNMP vs ezsnmp
 ====================================
 
-* **Thread-Safe Multi-Device Crawling**: Discovery pipelines poll hundreds
-  of switches in parallel. Legacy ``easysnmp`` crashed with mutex deadlocks
-  under heavy Python multi-threading. ``ezsnmp``'s C++17 session locking
-  guarantees clean, concurrent execution across thread pools.
+* **Concurrency Architecture in ezsnmp**: While ``ezsnmp``'s C++17 session
+  architecture ensures deterministic connection cleanup, Net-SNMP itself retains
+  process-global C state protected by internal mutexes. For large multi-device
+  crawls, isolate workers using ``concurrent.futures.ProcessPoolExecutor``
+  rather than large thread pools to prevent global lock contention.
 * **Binary Octet String Preservation**: Correctly handles raw binary
   strings in ``ifPhysAddress`` without truncation or encoding faults.
 
