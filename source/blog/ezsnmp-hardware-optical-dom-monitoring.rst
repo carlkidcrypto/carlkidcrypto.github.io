@@ -1,0 +1,249 @@
+.. meta::
+   :description: In modern high-speed data center fabrics and long-haul links (10G, 25G, 100G, and 400G), optical transceivers (SFP+, QSFP28, QSFP-DD) represent one of the...
+   :keywords: Python, Snmp, Optical, Dom, Ddm, Hardware-Monitoring, Ezsnmp, Python, ezsnmp, Networking, DevOps
+   :author: Carlos Santos (@carlkidcrypto)
+   :property=og:title: Hardware Health & Optical Power Monitoring (DOM/DDM) in ezsnmp
+   :property=og:description: In modern high-speed data center fabrics and long-haul links (10G, 25G, 100G, and 400G), optical transceivers (SFP+, QSFP28, QSFP-DD) represent one of the...
+   :property=og:type: article
+   :property=og:url: https://carlkidcrypto.github.io/blog/ezsnmp-hardware-optical-dom-monitoring.html
+   :property=og:image: https://carlkidcrypto.github.io/_static/logo.png
+   :name=twitter:card: summary
+   :name=twitter:title: Hardware Health & Optical Power Monitoring (DOM/DDM) in ezsnmp
+   :name=twitter:description: In modern high-speed data center fabrics and long-haul links (10G, 25G, 100G, and 400G), optical transceivers (SFP+, QSFP28, QSFP-DD) represent one of the...
+   :name=twitter:image: https://carlkidcrypto.github.io/_static/logo.png
+
+==============================================================
+Hardware Health & Optical Power Monitoring (DOM/DDM) in ezsnmp
+==============================================================
+
+.. note::
+
+   * **Published:** October 29, 2026
+   * **Authors:** Written by Gemini 3.8 Flash, Co-Authored & Reviewed by `Carlos Santos (@carlkidcrypto) <https://github.com/carlkidcrypto>`_
+   * **Estimated Reading Time:** 5 minutes
+   * **Tags:** `Python` • `Snmp` • `Optical` • `Dom` • `Ddm` • `Hardware-Monitoring` • `Ezsnmp`
+
+Why Optical Telemetry Matters Before Link Failure
+=================================================
+
+In modern high-speed data center fabrics and long-haul links (10G, 25G, 100G,
+and 400G), optical transceivers (SFP+, QSFP28, QSFP-DD) represent one of the
+most frequent sources of physical-layer degradation.
+
+Long before an optical link officially reports an administrative down state,
+fiber-optic paths exhibit measurable physical warning signs:
+
+* **Dirty or Scratched Fiber Endfaces**: Attenuating receive (Rx) light levels.
+* **Laser Diode Degradation**: Gradual decay in transmit (Tx) bias current.
+* **Thermal Stress**: Overheating transceivers in dense switch chassis leading
+  to bit-error rate (BER) spikes and Cyclic Redundancy Check (CRC) errors.
+
+Digital Optical Monitoring (DOM), also standardized as Digital Diagnostic
+Monitoring (DDM, SFF-8472), provides real-time internal diagnostic metrics
+probed directly from the transceiver's internal microcontroller over I2C/MDIO.
+
+`ezsnmp <https://github.com/carlkidcrypto/ezsnmp>`_ provides native Net-SNMP C
+bindings to query standard hardware sensor MIBs, allowing engineers to audit
+optical health across thousands of interfaces before packet loss occurs.
+
+
+The ENTITY-SENSOR-MIB Architecture
+==================================
+
+The vendor-neutral standard for hardware telemetry is ``ENTITY-SENSOR-MIB``
+(RFC 3433), which pairs with ``ENTITY-MIB`` (RFC 6933) to identify physical
+components and their operational sensor values.
+
+1. Mapping Physical Components (ENTITY-MIB)
+-------------------------------------------
+Under ``entPhysicalTable`` (OID ``.1.3.6.1.2.1.47.1.1.1``):
+
+* **``entPhysicalName``**: Human-readable component name (e.g.,
+  ``Ethernet1/1 Rx Power Sensor``).
+* **``entPhysicalDescr``**: Detailed hardware description.
+
+2. Sensor Telemetry (RFC 3433 ENTITY-SENSOR-MIB)
+------------------------------------------------
+Under ``entPhySensorTable`` (OID ``.1.3.6.1.2.1.99.1.1.1``):
+
+* **``entPhySensorType``**: The physical measurement unit:
+  - ``celsius(8)``: Temperature (note: ``hertz`` is 7).
+  - ``watts(6)``: Optical power in microWatts or milliWatts.
+  - ``dBm(14)``: Optical decibels relative to one milliwatt.
+* **``entPhySensorScale``**: Exponent scaling factor advancing in powers of
+  1,000 (e.g. ``micro(7)`` = :math:`10^{-6}`, ``milli(8)`` = :math:`10^{-3}`,
+  ``units(9)`` = :math:`10^{0}`).
+* **``entPhySensorPrecision``**: Number of decimal places in the raw value.
+* **``entPhySensorValue``**: The raw signed integer sensor measurement.
+* **``entPhySensorOperStatus``**: Operational state: ``ok(1)``,
+  ``unavailable(2)``, ``nonoperational(3)``.
+
+
+Calculating Real-World Sensor Values
+====================================
+
+Because SNMP transmits integer data types, physical measurements with decimal
+precision are scaled. To reconstruct the true floating-point value:
+
+.. code-block:: text
+
+    Scale Exponent = (entPhySensorScale - 9) * 3
+    True Value = entPhySensorValue * 10^(Scale Exponent - entPhySensorPrecision)
+
+For example, a raw ``entPhySensorValue`` of ``-652`` with ``entPhySensorScale=units(9)``
+and ``entPhySensorPrecision=2`` yields :math:`-652 \times 10^{0 - 2} =` **-6.52 dBm**.
+Similarly, a reading of ``1500`` with ``milli(8)`` and ``precision=0`` yields
+:math:`1500 \times 10^{-3} =` **1.50 W**.
+
+
+Practical Implementation: Optical Health Auditor
+================================================
+
+Below is a complete script using ezsnmp to discover optical transceivers,
+query optical receive/transmit power, and evaluate link safety margins:
+
+.. code-block:: python
+
+    from ezsnmp import Session
+    from ezsnmp.exceptions import GenericError
+
+    # RFC 3433 sensor scale exponents advancing in powers of 1,000 (10^3)
+    SCALE_EXPONENTS = {
+        1: -24, 2: -21, 3: -18, 4: -15, 5: -12, 6: -9, 7: -6, 8: -3,
+        9: 0, 10: 3, 11: 6, 12: 9, 13: 12, 14: 15, 15: 18, 16: 21, 17: 24,
+    }
+
+    def audit_optical_sensors(hostname: str, community: str = "public"):
+        session = Session(
+            hostname=hostname,
+            community=community,
+            version=2,
+            timeout=2,
+            retries=1,
+            print_enums_numerically=True,
+            set_max_repeaters_to_num=25
+        )
+
+        try:
+            # 1. Map physical sensor IDs to human-readable names
+            name_vars = session.bulk_walk("entPhysicalName")
+            sensor_names = {v.index: v.value for v in name_vars}
+
+            # 2. Bulk-walk sensor telemetry columns (RFC 3433 standard)
+            # Falls back to vendor/Cisco entSensor* columns if MIB uses legacy names
+            try:
+                type_vars = session.bulk_walk("entPhySensorType")
+                scale_vars = session.bulk_walk("entPhySensorScale")
+                prec_vars = session.bulk_walk("entPhySensorPrecision")
+                val_vars = session.bulk_walk("entPhySensorValue")
+                status_vars = session.bulk_walk("entPhySensorOperStatus")
+            except GenericError:
+                type_vars = session.bulk_walk("entSensorType")
+                scale_vars = session.bulk_walk("entSensorScale")
+                prec_vars = session.bulk_walk("entSensorPrecision")
+                val_vars = session.bulk_walk("entSensorValue")
+                status_vars = session.bulk_walk("entSensorStatus")
+
+            scales = {v.index: int(v.value) for v in scale_vars}
+            precisions = {v.index: int(v.value) for v in prec_vars}
+            values = {v.index: int(v.value) for v in val_vars}
+            statuses = {v.index: int(v.value) for v in status_vars}
+
+            optical_report = []
+
+            for v in type_vars:
+                idx = v.index
+                sensor_type = int(v.value)
+                name = sensor_names.get(idx, f"Sensor-{idx}")
+
+                # Focus on optical power sensors (dBm = 14) and temperature (celsius = 8)
+                if sensor_type in (8, 14) and statuses.get(idx) == 1:
+                    raw_val = values.get(idx, 0)
+                    scale = scales.get(idx, 9)
+                    precision = precisions.get(idx, 0)
+
+                    # Compute calibrated floating-point metric with scale exponent
+                    scale_exp = SCALE_EXPONENTS.get(scale, (scale - 9) * 3)
+                    calibrated = raw_val * (10 ** (scale_exp - precision))
+                    unit = "dBm" if sensor_type == 14 else "C"
+
+                    # Flag optical signal attenuation based on optics class
+                    warning = False
+                    is_rx_power = sensor_type == 14 and "Rx" in name
+                    # Standard 10G-SR baseline warning floor (-12.0 dBm)
+                    if is_rx_power and calibrated < -12.0:
+                        warning = True
+
+                    optical_report.append({
+                        "sensor": name,
+                        "value": round(calibrated, 2),
+                        "unit": unit,
+                        "warning": warning
+                    })
+
+            return optical_report
+
+        except GenericError as exc:
+            print(f"[{hostname}] Optical telemetry audit failed: {exc}")
+            return []
+
+    if __name__ == "__main__":
+        telemetry = audit_optical_sensors("edge-leaf01.internal")
+        print("--- Optical Diagnostic Monitoring Report ---")
+        for item in telemetry:
+            flag = " [LOW SIGNAL ALERT]" if item["warning"] else ""
+            sensor = item["sensor"]
+            val = item["value"]
+            unit = item["unit"]
+            print(f"  {sensor:<28} : {val:>6.2f} {unit}{flag}")
+
+
+Production Best Practices
+=========================
+
+* **Do Not Over-Poll I2C Transceiver Buses**: Optical transceivers update
+  internal analog-to-digital converters (ADCs) at slow rates (every 500ms to
+  1000ms). Polling DOM sensors faster than every 30 to 60 seconds risks
+  contention on the switch's internal I2C bus and can trigger linecard CPU
+  spikes.
+* **Correlate Rx Power with CRC Error Counters**: When an interface exhibits
+  sporadic CRC errors, cross-reference receive optical power (``Rx Power``)
+  against manufacturer optical sensitivity thresholds. Low Rx power (< -15 dBm
+  on standard 10GBASE-SR) indicates fiber degradation.
+* **Bulk Walk Optimization**: Physical sensor tables contain hundreds of
+  rows. Utilize ``bulk_walk`` with ``set_max_repeaters_to_num=25..50`` on the
+  ``Session`` constructor to retrieve the sensor table in fewer UDP round-trips.
+
+
+Migration Notes: Easy SNMP vs ezsnmp
+====================================
+
+* **Signed Integer Preservations**: Receive optical power in dBm is
+  inherently negative (e.g. ``-6.52 dBm``). Legacy ``easysnmp`` contained
+  integer signedness bugs in Python 3 that occasionally unpacked negative
+  values as massive unsigned 32-bit integers (e.g. ``4294966644``).
+* **ezsnmp Type Fidelity**: ``ezsnmp``'s modernized C++17 type conversion layer
+  correctly maps signed Net-SNMP ASN.1 integers into Python native signed
+  integers, ensuring negative optical dBm metrics parse with 100% accuracy.
+
+
+Useful Links & Community
+========================
+
+* **Source Repository**: `carlkidcrypto/ezsnmp on GitHub
+  <https://github.com/carlkidcrypto/ezsnmp>`_
+* **PyPI Distribution**: `ezsnmp Package on PyPI
+  <https://pypi.org/project/ezsnmp/>`_
+* **Documentation**: `ezsnmp Online Documentation
+  <https://carlkidcrypto.github.io/ezsnmp/>`_
+* **Blog & Updates**: `Carlos Santos Blog Updates`_
+
+.. _Carlos Santos Blog Updates:
+ https://github.com/carlkidcrypto/carlkidcrypto.github.io/tree/feature/updates
+
+----
+
+.. warning::
+
+   AI-generated content may contain misinformation or mistakes. A human does review this, but we are only human.
+
