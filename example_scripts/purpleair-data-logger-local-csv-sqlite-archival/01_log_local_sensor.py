@@ -39,7 +39,7 @@ def log_local_sensor(sensor_ip: str):
     data = response.json()
 
     epoch = int(datetime.now(timezone.utc).timestamp())
-    mac = data.get("mac")
+    mac = data.get("SensorId") or data.get("mac")
     pm25 = data.get("pm2_5_atm")
     pm25_cf1 = data.get("pm2_5_cf_1")
     pm10 = data.get("pm10_0_atm")
@@ -57,3 +57,14 @@ def log_local_sensor(sensor_ip: str):
             epoch, sensor_ip, mac, pm25, pm25_cf1, pm10,
             temp, humidity, pressure
         ))
+
+if __name__ == "__main__":
+    initialize_database()
+    # Poll configured local sensors (replace IP with your local sensor's LAN address)
+    configured_sensors = ["192.168.1.100"]
+    for ip in configured_sensors:
+        try:
+            log_local_sensor(ip)
+            print(f"Successfully recorded telemetry from {ip}")
+        except Exception as err:
+            print(f"Sensor polling skipped or failed for {ip}: {err}")
