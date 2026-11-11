@@ -111,6 +111,8 @@ size and preserve API credit points:
     records = response.get("data", [])
     print(f"Located {len(records)} active outside sensors in bounding box.")
 
+📥 `Download this script: 01_spatial_filtering_via_bounding_boxes.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-api-historical-data-bounding-box-queries/01_spatial_filtering_via_bounding_boxes.py>`_
+
 Understanding Historical Data Constraints
 =========================================
 
@@ -229,6 +231,8 @@ historical averages across a 60-day observation window:
 
         msg = f"Downloaded {len(data)} hourly records for {target_sensor}"
         print(msg)
+
+📥 `Download this script: 02_fetch_sensor_history_chunked.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-api-historical-data-bounding-box-queries/02_fetch_sensor_history_chunked.py>`_
 
 Best Practices for Scientific Data Extraction
 =============================================
