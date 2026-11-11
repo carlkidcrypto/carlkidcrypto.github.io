@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import os
 import re
 import subprocess
 import sys
@@ -683,6 +684,54 @@ def execute_test_harness(
     sys.modules["ezsnmp"] = mock_ezsnmp
     sys.modules["ezsnmp.exceptions"] = mock_exceptions
 
+    # Mock purpleair_api
+    mock_purpleair_module = types.ModuleType("purpleair_api")
+    mock_paa_mod = types.ModuleType("purpleair_api.PurpleAirAPI")
+    mock_pread_mod = types.ModuleType("purpleair_api.PurpleAirReadAPI")
+    mock_pwrite_mod = types.ModuleType("purpleair_api.PurpleAirWriteAPI")
+    mock_plocal_mod = types.ModuleType("purpleair_api.PurpleAirLocalAPI")
+
+    class MockPurpleAirBase:
+        def __init__(self, *a: Any, **k: Any): pass
+        def request_sensor_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
+            return {"sensor": {"name": "Mock Station", "pm2.5_atm": 12.5, "pm2.5_cf_1": 12.0, "temperature": 72.0, "humidity": 45.0, "pressure": 1013.25}}
+        def request_multiple_sensors_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
+            return {"fields": ["name", "latitude", "longitude", "pm2.5_atm", "temperature"], "data": [["Mock Sensor 1", 46.7, -117.1, 10.2, 70.0]]}
+        def request_group_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
+            return {"group_id": 1234, "name": "Mock Group"}
+        def request_members_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
+            return {"fields": ["sensor_index", "name", "pm2.5_atm"], "data": [[282168, "Mock Station", 12.5]]}
+        def post_create_group_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
+            return {"group_id": 1234, "name": "Mock Group"}
+        def post_create_member(self, *a: Any, **k: Any) -> Dict[str, Any]:
+            return {"member_id": 5678, "sensor_index": 282168}
+        def request_local_sensor_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
+            return {"SensorId": "MockLocal", "pm2_5_atm": 12.5, "current_temp_f": 72.0, "current_humidity": 45.0, "pressure": 1013.25}
+
+    mock_paa_mod.PurpleAirAPI = MockPurpleAirBase
+    mock_pread_mod.PurpleAirReadAPI = MockPurpleAirBase
+    mock_pwrite_mod.PurpleAirWriteAPI = MockPurpleAirBase
+    mock_plocal_mod.PurpleAirLocalAPI = MockPurpleAirBase
+    mock_purpleair_module.PurpleAirAPI = MockPurpleAirBase
+    mock_purpleair_module.PurpleAirReadAPI = MockPurpleAirBase
+    mock_purpleair_module.PurpleAirWriteAPI = MockPurpleAirBase
+    mock_purpleair_module.PurpleAirLocalAPI = MockPurpleAirBase
+
+    old_purpleair = sys.modules.get("purpleair_api")
+    old_purpleair_api = sys.modules.get("purpleair_api.PurpleAirAPI")
+    old_purpleair_read = sys.modules.get("purpleair_api.PurpleAirReadAPI")
+    old_purpleair_write = sys.modules.get("purpleair_api.PurpleAirWriteAPI")
+    old_purpleair_local = sys.modules.get("purpleair_api.PurpleAirLocalAPI")
+    sys.modules["purpleair_api"] = mock_purpleair_module
+    sys.modules["purpleair_api.PurpleAirAPI"] = mock_paa_mod
+    sys.modules["purpleair_api.PurpleAirReadAPI"] = mock_pread_mod
+    sys.modules["purpleair_api.PurpleAirWriteAPI"] = mock_pwrite_mod
+    sys.modules["purpleair_api.PurpleAirLocalAPI"] = mock_plocal_mod
+
+    # Default environment variables for mock tests
+    os.environ.setdefault("PURPLEAIR_READ_KEY", "mock-read-key-12345")
+    os.environ.setdefault("PURPLEAIR_WRITE_KEY", "mock-write-key-12345")
+
     # Mock time.sleep, multiprocessing.Pool, and ProcessPoolExecutor to avoid blocking or pickling issues
     import time
     import multiprocessing
@@ -830,6 +879,26 @@ def execute_test_harness(
             sys.modules["ezsnmp.exceptions"] = old_exceptions
         else:
             sys.modules.pop("ezsnmp.exceptions", None)
+        if old_purpleair is not None:
+            sys.modules["purpleair_api"] = old_purpleair
+        else:
+            sys.modules.pop("purpleair_api", None)
+        if old_purpleair_api is not None:
+            sys.modules["purpleair_api.PurpleAirAPI"] = old_purpleair_api
+        else:
+            sys.modules.pop("purpleair_api.PurpleAirAPI", None)
+        if old_purpleair_read is not None:
+            sys.modules["purpleair_api.PurpleAirReadAPI"] = old_purpleair_read
+        else:
+            sys.modules.pop("purpleair_api.PurpleAirReadAPI", None)
+        if old_purpleair_write is not None:
+            sys.modules["purpleair_api.PurpleAirWriteAPI"] = old_purpleair_write
+        else:
+            sys.modules.pop("purpleair_api.PurpleAirWriteAPI", None)
+        if old_purpleair_local is not None:
+            sys.modules["purpleair_api.PurpleAirLocalAPI"] = old_purpleair_local
+        else:
+            sys.modules.pop("purpleair_api.PurpleAirLocalAPI", None)
 
     return issues
 
