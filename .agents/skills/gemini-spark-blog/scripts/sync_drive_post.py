@@ -122,11 +122,18 @@ def parse_draft(draft_path: Path) -> dict:
         if len(line_s) >= 4 and set(line_s) == {"="}:
             title_lines = []
             j = i + 1
-            while j < len(lines) and not (len(lines[j].strip()) >= 4 and set(lines[j].strip()) == {"="}):
+            while j < len(lines) and not (
+                len(lines[j].strip()) >= 4 and set(lines[j].strip()) == {"="}
+            ):
                 if lines[j].strip():
                     title_lines.append(lines[j].strip())
                 j += 1
-            if title_lines and j < len(lines) and len(lines[j].strip()) >= 4 and set(lines[j].strip()) == {"="}:
+            if (
+                title_lines
+                and j < len(lines)
+                and len(lines[j].strip()) >= 4
+                and set(lines[j].strip()) == {"="}
+            ):
                 title = " ".join(title_lines)
                 break
         elif (
@@ -364,6 +371,18 @@ def generate_sphinx_rst(parsed: dict, slug: str) -> str:
     return content
 
 
+def get_category_for_slug(slug: str) -> str:
+    if slug.startswith("ezsnmp-"):
+        return "ezsnmp"
+    elif slug.startswith("purpleair-api-"):
+        return "purpleair-api"
+    elif slug.startswith("purpleair-data-logger-"):
+        return "purpleair-data-logger"
+    elif slug.startswith("purpleair-matterbridge-"):
+        return "purpleair-matterbridge"
+    return "ezsnmp"
+
+
 def register_in_index(
     slug: str,
     title: str,
@@ -372,27 +391,14 @@ def register_in_index(
     reading_time: int,
     tags: list[str],
 ) -> bool:
-    """Register slug in source/blog/index.rst (toctree & grid card)."""
+    """Register slug in source/blog/index.rst and corresponding category hub."""
     if not INDEX_FILE.exists():
         print(f"Error: {INDEX_FILE} not found.")
         return False
 
     content = INDEX_FILE.read_text(encoding="utf-8")
-
-    # 1. Add to toctree
-    if not re.search(rf"^\s*{re.escape(slug)}\s*$", content, re.MULTILINE):
-        toctree_pattern = r"(\.\. toctree::\s*\n\s*:maxdepth:\s*\d+\s*\n\s*:caption:\s*Articles:\s*\n)"
-        match = re.search(toctree_pattern, content)
-        if match:
-            replacement = match.group(1) + f"\n   {slug}\n"
-            content = content[: match.start()] + replacement + content[match.end() :]
-        else:
-            print("Warning: Could not locate .. toctree:: block in index.rst")
-
-    # 2. Add grid card
-    if not re.search(rf":link:\s*{re.escape(slug)}\s*$", content, re.MULTILINE):
-        card_tags = " ".join(f"`{t}`" for t in tags[:4])
-        card_snippet = f"""   .. grid-item-card:: 📖 {title}
+    card_tags = " ".join(f"`{t}`" for t in tags[:4])
+    card_snippet = f"""   .. grid-item-card:: 📖 {title}
       :link: {slug}
       :link-type: doc
 
@@ -402,14 +408,59 @@ def register_in_index(
       📅 *{date_str}* • ⏱️ *{reading_time} min read* • {card_tags}
 
 """
-        grid_pattern = r"(\.\. grid:: 1\s*\n\s*:gutter: \d+\s*\n\n)"
+
+    # 1. Add to corresponding Category Hub (toctree & category grid)
+    cat_name = get_category_for_slug(slug)
+    cat_file = INDEX_FILE.parent / f"category-{cat_name}.rst"
+    if cat_file.exists():
+        cat_content = cat_file.read_text(encoding="utf-8")
+        if not re.search(rf"^\s*{re.escape(slug)}\s*$", cat_content, re.MULTILINE):
+            cat_pattern = r"(\.\. toctree::\s*\n\s*:maxdepth:\s*\d+\s*\n\s*:caption:\s*Articles:\s*\n)"
+            m = re.search(cat_pattern, cat_content)
+            if m:
+                cat_content = (
+                    cat_content[: m.end()] + f"\n   {slug}\n" + cat_content[m.end() :]
+                )
+            else:
+                print(
+                    f"Warning: Could not locate .. toctree:: block in {cat_file.name}"
+                )
+
+            # Add card to category grid
+            if not re.search(
+                rf":link:\s*{re.escape(slug)}\s*$", cat_content, re.MULTILINE
+            ):
+                c_grid_pattern = r"(\.\. grid:: 1\s*\n\s*:gutter: \d+\s*\n\n)"
+                c_grid_match = re.search(c_grid_pattern, cat_content)
+                if c_grid_match:
+                    cat_content = (
+                        cat_content[: c_grid_match.end()]
+                        + card_snippet
+                        + cat_content[c_grid_match.end() :]
+                    )
+            cat_file.write_text(cat_content, encoding="utf-8")
+
+    # 2. Add grid card to index.rst under All Posts
+    if not re.search(rf":link:\s*{re.escape(slug)}\s*$", content, re.MULTILINE):
+        grid_pattern = (
+            r"(All Posts\s*\n-+\s*\n\n\.\. grid:: 1\s*\n\s*:gutter: \d+\s*\n\n)"
+        )
         grid_match = re.search(grid_pattern, content)
         if grid_match:
             content = (
                 content[: grid_match.end()] + card_snippet + content[grid_match.end() :]
             )
         else:
-            print("Warning: Could not locate .. grid:: block in index.rst")
+            grid_fallback = r"(\.\. grid:: 1\s*\n\s*:gutter: \d+\s*\n\n)"
+            grid_match2 = re.search(grid_fallback, content)
+            if grid_match2:
+                content = (
+                    content[: grid_match2.end()]
+                    + card_snippet
+                    + content[grid_match2.end() :]
+                )
+            else:
+                print("Warning: Could not locate .. grid:: block in index.rst")
 
     INDEX_FILE.write_text(content, encoding="utf-8")
     return True

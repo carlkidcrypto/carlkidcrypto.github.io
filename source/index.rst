@@ -73,7 +73,7 @@ A collection of projects that I work on when time appears...
       A modern, well-maintained Python wrapper for the PurpleAir sensors and sensor data API.
 
       +++
-      `GitHub <https://github.com/carlkidcrypto/purpleair_api>`_ • `Documentation <https://carlkidcrypto.github.io/purpleair_api/>`_
+      `GitHub <https://github.com/carlkidcrypto/purpleair_api>`__ • `Documentation <https://carlkidcrypto.github.io/purpleair_api/>`__
 
    .. grid-item-card:: 📊 PurpleAir Data Logger(s) PADLs
       :link: https://github.com/carlkidcrypto/purpleair_data_logger
@@ -82,7 +82,7 @@ A collection of projects that I work on when time appears...
       Data loggers for PurpleAir sensors supporting SQLite, PostgreSQL, CSV, Prometheus, and Matter.
 
       +++
-      `GitHub <https://github.com/carlkidcrypto/purpleair_data_logger>`_ • `Documentation <https://carlkidcrypto.github.io/purpleair_data_logger/>`_
+      `GitHub <https://github.com/carlkidcrypto/purpleair_data_logger>`__ • `Documentation <https://carlkidcrypto.github.io/purpleair_data_logger/>`__
 
    .. grid-item-card:: 🏠 PurpleAir Matterbridge
       :link: https://github.com/carlkidcrypto/purpleair-matterbridge
@@ -91,7 +91,7 @@ A collection of projects that I work on when time appears...
       Matterbridge plugin exposing PurpleAir sensor readings as bridged Matter air quality and environmental devices.
 
       +++
-      `GitHub <https://github.com/carlkidcrypto/purpleair-matterbridge>`_ • `Documentation <https://carlkidcrypto.github.io/purpleair-matterbridge/>`_
+      `GitHub <https://github.com/carlkidcrypto/purpleair-matterbridge>`__ • `Documentation <https://carlkidcrypto.github.io/purpleair-matterbridge/>`__
 
    .. grid-item-card:: 📡 EzSnmp
       :link: https://github.com/carlkidcrypto/ezsnmp
@@ -100,7 +100,7 @@ A collection of projects that I work on when time appears...
       A fast, Pythonic SNMP library wrapping Net-SNMP with a C++ extension for network management.
 
       +++
-      `GitHub <https://github.com/carlkidcrypto/ezsnmp>`_ • `Documentation <https://carlkidcrypto.github.io/ezsnmp/>`_
+      `GitHub <https://github.com/carlkidcrypto/ezsnmp>`__ • `Documentation <https://carlkidcrypto.github.io/ezsnmp/>`__
 
    .. grid-item-card:: 🚀 OS Specific Runner
       :link: https://github.com/carlkidcrypto/os-specific-runner
@@ -109,7 +109,7 @@ A collection of projects that I work on when time appears...
       GitHub Action that executes operating-system-specific commands across Linux, macOS, and Windows runners.
 
       +++
-      `GitHub <https://github.com/carlkidcrypto/os-specific-runner>`_ • `Documentation <https://carlkidcrypto.github.io/os-specific-runner/>`_
+      `GitHub <https://github.com/carlkidcrypto/os-specific-runner>`__ • `Documentation <https://carlkidcrypto.github.io/os-specific-runner/>`__
 
 .. _contact-me:
 

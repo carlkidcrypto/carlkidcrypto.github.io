@@ -692,21 +692,50 @@ def execute_test_harness(
     mock_plocal_mod = types.ModuleType("purpleair_api.PurpleAirLocalAPI")
 
     class MockPurpleAirBase:
-        def __init__(self, *a: Any, **k: Any): pass
+        def __init__(self, *a: Any, **k: Any):
+            pass
+
         def request_sensor_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {"sensor": {"name": "Mock Station", "pm2.5_atm": 12.5, "pm2.5_cf_1": 12.0, "temperature": 72.0, "humidity": 45.0, "pressure": 1013.25}}
+            return {
+                "sensor": {
+                    "name": "Mock Station",
+                    "pm2.5_atm": 12.5,
+                    "pm2.5_cf_1": 12.0,
+                    "temperature": 72.0,
+                    "humidity": 45.0,
+                    "pressure": 1013.25,
+                }
+            }
+
         def request_multiple_sensors_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {"fields": ["name", "latitude", "longitude", "pm2.5_atm", "temperature"], "data": [["Mock Sensor 1", 46.7, -117.1, 10.2, 70.0]]}
+            return {
+                "fields": ["name", "latitude", "longitude", "pm2.5_atm", "temperature"],
+                "data": [["Mock Sensor 1", 46.7, -117.1, 10.2, 70.0]],
+            }
+
         def request_group_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
             return {"group_id": 1234, "name": "Mock Group"}
+
         def request_members_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {"fields": ["sensor_index", "name", "pm2.5_atm"], "data": [[282168, "Mock Station", 12.5]]}
+            return {
+                "fields": ["sensor_index", "name", "pm2.5_atm"],
+                "data": [[282168, "Mock Station", 12.5]],
+            }
+
         def post_create_group_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
             return {"group_id": 1234, "name": "Mock Group"}
+
         def post_create_member(self, *a: Any, **k: Any) -> Dict[str, Any]:
             return {"member_id": 5678, "sensor_index": 282168}
+
         def request_local_sensor_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {"SensorId": "MockLocal", "pm2_5_atm": 12.5, "current_temp_f": 72.0, "current_humidity": 45.0, "pressure": 1013.25}
+            return {
+                "SensorId": "MockLocal",
+                "pm2_5_atm": 12.5,
+                "current_temp_f": 72.0,
+                "current_humidity": 45.0,
+                "pressure": 1013.25,
+            }
 
     mock_paa_mod.PurpleAirAPI = MockPurpleAirBase
     mock_pread_mod.PurpleAirReadAPI = MockPurpleAirBase
@@ -1260,7 +1289,7 @@ def save_all_example_scripts(
         blog_dir = BLOG_DIR
     results: Dict[str, List[Path]] = {}
     for post in sorted(blog_dir.glob("*.rst")):
-        if post.name == "index.rst":
+        if post.name == "index.rst" or post.name.startswith("category-"):
             continue
         saved = save_example_scripts(
             post, output_base=output_base, update_links=update_links
@@ -1352,7 +1381,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         posts = [
             f
             for f in sorted(BLOG_DIR.glob("*"))
-            if f.name != "index.rst" and f.suffix in (".rst", ".md")
+            if f.name != "index.rst"
+            and not f.name.startswith("category-")
+            and f.suffix in (".rst", ".md")
         ]
 
     if args.fix:

@@ -53,6 +53,7 @@ ORDERED_STACK = [
     ("feature/blog-purpleair-api-historical-data-bounding-box-queries", 51),
     ("feature/blog-purpleair-data-logger-local-csv-sqlite-archival", 52),
     ("feature/blog-purpleair-matterbridge-device-clustering-telemetry-mapping", 53),
+    ("feature/blog-navigation-optimization", 55),
 ]
 
 
