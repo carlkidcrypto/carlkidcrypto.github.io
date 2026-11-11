@@ -119,16 +119,16 @@ def parse_draft(draft_path: Path) -> dict:
     # Find title from overline/underline or underline
     for i, line in enumerate(lines):
         line_s = line.strip()
-        if (
-            i + 1 < len(lines)
-            and len(line_s) >= 4
-            and set(line_s) == {"="}
-            and not set(lines[i + 1].strip()).issubset({"="})
-            and i + 2 < len(lines)
-            and set(lines[i + 2].strip()) == {"="}
-        ):
-            title = lines[i + 1].strip()
-            break
+        if len(line_s) >= 4 and set(line_s) == {"="}:
+            title_lines = []
+            j = i + 1
+            while j < len(lines) and not (len(lines[j].strip()) >= 4 and set(lines[j].strip()) == {"="}):
+                if lines[j].strip():
+                    title_lines.append(lines[j].strip())
+                j += 1
+            if title_lines and j < len(lines) and len(lines[j].strip()) >= 4 and set(lines[j].strip()) == {"="}:
+                title = " ".join(title_lines)
+                break
         elif (
             i + 1 < len(lines)
             and set(lines[i + 1].strip()) == {"="}
