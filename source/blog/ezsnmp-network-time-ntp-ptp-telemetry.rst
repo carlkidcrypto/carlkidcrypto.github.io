@@ -193,6 +193,7 @@ evaluate stratum levels, and alert on clock skew:
             print(f"  Root Dispersion     : {result['dispersion_ms']:.3f} ms")
             print(f"  Overall Health      : {result['status']}")
 
+📥 `Download this script: audit_device_clock.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-network-time-ntp-ptp-telemetry/audit_device_clock.py>`_
 
 Production Best Practices
 =========================
