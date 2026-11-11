@@ -66,13 +66,22 @@ Explore by Topic
       Exposing PurpleAir sensors as Matter 1.5.1 Air Quality devices into Apple Home, Home Assistant, and Matterbridge smart home ecosystems.
 
       +++
-      📚 *1 Article* • `Matter` `Smart Home` `Apple Home`
+      📚 *2 Articles* • `Matter` `Smart Home` `Apple Home`
 
 All Posts
 ---------
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Matter Device Clustering & Sensor Telemetry Mapping for Smart Homes
+      :link: purpleair-matterbridge-device-clustering-telemetry-mapping
+      :link-type: doc
+
+      The Connectivity Standards Alliance (CSA) Matter specification has fundamentally transformed smart home interoperability. By providing an open, IP-based...
+
+      +++
+      📅 *November 10, 2026* • ⏱️ *5 min read* • `Purpleair` `Matter` `Smart-Home` `Iot`
 
    .. grid-item-card:: 📖 Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
       :link: purpleair-data-logger-local-csv-sqlite-archival
