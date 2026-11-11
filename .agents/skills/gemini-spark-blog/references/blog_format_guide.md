@@ -127,15 +127,44 @@ Add a `.. grid-item-card::` under the `All Posts` section:
 
 ---
 
-## 5. Technical Accuracy Checklist
+## 5. Technical Accuracy & Gemini Spark Review Checklist
 
-Before publishing, verify against the common issues identified in Copilot/human reviews:
+Before publishing, verify against the common issues identified in Copilot and agent audits:
 
 - **Exception Hierarchy**: Use modern `ezsnmp.exceptions` classes (`GenericError`, `ConnectionError`, `TimeoutError`, `NoSuchInstanceError`, `NoSuchNameError`, `NoSuchObjectError`, `PacketError`, `ParseError`, `UndeterminedTypeError`, `UnknownObjectIDError`). Never use legacy `EasySNMP*` names (e.g. `EasySNMPUndeterminedTypeError` does not exist in ezsnmp—the class is `UndeterminedTypeError`).
-- **Library Versioning**: Do not call `ezsnmp.version` (attribute does not exist). Use `from importlib.metadata import version; version('ezsnmp')`.
-- **Concurrency Models**: Clarify that Net-SNMP C library maintains global C state, so multi-processing (`ProcessPoolExecutor`) provides thread-safe process isolation, whereas high-concurrency multi-threading (>4 threads) can risk race conditions.
+- **Method Signatures**:
+  - `session.get()` takes single string OID or list of OIDs (never tuple notation `('sysDescr', '0')`). Always returns `tuple[Result, ...]`; unpack the scalar element (`session.get(...)[0].value`) before reading values.
+  - `session.walk()` takes a single root OID string.
+  - `session.bulk_walk()` takes only OIDs; configure repetition counts via `Session(set_max_repeaters_to_num=25)` constructor (never pass `max_repetitions`, which raises `TypeError`).
+  - `session.set()` takes OID-type-value triples where values MUST be string representations (e.g. `[oid, 'i', str(int_val)]`), never native Python integers. All nonzero agent response error codes raise `ezsnmp.exceptions.PacketError`.
+- **Result Attributes & Types**:
+  - Use `.index` and `.type` on `Result` objects, never `.oid_index` or `.snmp_type`.
+  - C++ `SessionBase::get` returns `std::vector<Result>`, exposed through SWIG as a tuple of `ezsnmp.Result` instances (never legacy `SNMPVariable`).
+- **Binary & Hex Encoding (PortLists & MACs)**:
+  - SNMP `PortList` bitmasks and MAC addresses formatted as `Hex-STRING` text (e.g. `'80 00'`) must be normalized and decoded using `bytes.fromhex(val.replace(' ', ''))` before evaluating bit positions. Never pass raw hex text to `.encode('latin1')`.
+- **Topology Discovery (LLDP / CDP)**:
+  - LLDP remote tables use 3-part composite indices: `[time_mark].[local_port].[rem_idx]`. Extract full composite keys by examining `.oid` + `.index`.
+  - Local port numbers in LLDP tables do NOT always align with IF-MIB `ifIndex`. Map local ports using `lldpLocPortDesc`.
+  - In production crawlers, query both LLDP and CDP simultaneously and deduplicate link records.
+- **Metrics Exporters (Prometheus & OpenTelemetry)**:
+  - In Prometheus collectors, `ifDescr` is not unique across ports. Include `if_index` in the metric labels to prevent scrape rejection due to duplicate series.
+  - In OpenTelemetry Metrics, register cumulative monotonic byte counters (`ifHCInOctets`) as `ObservableCounter`, never `ObservableGauge`.
+  - Standalone OTel snippets must initialize `MeterProvider` with a periodic reader and keep the application alive to export metric batches.
+- **Telemetry Throughput vs Microbursts**:
+  - 1–5s SNMP polling measures interval-average utilization, not sub-second microbursts or packet buffer drops (which require queue watermarks or streaming sFlow/IPFIX).
+  - While in-memory Arrow queries between Polars and DuckDB are zero-copy, exporting via `.write_parquet(..., compression='zstd')` incurs serialization and compression overhead.
+- **SNMPv2 Result Types**: `NOSUCHOBJECT` and `NOSUCHINSTANCE` return as `Result.type` values, not raised Python exceptions. Check `var.type` explicitly.
+- **Timeouts & Deadlines**:
+  - ezsnmp defaults to `timeout=1` and `retries=3` (~4s total wait budget). Avoid claiming 30-second default wait budgets unless explicit.
+  - Use `time.monotonic()` for circuit breaker and cooldown deadlines to prevent clock drift / NTP adjustments.
+- **Library Versioning**: Do not call `ezsnmp.__version__` or `ezsnmp.version` (attribute does not exist). Use `from importlib.metadata import version; version('ezsnmp')`.
+- **Concurrency & Locking**:
+  - Net-SNMP C library maintains process-global C state protected by internal mutexes. Scaling beyond 4 threads per Python process introduces lock contention. Multi-process architectures (`ProcessPoolExecutor`) provide true process isolation.
+  - A single `Session` instance rebuilds internal C++ argument vectors per call; serialize concurrent calls on the same client using an `asyncio.Lock()`.
+- **Table Navigation**: Independent walks across multiple columns collect data sequentially and are not atomic across high-churn interface changes.
+- **Drop-in Compatibility**: Do not claim 100% drop-in compatibility with Easy SNMP; explain exact modern API differences.
 - **Packaging & Builds**: When explaining C-extensions, distinguish between pre-built binary wheels (which bundle compiled DLLs on Windows) versus source distributions (`sdist`), which require SWIG and compilers.
-- **Code Snippet Reproducibility**: All code samples should be syntactically valid and runnable against real or mock endpoints.
+- **Code Snippet Reproducibility**: All code samples should pass `validate_blog_code.py` including bytecode compilation and sandbox execution.
 
 ---
 

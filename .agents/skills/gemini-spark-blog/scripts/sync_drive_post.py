@@ -218,15 +218,20 @@ def parse_draft(draft_path: Path) -> dict:
 
     clean_body = "\n".join(body_lines).strip()
 
-    # Extract first paragraph as summary
+    # Extract first prose paragraph as summary (skipping section headings and directives)
     summary = ""
     for paragraph in clean_body.split("\n\n"):
         p = paragraph.strip()
-        if not p.startswith(("=", "-", "~", "..", "*", "#")):
-            summary = p.replace("\n", " ").strip()
-            if len(summary) > 160:
-                summary = summary[:157].rsplit(" ", 1)[0] + "..."
-            break
+        if not p or p.startswith(("=", "-", "~", "..", "*", "#")):
+            continue
+        p_lines = [pl.strip() for pl in p.splitlines() if pl.strip()]
+        # Skip section headings with underlines
+        if any(re.match(r"^[=\-~#`^]{4,}$", pl) for pl in p_lines):
+            continue
+        summary = " ".join(p_lines).strip()
+        if len(summary) > 160:
+            summary = summary[:157].rsplit(" ", 1)[0] + "..."
+        break
 
     if not summary:
         summary = f"Practical guide and technical walkthrough for {title}."
