@@ -284,7 +284,7 @@ To avoid stepping on other concurrent agents (maintainer, background agentic wor
 3. **Targeted Staging & Atomic Commit**:
    Use targeted staging only—never blanket `git add .` or `git add -A`:
    ```bash
-   git add source/blog/<slug>.rst source/blog/index.rst example_scripts/<slug>/
+   git add source/blog/<slug>.rst source/blog/index.rst source/blog/category-<name>.rst example_scripts/<slug>/
    git commit -m "feat(blog): add <topic> blog post" -m "Co-authored-by: Gemini 3.8 Flash <gemini@google.com>"
    ```
 

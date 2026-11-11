@@ -67,16 +67,16 @@ Matter Sensor Endpoint Topology
 -------------------------------
 
 To represent a PurpleAir monitor with full fidelity, ``purpleair-matterbridge``
-deploys the standardized **Air Quality Sensor Device Type (0x002D)** on each
-bridged endpoint:
+deploys the standardized **Air Quality Sensor Device Type (0x002C)** on each
+bridged endpoint, attaching air quality, concentration, and environmental cluster
+servers directly to Endpoint N:
 
 .. code-block:: text
 
     Bridged Node (Endpoint N)
-     ├── Device Type: Air Quality Sensor (0x002D)
-     │    ├── Cluster 0x005D: Air Quality Measurement (EPA AQI Categories)
-     │    └── Cluster 0x042A: PM2.5 Concentration Measurement (ug/m3)
-     └── Nested Child Endpoints (Sensors)
+     └── Device Type: Air Quality Sensor (0x002C)
+          ├── Cluster 0x005D: Air Quality Measurement (EPA AQI Categories)
+          ├── Cluster 0x042A: PM2.5 Concentration Measurement (ug/m3)
           ├── Cluster 0x0402: Temperature Measurement (0.01 deg C)
           ├── Cluster 0x0405: Relative Humidity Measurement (0.01 %)
           └── Cluster 0x0403: Pressure Measurement (0.1 kPa / hPa)
@@ -153,15 +153,19 @@ inconsistencies across constrained microcontrollers:
 Telemetry Normalization & Mapping Implementation
 ================================================
 
-In ``purpleair-matterbridge``, raw JSON payloads retrieved from
-``purpleair_data_logger`` or direct LAN sensor sockets are normalized before
-invoking cluster attribute update handlers.
+In production, the ``purpleair-matterbridge`` plugin consumes the Python data
+logger's ``/matter/sensors`` HTTP feed. That feed exposes structured
+``device.clusters`` records where environmental metrics like temperature and
+relative humidity are already scaled into Matter-standard units.
 
-Below is the reference transformation pipeline implemented in TypeScript:
+To illustrate the mathematical normalization pipeline, below is a standalone
+reference conversion module in TypeScript demonstrating how raw environmental
+measurements (e.g., from direct local sensor HTTP ``/json`` endpoints or flat
+CSV records) map into Matter cluster attributes:
 
 .. code-block:: typescript
 
-    export interface PurpleAirTelemetry {
+    export interface RawSensorTelemetry {
       sensor_index: number;
       pm2_5_atm: number;
       current_temp_f: number;
@@ -174,7 +178,10 @@ Below is the reference transformation pipeline implemented in TypeScript:
       rating: number;
     }
 
-    export function calculateEpaAqi(pm25: number): AqiAssessment {
+    export function calculateEpaAqi(rawPm25: number): AqiAssessment {
+      // EPA PM2.5 calculation standard requires truncating to 1 decimal place
+      const pm25 = Math.floor(rawPm25 * 10) / 10;
+
       // US EPA PM2.5 Breakpoints (2024 standard)
       if (pm25 <= 9.0) {
         return { aqi: Math.round((50 / 9.0) * pm25), rating: 1 };
@@ -195,11 +202,13 @@ Below is the reference transformation pipeline implemented in TypeScript:
         const aqi = Math.round(201 + (99 / 99.9) * (pm25 - 125.5));
         return { aqi, rating: 5 };
       }
-      const aqi = Math.round(301 + (199 / 274.5) * (pm25 - 225.5));
+      // 2024 EPA Hazardous: 225.5 to 325.4 ug/m3 -> AQI 301 to 500 (span = 99.9)
+      const clampedPm = Math.min(pm25, 325.4);
+      const aqi = Math.round(301 + (199 / 99.9) * (clampedPm - 225.5));
       return { aqi, rating: 6 };
     }
 
-    export function mapTelemetryToMatterClusters(raw: PurpleAirTelemetry) {
+    export function mapTelemetryToMatterClusters(raw: RawSensorTelemetry) {
       const { aqi, rating } = calculateEpaAqi(raw.pm2_5_atm);
 
       // Convert Fahrenheit to Celsius x 100 for Matter int16 attribute
@@ -234,9 +243,10 @@ native UI paradigms:
 - **Home Assistant**: Exposes each cluster as discrete entities:
   ``sensor.purple_air_air_quality``, ``sensor.purple_air_pm2_5``,
   ``sensor.purple_air_temperature``, and ``sensor.purple_air_humidity``.
-- **Local Diagnostics**: The bridge exposes local diagnostic status via
-  HTTP at ``http://127.0.0.1:9855/matter/diagnostics``, detailing active
-  fabric subscriptions and attribute update timestamps.
+- **Local Diagnostics**: The Python data logger serves local HTTP endpoints on port 9855:
+  ``http://127.0.0.1:9855/health`` verifies ingestion thread health and sensor
+  connectivity, while ``http://127.0.0.1:9855/matter/sensors`` provides the JSON
+  payload consumed by the Matterbridge plugin.
 
 Summary & What's Next
 =====================
