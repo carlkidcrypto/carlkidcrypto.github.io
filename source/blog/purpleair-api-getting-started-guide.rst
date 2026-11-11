@@ -124,6 +124,8 @@ keys:
     sensor_data = paa.request_sensor_data(sensor_index=sensor_id)
     print(f"Sensor Name: {sensor_data['sensor']['name']}")
 
+📥 `Download this script: 01_using_the_unified_facade.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-api-getting-started-guide/01_using_the_unified_facade.py>`_
+
 Using the Focused Read Client
 -----------------------------
 
@@ -158,6 +160,8 @@ environments:
     print(f"Station: {sensor.get('name')}")
     print(f"PM2.5 (ATM): {sensor.get('pm2.5_atm')} ug/m3")
     print(f"Temperature: {sensor.get('temperature')} deg F")
+
+📥 `Download this script: 02_using_the_focused_read_client.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-api-getting-started-guide/02_using_the_focused_read_client.py>`_
 
 Querying Multiple Sensors and Bounding Boxes
 ============================================
@@ -207,6 +211,8 @@ defined by northwest and southeast latitude/longitude corners:
             f"PM2.5 = {row_dict.get('pm2.5_atm')} ug/m3"
         )
 
+📥 `Download this script: 03_querying_multiple_sensors_and_bounding_b.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-api-getting-started-guide/03_querying_multiple_sensors_and_bounding_b.py>`_
+
 Managing Sensor Groups with Write Credentials
 =============================================
 
@@ -241,6 +247,8 @@ register sensor members:
             sensor_index=sensor_id
         )
         print(f"Enrolled sensor {sensor_id} into group {group_id}")
+
+📥 `Download this script: 04_managing_sensor_groups_with_write_creden.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-api-getting-started-guide/04_managing_sensor_groups_with_write_creden.py>`_
 
 Once populated, the entire group can be queried using ``request_members_data``
 on your read client, retrieving batch readings for enrolled sensors in a single
@@ -292,6 +300,8 @@ Here is a resilient query helper pattern:
                     raise RuntimeError(err_msg) from exc
                 time.sleep(backoff_seconds)
                 backoff_seconds *= 2.0
+
+📥 `Download this script: 05_resilient_sensor_query.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-api-getting-started-guide/05_resilient_sensor_query.py>`_
 
 Summary & What's Next
 =====================
