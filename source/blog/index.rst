@@ -18,49 +18,55 @@ Blog
 Articles, release notes, and engineering tutorials on open source software, air quality sensing, and DevOps automation.
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Articles:
+   :maxdepth: 2
+   :caption: Topics:
 
+   category-ezsnmp
+   category-purpleair-api
+   category-purpleair-data-logger
+   category-purpleair-matterbridge
 
+Explore by Topic
+----------------
 
+.. grid:: 1 1 2 2
+   :gutter: 3
 
+   .. grid-item-card:: 📡 ezsnmp Telemetry & Architecture
+      :link: category-ezsnmp
+      :link-type: doc
 
+      Deep dives into high-throughput SNMP polling, SNMPv3 security, network protocols (BGP, OSPF, IS-IS, VRRP, NetFlow, PoE, LLDP), and C++17 internals.
 
+      +++
+      📚 *22 Articles* • `ezsnmp` `Networking` `SNMP`
 
+   .. grid-item-card:: 🌬️ PurpleAir API & IoT Sensing
+      :link: category-purpleair-api
+      :link-type: doc
 
+      Developer tutorials for extracting real-time and historical air quality sensor telemetry, bounding box queries, and sensor group management.
 
+      +++
+      📚 *IoT Sensing* • `PurpleAir` `IoT` `Air Quality`
 
+   .. grid-item-card:: 📊 PurpleAir Data Logger & TimescaleDB
+      :link: category-purpleair-data-logger
+      :link-type: doc
 
+      Architecture and deployment guides for logging sensor data to TimescaleDB, PostgreSQL hypertables, and local CSV/SQLite archives.
 
+      +++
+      📚 *Data Logging* • `TimescaleDB` `PostgreSQL` `Data Logging`
 
+   .. grid-item-card:: 🏠 Matter Smart Home & Matterbridge
+      :link: category-purpleair-matterbridge
+      :link-type: doc
 
+      Exposing PurpleAir sensors as Matter 1.5.1 Air Quality devices into Apple Home, Home Assistant, and Matterbridge smart home ecosystems.
 
-
-
-
-
-   ezsnmp-traffic-flow-netflow-ipfix-auditing
-   ezsnmp-enterprise-poe-power-auditing
-   ezsnmp-bgp-routing-telemetry
-   ezsnmp-dynamic-inventory-sync-netbox
-   ezsnmp-testing-ci-cd-pytest
-   ezsnmp-hardware-optical-dom-monitoring
-   ezsnmp-snmpv3-tls-dtls-security
-   ezsnmp-custom-agent-extensions-agentx
-   ezsnmp-vlan-management-qinq-automation
-   ezsnmp-realtime-telemetry-polars-duckdb
-   ezsnmp-set-operations-device-configuration
-   ezsnmp-network-topology-discovery-lldp-cdp
-   ezsnmp-custom-observability-exporters
-   ezsnmp-cpp17-native-architecture
-   ezsnmp-advanced-table-navigation
-   ezsnmp-resilient-polling-error-handling
-   ezsnmp-async-polling-event-loops
-   ezsnmp-working-with-mibs-guide
-   ezsnmp-cross-platform-installation-troubleshooting
-   ezsnmp-high-throughput-multithreading
-   ezsnmp-snmpv3-deep-dive
-   ezsnmp-getting-started-guide
+      +++
+      📚 *Smart Home* • `Matter` `Smart Home` `Apple Home`
 
 All Posts
 ---------
