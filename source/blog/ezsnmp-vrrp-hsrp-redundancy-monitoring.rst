@@ -199,6 +199,7 @@ of redundant gateways and detect split-brain or missing master conditions:
     if __name__ == "__main__":
         reconcile_fhrp_pair("gw-core01.internal", "gw-core02.internal")
 
+📥 `Download this script: reconcile_fhrp_pair.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-vrrp-hsrp-redundancy-monitoring/reconcile_fhrp_pair.py>`_
 
 Production Best Practices
 =========================
