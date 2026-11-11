@@ -33,24 +33,37 @@ def fetch_sensor_history_chunked(
         start_epoch = int(current_start.timestamp())
         end_epoch = int(current_end.timestamp())
 
-        try:
-            result = client.request_sensor_historic_data(
-                sensor_index=sensor_index,
-                fields=fields_str,
-                start_timestamp=start_epoch,
-                end_timestamp=end_epoch,
-                average=average_minutes
-            )
+        backoff = 2.0
+        for attempt in range(1, 4):
+            try:
+                result = client.request_sensor_historic_data(
+                    sensor_index=sensor_index,
+                    fields=fields_str,
+                    start_timestamp=start_epoch,
+                    end_timestamp=end_epoch,
+                    average=average_minutes
+                )
 
-            if header is None:
-                header = result.get("fields", [])
+                if header is None:
+                    header = result.get("fields", [])
 
-            chunk_rows = result.get("data", [])
-            all_rows.extend(chunk_rows)
+                chunk_rows = result.get("data", [])
+                all_rows.extend(chunk_rows)
+                break
 
-        except Exception as err:
-            msg = f"Error querying {sensor_index} [{start_epoch}]: {err}"
-            print(msg)
+            except Exception as err:
+                msg = (
+                    f"Error querying {sensor_index} [{start_epoch}] "
+                    f"attempt {attempt}: {err}"
+                )
+                print(msg)
+                if attempt == 3:
+                    raise RuntimeError(
+                        f"Failed chunk {start_epoch}-{end_epoch} for "
+                        f"sensor {sensor_index}"
+                    ) from err
+                time.sleep(backoff)
+                backoff *= 2.0
 
         current_start = current_end
         time.sleep(1.2)  # Strict rate limit compliance
