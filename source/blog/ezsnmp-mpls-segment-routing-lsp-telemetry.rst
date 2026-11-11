@@ -215,6 +215,8 @@ batches:
         except GenericError as err:
             print(f"[-] SNMP telemetry query failed: {err}")
 
+📥 `Download this script: audit_mpls_telemetry.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-mpls-segment-routing-lsp-telemetry/audit_mpls_telemetry.py>`_
+
 Automating Fast-Reroute (FRR) Verification
 ==========================================
 
