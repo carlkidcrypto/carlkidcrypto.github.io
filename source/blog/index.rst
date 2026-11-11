@@ -21,8 +21,6 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 2
    :caption: Topics:
 
-<<<<<<< HEAD
-
    category-ezsnmp
    category-purpleair-api
    category-purpleair-data-logger

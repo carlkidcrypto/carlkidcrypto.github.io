@@ -87,42 +87,54 @@ You can also install the package alongside database drivers:
 Database Schema and Hypertable Definition
 =========================================
 
-Before launching the ingestion daemon, initialize your PostgreSQL database with
-the TimescaleDB extension and create the destination telemetry table.
+When initialized, ``PurpleAirPSQLDataLogger`` automatically creates normalized,
+domain-separated tables in PostgreSQL and registers each as a TimescaleDB
+hypertable partitioned by ``data_time_stamp`` in 7-day chunks:
 
-Execute the following SQL commands in your target database:
+- ``pm2_5_fields``: Stores particulate matter readings (``pm2_5_atm``,
+  ``pm2_5_atm_a``, ``pm2_5_atm_b``, ``pm2_5_cf_1``, ``pm2_5_alt``).
+- ``environmental_fields``: Stores meteorological metrics (``temperature``,
+  ``humidity``, ``pressure``).
+- ``station_information_and_status_fields``: Tracks hardware metadata, device
+  names, coordinates, uptime, and firmware versions.
+- Additional specialized tables: ``pm1_0_fields``, ``pm10_0_fields``, and
+  ``miscellaneous_fields``.
+
+Each table uses a composite primary key of ``(data_time_stamp, sensor_index)``.
+If creating or inspecting the underlying schema manually, the core definitions
+are:
 
 .. code-block:: sql
 
     -- Enable TimescaleDB extension
     CREATE EXTENSION IF NOT EXISTS timescaledb;
 
-    -- Create raw sensor telemetry table
-    CREATE TABLE IF NOT EXISTS purpleair_sensor_data (
-        time TIMESTAMPTZ NOT NULL,
-        sensor_index INTEGER NOT NULL,
-        name TEXT,
-        pm1_0_atm REAL,
-        pm2_5_atm REAL,
-        pm10_0_atm REAL,
-        pm2_5_cf_1 REAL,
-        temperature REAL,
-        humidity REAL,
-        pressure REAL,
-        PRIMARY KEY (time, sensor_index)
+    -- Create PM2.5 telemetry table
+    CREATE TABLE IF NOT EXISTS pm2_5_fields (
+        data_time_stamp TIMESTAMPTZ NOT NULL,
+        sensor_index INT NOT NULL,
+        pm2_5_atm FLOAT NULL,
+        pm2_5_atm_a FLOAT NULL,
+        pm2_5_atm_b FLOAT NULL,
+        pm2_5_cf_1 FLOAT NULL,
+        PRIMARY KEY (data_time_stamp, sensor_index)
     );
 
-    -- Convert standard table into a TimescaleDB hypertable
-    SELECT create_hypertable(
-        'purpleair_sensor_data',
-        'time',
-        chunk_time_interval => INTERVAL '7 days',
-        if_not_exists => TRUE
+    -- Create environmental telemetry table
+    CREATE TABLE IF NOT EXISTS environmental_fields (
+        data_time_stamp TIMESTAMPTZ NOT NULL,
+        sensor_index INT NOT NULL,
+        humidity INT NULL,
+        temperature INT NULL,
+        pressure FLOAT NULL,
+        PRIMARY KEY (data_time_stamp, sensor_index)
     );
 
-    -- Create secondary index on sensor_index for fast filtering
-    CREATE INDEX IF NOT EXISTS idx_purpleair_sensor_idx
-    ON purpleair_sensor_data (sensor_index, time DESC);
+    -- Convert standard tables into TimescaleDB hypertables
+    SELECT create_hypertable('pm2_5_fields', 'data_time_stamp',
+        chunk_time_interval => INTERVAL '7 days', if_not_exists => TRUE);
+    SELECT create_hypertable('environmental_fields', 'data_time_stamp',
+        chunk_time_interval => INTERVAL '7 days', if_not_exists => TRUE);
 
 Automating Remote Ingestion via PurpleAirPSQLDataLogger
 =======================================================
@@ -133,16 +145,42 @@ The ``PurpleAirPSQLDataLogger`` module orchestrates fetching telemetry via
 Ingesting from Cloud Sensors
 ----------------------------
 
-To log a remote sensor group or specific station IDs using your PurpleAir API
-Read Key, configure and execute a Python ingestion routine:
+Cloud sensor queries require a JSON configuration file specifying the target
+station and polling interval. Create ``single_sensor_config.json`` in your
+working directory:
+
+.. code-block:: json
+
+    {
+        "poll_interval_seconds": 60,
+        "sensor_index": 53,
+        "read_key": null,
+        "fields": null
+    }
+
+Then configure and launch the Python ingestion routine:
 
 .. code-block:: python
 
+    import json
     import os
+    from pathlib import Path
     import pg8000
     from purpleair_data_logger.PurpleAirPSQLDataLogger import (
         PurpleAirPSQLDataLogger,
     )
+
+    # Ensure configuration file exists
+    config_file = Path("single_sensor_config.json")
+    if not config_file.exists():
+        config_file.write_text(
+            json.dumps({
+                "poll_interval_seconds": 60,
+                "sensor_index": 53,
+                "read_key": None,
+                "fields": None
+            }, indent=4)
+        )
 
     # Establish PG8000 PostgreSQL database connection
     conn = pg8000.connect(
@@ -162,7 +200,7 @@ Read Key, configure and execute a Python ingestion routine:
 
     # Execute polling via JSON configuration file
     logger.validate_parameters_and_run(
-        paa_single_sensor_request_json_file="single_sensor_config.json"
+        paa_single_sensor_request_json_file=str(config_file)
     )
 
 📥 `Download this script: 01_ingesting_from_cloud_sensors.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-timescaledb-postgresql-ingestion/01_ingesting_from_cloud_sensors.py>`_
@@ -173,15 +211,46 @@ Ingesting from Local LAN Sensors Without API Credits
 When sensors reside on your local network (e.g., in a smart home or lab), you
 can poll them directly over HTTP using their LAN IP address. This bypasses the
 PurpleAir cloud API entirely, preserving API credits and maintaining data
-logging during internet outages:
+logging during internet outages.
+
+Create a ``local_sensor_config.json`` file specifying the LAN IP addresses:
+
+.. code-block:: json
+
+    {
+        "sensor_ip_list": [
+            "192.168.1.100"
+        ],
+        "poll_interval_seconds": 60
+    }
+
+Because the base ``PurpleAirPSQLDataLogger`` constructor forwards API keys
+without IP addresses, define a lightweight adapter subclass that initializes
+``_purpleair_api_obj`` with the configured IP endpoints:
 
 .. code-block:: python
 
+    import json
     import os
+    from pathlib import Path
     import pg8000
+    from purpleair_api.PurpleAirAPI import PurpleAirAPI
     from purpleair_data_logger.PurpleAirPSQLDataLogger import (
         PurpleAirPSQLDataLogger,
     )
+
+    # Ensure configuration file exists
+    config_file = Path("local_sensor_config.json")
+    if not config_file.exists():
+        config_file.write_text(
+            json.dumps({
+                "sensor_ip_list": ["192.168.1.100"],
+                "poll_interval_seconds": 60
+            }, indent=4)
+        )
+
+    with open(config_file) as f:
+        local_config = json.load(f)
 
     conn = pg8000.connect(
         user="ts_user",
@@ -191,20 +260,30 @@ logging during internet outages:
         database="airquality",
     )
 
-    # Initialize data logger for local network sensors
-    logger = PurpleAirPSQLDataLogger(
-        PurpleAirAPIReadKey=None,
-        PurpleAirAPIWriteKey=None,
+    class LocalPurpleAirPSQLDataLogger(PurpleAirPSQLDataLogger):
+        """Adapter configuring local LAN sensor endpoints on the data logger."""
+        def __init__(self, sensor_ip_list, psql_db_conn):
+            super().__init__(None, None, psql_db_conn)
+            if not isinstance(sensor_ip_list, list):
+                sensor_ip_list = [sensor_ip_list]
+            self._purpleair_api_obj = [
+                PurpleAirAPI(your_ipv4_address=[ip])
+                for ip in sensor_ip_list
+            ]
+
+    # Initialize data logger with LAN sensor addresses
+    logger = LocalPurpleAirPSQLDataLogger(
+        sensor_ip_list=local_config["sensor_ip_list"],
         psql_db_conn=conn,
     )
 
     # Ingest directly across local network sockets using local config
     logger.validate_parameters_and_run(
-        paa_local_sensor_request_json_file="local_sensor_config.json"
+        paa_local_sensor_request_json_file=str(config_file)
     )
     print("Local sensor poll completed successfully.")
 
-📥 `Download this script: 02_ingesting_from_local_lan_sensors_without.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-timescaledb-postgresql-ingestion/02_ingesting_from_local_lan_sensors_without.py>`_
+📥 `Download this script: 02_localpurpleairpsqldatalogger.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-timescaledb-postgresql-ingestion/02_localpurpleairpsqldatalogger.py>`_
 
 Continuous Aggregations & Analytical Queries
 ============================================
@@ -217,19 +296,23 @@ Calculating Hourly Rolling Averages
 -----------------------------------
 
 To calculate hourly average PM2.5, temperature, and humidity for Grafana
-dashboards or analytical research, use ``time_bucket()``:
+dashboards or analytical research, query ``pm2_5_fields`` and join
+``environmental_fields`` using ``time_bucket()``:
 
 .. code-block:: sql
 
     SELECT
-        time_bucket('1 hour', time) AS bucket,
-        sensor_index,
-        ROUND(AVG(pm2_5_atm)::numeric, 2) AS avg_pm25,
-        ROUND(AVG(temperature)::numeric, 1) AS avg_temp,
-        ROUND(AVG(humidity)::numeric, 1) AS avg_humidity
-    FROM purpleair_sensor_data
-    WHERE time > NOW() - INTERVAL '30 days'
-    GROUP BY bucket, sensor_index
+        time_bucket('1 hour', p.data_time_stamp) AS bucket,
+        p.sensor_index,
+        ROUND(AVG(p.pm2_5_atm)::numeric, 2) AS avg_pm25,
+        ROUND(AVG(e.temperature)::numeric, 1) AS avg_temp,
+        ROUND(AVG(e.humidity)::numeric, 1) AS avg_humidity
+    FROM pm2_5_fields p
+    JOIN environmental_fields e
+        ON p.data_time_stamp = e.data_time_stamp
+        AND p.sensor_index = e.sensor_index
+    WHERE p.data_time_stamp > NOW() - INTERVAL '30 days'
+    GROUP BY bucket, p.sensor_index
     ORDER BY bucket DESC;
 
 Creating Continuous Aggregate Materialized Views
@@ -241,20 +324,19 @@ as new rows are ingested:
 
 .. code-block:: sql
 
-    CREATE MATERIALIZED VIEW purpleair_hourly_summary
+    CREATE MATERIALIZED VIEW pm2_5_hourly_summary
     WITH (timescaledb.continuous) AS
     SELECT
-        time_bucket('1 hour', time) AS bucket,
+        time_bucket('1 hour', data_time_stamp) AS bucket,
         sensor_index,
         AVG(pm2_5_atm) AS avg_pm25,
-        MAX(pm2_5_atm) AS peak_pm25,
-        AVG(temperature) AS avg_temp
-    FROM purpleair_sensor_data
+        MAX(pm2_5_atm) AS peak_pm25
+    FROM pm2_5_fields
     GROUP BY bucket, sensor_index;
 
     -- Refresh policy: recompute recent 2 hours automatically every 15 minutes
     SELECT add_continuous_aggregate_policy(
-        'purpleair_hourly_summary',
+        'pm2_5_hourly_summary',
         start_offset => INTERVAL '2 hours',
         end_offset => INTERVAL '15 minutes',
         schedule_interval => INTERVAL '15 minutes'
