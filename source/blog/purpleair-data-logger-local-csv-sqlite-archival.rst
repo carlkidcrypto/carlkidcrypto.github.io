@@ -140,6 +140,8 @@ readings using Python:
                 temp, humidity, pressure
             ))
 
+📥 `Download this script: 01_log_local_sensor.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-local-csv-sqlite-archival/01_log_local_sensor.py>`_
+
 Flat CSV Archival with Rolling Partitions
 =========================================
 
@@ -172,6 +174,8 @@ streams can be appended directly to daily or monthly CSV files:
     # Ingest from local sensor endpoints directly to CSV
     csv_logger.store_local_sensors_data()
     print("Successfully appended local readings to CSV log.")
+
+📥 `Download this script: 02_flat_csv_archival_with_rolling_partition.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-local-csv-sqlite-archival/02_flat_csv_archival_with_rolling_partition.py>`_
 
 Deploying as a Resilient Systemd Edge Service
 =============================================
