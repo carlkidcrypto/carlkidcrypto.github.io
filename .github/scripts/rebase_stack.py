@@ -42,6 +42,13 @@ ORDERED_STACK = [
     ("feature/blog-ezsnmp-bgp-routing-telemetry", 36),
     ("feature/blog-ezsnmp-enterprise-poe-power-auditing", 37),
     ("feature/blog-ezsnmp-traffic-flow-netflow-ipfix-auditing", 39),
+    ("feature/blog-ezsnmp-ospf-isis-link-state-telemetry", 41),
+    ("feature/blog-ezsnmp-network-time-ntp-ptp-telemetry", 42),
+    ("feature/blog-ezsnmp-vrrp-hsrp-redundancy-monitoring", 43),
+    ("feature/blog-purpleair-api-getting-started-guide", 44),
+    ("feature/blog-purpleair-data-logger-timescaledb-postgresql-ingestion", 45),
+    ("feature/blog-purpleair-matterbridge-smart-home-integration", 46),
+    ("feature/blog-ezsnmp-mpls-segment-routing-lsp-telemetry", 50),
 ]
 
 

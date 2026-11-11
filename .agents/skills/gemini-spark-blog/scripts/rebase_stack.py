@@ -48,6 +48,7 @@ ORDERED_STACK = [
     ("feature/blog-purpleair-api-getting-started-guide", 44),
     ("feature/blog-purpleair-data-logger-timescaledb-postgresql-ingestion", 45),
     ("feature/blog-purpleair-matterbridge-smart-home-integration", 46),
+    ("feature/blog-ezsnmp-mpls-segment-routing-lsp-telemetry", 50),
 ]
 
 
