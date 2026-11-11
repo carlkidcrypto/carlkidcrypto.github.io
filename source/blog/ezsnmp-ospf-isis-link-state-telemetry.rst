@@ -208,6 +208,7 @@ ezsnmp:
                 f"RetransQ: {n['retrans_queue']:>2}{flag}"
             )
 
+📥 `Download this script: audit_ospf_neighbors.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-ospf-isis-link-state-telemetry/audit_ospf_neighbors.py>`_
 
 Diagnosing Root Causes from Telemetry Signatures
 ================================================
