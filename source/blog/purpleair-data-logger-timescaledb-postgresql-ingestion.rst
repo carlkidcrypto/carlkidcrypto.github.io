@@ -165,6 +165,8 @@ Read Key, configure and execute a Python ingestion routine:
         paa_single_sensor_request_json_file="single_sensor_config.json"
     )
 
+📥 `Download this script: 01_ingesting_from_cloud_sensors.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-timescaledb-postgresql-ingestion/01_ingesting_from_cloud_sensors.py>`_
+
 Ingesting from Local LAN Sensors Without API Credits
 ----------------------------------------------------
 
@@ -201,6 +203,8 @@ logging during internet outages:
         paa_local_sensor_request_json_file="local_sensor_config.json"
     )
     print("Local sensor poll completed successfully.")
+
+📥 `Download this script: 02_ingesting_from_local_lan_sensors_without.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-timescaledb-postgresql-ingestion/02_ingesting_from_local_lan_sensors_without.py>`_
 
 Continuous Aggregations & Analytical Queries
 ============================================
