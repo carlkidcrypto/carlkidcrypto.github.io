@@ -42,6 +42,7 @@ ORDERED_STACK = [
     ("feature/blog-ezsnmp-bgp-routing-telemetry", 36),
     ("feature/blog-ezsnmp-enterprise-poe-power-auditing", 37),
     ("feature/blog-ezsnmp-traffic-flow-netflow-ipfix-auditing", 39),
+    ("feature/blog-example-scripts-extraction", 54),
     ("feature/blog-ezsnmp-ospf-isis-link-state-telemetry", 41),
     ("feature/blog-ezsnmp-network-time-ntp-ptp-telemetry", 42),
     ("feature/blog-ezsnmp-vrrp-hsrp-redundancy-monitoring", 43),
@@ -153,7 +154,9 @@ def rebase_stack(repo_dir, push=False, dry_run=False):
         f"Active stack has {len(active_stack)} branches. Root branch: {root_branch} (PR #{root_pr})"
     )
     if last_merged_branch:
-        print(f"Last merged upstream branch: {last_merged_branch} (PR #{last_merged_pr})")
+        print(
+            f"Last merged upstream branch: {last_merged_branch} (PR #{last_merged_pr})"
+        )
 
     # Snapshot initial local commit SHAs of all branches before any rebasing
     initial_shas = {}
@@ -221,7 +224,9 @@ def rebase_stack(repo_dir, push=False, dry_run=False):
 
     # Step 4: Push to origin with force-with-lease
     if push and not dry_run:
-        print("\n[Step 4] Pushing all rebased branches to origin (--force-with-lease)...")
+        print(
+            "\n[Step 4] Pushing all rebased branches to origin (--force-with-lease)..."
+        )
         for branch, pr_num in active_stack:
             print(f"  Pushing {branch} (PR #{pr_num})...")
             run_cmd(f"git push --force-with-lease origin {branch}", cwd=repo_dir)
@@ -252,7 +257,9 @@ def main():
 
     # Locate repo directory
     script_dir = Path(__file__).resolve().parent
-    repo_dir = script_dir.parents[3]  # .agents/skills/gemini-spark-blog/scripts -> repo root
+    repo_dir = script_dir.parents[
+        3
+    ]  # .agents/skills/gemini-spark-blog/scripts -> repo root
     if not (repo_dir / ".git").is_dir():
         repo_dir = Path.cwd()
 
