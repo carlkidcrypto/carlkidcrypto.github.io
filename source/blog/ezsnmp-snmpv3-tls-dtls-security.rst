@@ -182,6 +182,7 @@ prefix:
         poll_secure_switch_tls("core-sw01.internal")
         poll_secure_switch_dtls("core-sw01.internal")
 
+📥 `Download this script: poll_secure_switch_tls.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-snmpv3-tls-dtls-security/poll_secure_switch_tls.py>`_
 
 Choosing Between TLS (TCP) and DTLS (UDP)
 =========================================

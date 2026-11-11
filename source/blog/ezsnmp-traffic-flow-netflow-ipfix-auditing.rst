@@ -173,6 +173,7 @@ calculate flow drop ratios, and alert on buffer starvation:
                     f"({result['drop_ratio_pct']:.4f}% <= 0.05%)."
                 )
 
+📥 `Download this script: audit_flow_exporter.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-traffic-flow-netflow-ipfix-auditing/audit_flow_exporter.py>`_
 
 Production Best Practices
 =========================

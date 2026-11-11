@@ -157,6 +157,7 @@ link adjacency map:
                 f"{link['remote_device']}:{link['remote_port']}"
             )
 
+📥 `Download this script: 01_discover_lldp_topology.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-network-topology-discovery-lldp-cdp/01_discover_lldp_topology.py>`_
 
 Handling Multi-Vendor Protocol Differences: LLDP vs CDP
 =======================================================
@@ -190,6 +191,7 @@ legacy Cisco infrastructure:
             return ":".join(clean_hex[i:i + 2].lower() for i in range(0, 12, 2))
         return raw_hex
 
+📥 `Download this script: 02_format_chassis_mac.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-network-topology-discovery-lldp-cdp/02_format_chassis_mac.py>`_
 
 Production Best Practices
 =========================

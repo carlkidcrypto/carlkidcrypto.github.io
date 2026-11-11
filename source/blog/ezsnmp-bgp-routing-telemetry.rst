@@ -201,6 +201,7 @@ peers, and verify accepted prefix counts:
                 f"Prefixes: {p['prefixes']:>5}{status_flag}"
             )
 
+📥 `Download this script: audit_bgp_peers.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-bgp-routing-telemetry/audit_bgp_peers.py>`_
 
 Production Best Practices
 =========================

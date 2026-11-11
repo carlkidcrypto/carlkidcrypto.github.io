@@ -216,6 +216,7 @@ inspect port power delivery, and detect overloaded budgets via ezsnmp:
                     f"Draw: {p['watts']:>5.2f} W"
                 )
 
+📥 `Download this script: audit_switch_poe.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-enterprise-poe-power-auditing/audit_switch_poe.py>`_
 
 Production Best Practices
 =========================

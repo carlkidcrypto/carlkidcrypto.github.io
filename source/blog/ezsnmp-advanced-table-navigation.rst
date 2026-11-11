@@ -124,6 +124,8 @@ single pass and reconstruct a coherent, indexed dictionary of devices rows.
                 f"Status: {status} In: {in_octets}"
             )
 
+📥 `Download this script: 01_collect_interface_table.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-advanced-table-navigation/01_collect_interface_table.py>`_
+
 2. Parsing Composite Multi-Part Indices
 ---------------------------------------
 
@@ -156,6 +158,7 @@ or IP manipulation tools:
 
         return route_table
 
+📥 `Download this script: 02_parse_ip_route_table.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-advanced-table-navigation/02_parse_ip_route_table.py>`_
 
 Handling Sparse Tables with Default Fallbacks
 =============================================
@@ -186,6 +189,7 @@ defaults or wrap results in typed data transfer objects (DTOs):
             out_octets=int(raw_row.get("ifHCOutOctets", 0))
         )
 
+📥 `Download this script: 03_build_metric_dto.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-advanced-table-navigation/03_build_metric_dto.py>`_
 
 Production Best Practices
 =========================

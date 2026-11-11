@@ -68,6 +68,7 @@ attributes automatically:
     print(f"Value        : {var.value}")      # '12345678'
     print(f"Type         : {var.type}")       # 'TICKS'
 
+📥 `Download this script: 01_how_ezsnmp_resolves_oids.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-working-with-mibs-guide/01_how_ezsnmp_resolves_oids.py>`_
 
 Loading Custom Enterprise MIBs
 ==============================
@@ -120,6 +121,8 @@ instantiating an ezsnmp ``Session``:
     # Query custom vendor metric by symbol name
     cpu_usage = session.get('cpmCPUTotal5minRev.1')[0]
     print(f"CPU Utilization (5m): {cpu_usage.value}%")
+
+📥 `Download this script: 02_configuring_environment_variables.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-working-with-mibs-guide/02_configuring_environment_variables.py>`_
 
 3. Configuring via snmp.conf
 ----------------------------

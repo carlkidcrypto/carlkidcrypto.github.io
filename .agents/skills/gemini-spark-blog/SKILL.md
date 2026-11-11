@@ -115,6 +115,13 @@ Every blog post must follow this exact format:
   - H2 subsections: `-`
   - H3 sub-subsections: `~`
 * **Code Blocks**: Specify language explicitly (e.g., `.. code-block:: python`, `.. code-block:: bash`).
+* **Example Scripts & Download Links**:
+  - Every runnable Python code example is automatically extracted and saved into `example_scripts/<slug>/<filename>` as a standalone, executable Python script (`chmod +x`).
+  - Directly under each example code block in the article, include a raw download link:
+    ```rst
+    📥 `Download this script: <filename> <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/<slug>/<filename>>`_
+    ```
+  - Extraction and link synchronization is automatically handled during ingestion by `sync_drive_post.py --ingest` and by `validate_blog_code.py --save-examples`.
 * **Cross-References**: Always use full external HTTPS URLs or Sphinx `:doc:` / `:ref:` directives.
 
 See [references/blog_format_guide.md](./references/blog_format_guide.md) for full style guidelines.

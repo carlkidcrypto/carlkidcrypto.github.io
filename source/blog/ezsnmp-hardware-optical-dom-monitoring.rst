@@ -197,6 +197,7 @@ query optical receive/transmit power, and evaluate link safety margins:
             unit = item["unit"]
             print(f"  {sensor:<28} : {val:>6.2f} {unit}{flag}")
 
+📥 `Download this script: audit_optical_sensors.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-hardware-optical-dom-monitoring/audit_optical_sensors.py>`_
 
 Production Best Practices
 =========================

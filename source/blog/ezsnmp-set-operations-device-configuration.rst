@@ -104,6 +104,8 @@ The following example updates device metadata and verifies the change:
     except GenericError as exc:
         print(f"SNMP SET failed: {exc}")
 
+📥 `Download this script: 01_updating_system_metadata.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-set-operations-device-configuration/01_updating_system_metadata.py>`_
+
 2. Toggling Interface Administrative Status (Port Quarantine)
 -------------------------------------------------------------
 
@@ -132,6 +134,8 @@ port using standard integer enums:
         print(
             f"Interface index {if_index} set to {state.upper()} ({int_value})."
         )
+
+📥 `Download this script: 02_set_interface_admin_state.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-set-operations-device-configuration/02_set_interface_admin_state.py>`_
 
 3. Atomic Multi-Variable SET Operations
 ---------------------------------------
@@ -195,6 +199,7 @@ exception message in your error handler to diagnose failure reasons:
     except PacketError as exc:
         print(f"SET rejected by agent: {exc}")
 
+📥 `Download this script: 03_error_handling_diagnostic_codes.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-set-operations-device-configuration/03_error_handling_diagnostic_codes.py>`_
 
 Migration Notes: Easy SNMP vs ezsnmp
 ====================================
