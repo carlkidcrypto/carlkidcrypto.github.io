@@ -24,6 +24,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
 
 
 
+
+   purpleair-matterbridge-device-clustering-telemetry-mapping
    purpleair-data-logger-local-csv-sqlite-archival
    purpleair-api-historical-data-bounding-box-queries
    ezsnmp-mpls-segment-routing-lsp-telemetry
@@ -61,6 +63,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Matter Device Clustering & Sensor Telemetry Mapping for Smart Homes
+      :link: purpleair-matterbridge-device-clustering-telemetry-mapping
+      :link-type: doc
+
+      The Connectivity Standards Alliance (CSA) Matter specification has fundamentally transformed smart home interoperability. By providing an open, IP-based...
+
+      +++
+      📅 *November 10, 2026* • ⏱️ *5 min read* • `Purpleair` `Matter` `Smart-Home` `Iot`
 
    .. grid-item-card:: 📖 Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
       :link: purpleair-data-logger-local-csv-sqlite-archival
