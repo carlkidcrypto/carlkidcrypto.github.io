@@ -168,6 +168,7 @@ interface traffic and operational status via ezsnmp:
         while True:
             time.sleep(3600)
 
+📥 `Download this script: 01_collect.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-custom-observability-exporters/01_collect.py>`_
 
 Integrating with OpenTelemetry (OTel)
 =====================================
@@ -238,6 +239,7 @@ OpenTelemetry Collector or console exporter via OTLP:
         except KeyboardInterrupt:
             pass
 
+📥 `Download this script: 02_observe_interface_traffic.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-custom-observability-exporters/02_observe_interface_traffic.py>`_
 
 Production Best Practices
 =========================

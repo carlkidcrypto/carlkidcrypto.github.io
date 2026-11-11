@@ -203,6 +203,7 @@ ezsnmp, query NetBox via ``pynetbox``, and detect configuration drift:
         if inv:
             reconcile_with_netbox(inv)
 
+📥 `Download this script: discover_device_inventory.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-dynamic-inventory-sync-netbox/discover_device_inventory.py>`_
 
 Production Best Practices
 =========================

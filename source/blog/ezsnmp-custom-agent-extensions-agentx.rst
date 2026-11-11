@@ -166,6 +166,8 @@ serves custom application metrics:
     if __name__ == "__main__":
         handle_pass_persist()
 
+📥 `Download this script: 01_oid_to_tuple.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-custom-agent-extensions-agentx/01_oid_to_tuple.py>`_
+
 2. Registering with snmpd
 -------------------------
 
@@ -222,6 +224,7 @@ responsiveness using ``ezsnmp``:
     if __name__ == "__main__":
         test_custom_agent_extension()
 
+📥 `Download this script: 02_test_custom_agent_extension.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-custom-agent-extensions-agentx/02_test_custom_agent_extension.py>`_
 
 Production Best Practices
 =========================

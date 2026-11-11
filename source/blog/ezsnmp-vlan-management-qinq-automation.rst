@@ -180,6 +180,7 @@ allocation report:
                 f"Tagged: [{tagged}] | Untagged: [{untagged}]"
             )
 
+📥 `Download this script: audit_switch_vlans.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-vlan-management-qinq-automation/audit_switch_vlans.py>`_
 
 Inspecting Q-in-Q (VLAN Stacking) Configurations
 ================================================

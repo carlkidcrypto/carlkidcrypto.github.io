@@ -72,10 +72,10 @@ def slug_from_filename(filename: str | Path) -> str:
     """Convert a filename like 'ezsnmp_working_with_mibs_guide.rst' to 'ezsnmp-working-with-mibs-guide'."""
     stem = Path(filename).stem
     # Remove ' - POSTED' if present
-    stem = re.sub(r'\s*-\s*POSTED$', '', stem, flags=re.IGNORECASE)
+    stem = re.sub(r"\s*-\s*POSTED$", "", stem, flags=re.IGNORECASE)
     # Convert underscores to hyphens and lowercase
     slug = stem.replace("_", "-").lower()
-    slug = re.sub(r'[^a-z0-9-]+', '', slug)
+    slug = re.sub(r"[^a-z0-9-]+", "", slug)
     return slug
 
 
@@ -147,7 +147,7 @@ def parse_draft(draft_path: Path) -> dict:
     tags: list[str] = ["Python", "Networking", "SNMP", "ezsnmp"]
     category = ""
 
-    date_m = re.search(r'^:Date:\s*(.+)$', raw, re.MULTILINE)
+    date_m = re.search(r"^:Date:\s*(.+)$", raw, re.MULTILINE)
     if date_m:
         date_raw = date_m.group(1).strip()
         try:
@@ -156,11 +156,11 @@ def parse_draft(draft_path: Path) -> dict:
         except ValueError:
             date_str = date_raw
 
-    time_m = re.search(r'^:Estimated Reading Time:\s*(\d+)', raw, re.MULTILINE)
+    time_m = re.search(r"^:Estimated Reading Time:\s*(\d+)", raw, re.MULTILINE)
     if time_m:
         reading_time = int(time_m.group(1))
 
-    tags_m = re.search(r'^:Tags:\s*(.+)$', raw, re.MULTILINE)
+    tags_m = re.search(r"^:Tags:\s*(.+)$", raw, re.MULTILINE)
     if tags_m:
         raw_tags = tags_m.group(1).split(",")
         tags = [t.strip().title() for t in raw_tags if t.strip()]
@@ -192,7 +192,10 @@ def parse_draft(draft_path: Path) -> dict:
             i += 1
             continue
         if skip_contents:
-            if stripped.startswith(":") or (line.startswith("   ") and not stripped.startswith(("=", "-", "~", "..", "*", "#"))):
+            if stripped.startswith(":") or (
+                line.startswith("   ")
+                and not stripped.startswith(("=", "-", "~", "..", "*", "#"))
+            ):
                 i += 1
                 continue
             skip_contents = False
@@ -265,13 +268,27 @@ def generate_sphinx_rst(parsed: dict, slug: str) -> str:
 
     for b_line in body_lines:
         s_line = b_line.strip()
-        if "Migration Notes" in b_line or "Migration Guide" in b_line or "Modern API Differences" in b_line:
+        if (
+            "Migration Notes" in b_line
+            or "Migration Guide" in b_line
+            or "Modern API Differences" in b_line
+        ):
             in_migration_section = True
-        elif in_migration_section and (b_line.startswith("===") or b_line.startswith("---")) and not b_line.startswith("   "):
-            if any(h in b_line for h in ["Useful Links", "Production Best", "Conclusion"]):
+        elif (
+            in_migration_section
+            and (b_line.startswith("===") or b_line.startswith("---"))
+            and not b_line.startswith("   ")
+        ):
+            if any(
+                h in b_line for h in ["Useful Links", "Production Best", "Conclusion"]
+            ):
                 in_migration_section = False
 
-        if s_line.startswith(".. list-table::") or s_line.startswith("+---") or s_line.startswith("+==="):
+        if (
+            s_line.startswith(".. list-table::")
+            or s_line.startswith("+---")
+            or s_line.startswith("+===")
+        ):
             in_table = True
         elif in_table and s_line == "" and not b_line.startswith(" "):
             in_table = False
@@ -364,11 +381,11 @@ def register_in_index(
 
     # 1. Add to toctree
     if not re.search(rf"^\s*{re.escape(slug)}\s*$", content, re.MULTILINE):
-        toctree_pattern = r'(\.\. toctree::\s*\n\s*:maxdepth:\s*\d+\s*\n\s*:caption:\s*Articles:\s*\n)'
+        toctree_pattern = r"(\.\. toctree::\s*\n\s*:maxdepth:\s*\d+\s*\n\s*:caption:\s*Articles:\s*\n)"
         match = re.search(toctree_pattern, content)
         if match:
             replacement = match.group(1) + f"\n   {slug}\n"
-            content = content[:match.start()] + replacement + content[match.end():]
+            content = content[: match.start()] + replacement + content[match.end() :]
         else:
             print("Warning: Could not locate .. toctree:: block in index.rst")
 
@@ -385,13 +402,11 @@ def register_in_index(
       📅 *{date_str}* • ⏱️ *{reading_time} min read* • {card_tags}
 
 """
-        grid_pattern = r'(\.\. grid:: 1\s*\n\s*:gutter: \d+\s*\n\n)'
+        grid_pattern = r"(\.\. grid:: 1\s*\n\s*:gutter: \d+\s*\n\n)"
         grid_match = re.search(grid_pattern, content)
         if grid_match:
             content = (
-                content[:grid_match.end()]
-                + card_snippet
-                + content[grid_match.end():]
+                content[: grid_match.end()] + card_snippet + content[grid_match.end() :]
             )
         else:
             print("Warning: Could not locate .. grid:: block in index.rst")
@@ -439,19 +454,51 @@ Publication Target
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Sync blog drafts from Google Drive")
-    parser.add_argument("--list", action="store_true", help="List all drafts in Google Drive and their status")
-    parser.add_argument("--ingest", type=str, help="Filename or slug of draft to ingest (e.g. ezsnmp_working_with_mibs_guide.rst)")
-    parser.add_argument("--mark-posted", type=str, help="Filename or slug to mark as POSTED in Google Drive")
-    parser.add_argument("--pr", type=str, help="Pull Request URL when marking as posted")
-    parser.add_argument("--review-status", type=str, default="All code snippets 100% verified against local daemon", help="Review status text")
-    parser.add_argument("--drive-dir", type=str, help="Explicit path to Google Drive 'Auto Blog Posts' directory")
-    parser.add_argument("--rebase-stack", action="store_true", help="Rebase all stacked PR branches onto main")
-    parser.add_argument("--push", action="store_true", help="When rebasing stack, push rebased branches with --force-with-lease")
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="List all drafts in Google Drive and their status",
+    )
+    parser.add_argument(
+        "--ingest",
+        type=str,
+        help="Filename or slug of draft to ingest (e.g. ezsnmp_working_with_mibs_guide.rst)",
+    )
+    parser.add_argument(
+        "--mark-posted",
+        type=str,
+        help="Filename or slug to mark as POSTED in Google Drive",
+    )
+    parser.add_argument(
+        "--pr", type=str, help="Pull Request URL when marking as posted"
+    )
+    parser.add_argument(
+        "--review-status",
+        type=str,
+        default="All code snippets 100% verified against local daemon",
+        help="Review status text",
+    )
+    parser.add_argument(
+        "--drive-dir",
+        type=str,
+        help="Explicit path to Google Drive 'Auto Blog Posts' directory",
+    )
+    parser.add_argument(
+        "--rebase-stack",
+        action="store_true",
+        help="Rebase all stacked PR branches onto main",
+    )
+    parser.add_argument(
+        "--push",
+        action="store_true",
+        help="When rebasing stack, push rebased branches with --force-with-lease",
+    )
     args = parser.parse_args(argv)
 
     if args.rebase_stack:
         sys.path.insert(0, str(Path(__file__).resolve().parent))
         from rebase_stack import rebase_stack
+
         rebase_stack(REPO_ROOT, push=args.push, dry_run=False)
         return 0
 
@@ -492,7 +539,11 @@ def main(argv: list[str] | None = None) -> int:
 
         if not candidate.exists():
             # Try finding by slug
-            found = [p for p in status["pending"] if slug_from_filename(p.name) == slug_from_filename(target_name)]
+            found = [
+                p
+                for p in status["pending"]
+                if slug_from_filename(p.name) == slug_from_filename(target_name)
+            ]
             if found:
                 candidate = found[0]
             else:
@@ -512,17 +563,27 @@ def main(argv: list[str] | None = None) -> int:
         out_rst.write_text(sphinx_rst, encoding="utf-8")
         print(f"  -> Generated: {out_rst.relative_to(REPO_ROOT)}")
 
-        # Validate code blocks in the generated post
+        # Validate code blocks in the generated post, extract example scripts, and add download links
         try:
             sys.path.insert(0, str(Path(__file__).resolve().parent))
-            from validate_blog_code import validate_post
-            issues = validate_post(out_rst)
+            from validate_blog_code import validate_post, save_example_scripts
+
+            saved = save_example_scripts(out_rst, update_links=True)
+            if saved:
+                print(
+                    f"  -> Extracted {len(saved)} script(s) to example_scripts/{slug}/ with download links"
+                )
+            issues = validate_post(out_rst, run_tests=True, save_scripts=False)
             if issues:
                 print(f"  ⚠️ Warning: {len(issues)} code validation issue(s) detected:")
                 for iss in issues:
-                    print(f"     [Line {iss.line_number}] {iss.severity}: {iss.message}")
+                    print(
+                        f"     [Line {iss.line_number}] {iss.severity}: {iss.message}"
+                    )
             else:
-                print("  -> Code Validation: 100% verified (syntax, ezsnmp API, and runtime execution)")
+                print(
+                    "  -> Code Validation: 100% verified (syntax, ezsnmp API, and runtime execution)"
+                )
         except Exception as exc:
             print(f"  (Code validation skipped: {exc})")
 
@@ -545,7 +606,9 @@ def main(argv: list[str] | None = None) -> int:
         print("\nNext steps:")
         print(f"1. Audit: python3 .github/scripts/audit_blog_posts.py")
         print(f"2. Build: .venv/bin/sphinx-build -b html source _build/html -W")
-        print(f"3. Open PR and mark posted: python3 {script_path} --mark-posted {candidate.name} --pr <PR_URL>")
+        print(
+            f"3. Open PR and mark posted: python3 {script_path} --mark-posted {candidate.name} --pr <PR_URL>"
+        )
         return 0
 
     if args.mark_posted:
@@ -560,7 +623,11 @@ def main(argv: list[str] | None = None) -> int:
 
         if not candidate.exists():
             all_drafts = status["pending"] + [d for d, _ in status["posted"]]
-            found = [p for p in all_drafts if slug_from_filename(p.name) == slug_from_filename(target_name)]
+            found = [
+                p
+                for p in all_drafts
+                if slug_from_filename(p.name) == slug_from_filename(target_name)
+            ]
             if found:
                 candidate = found[0]
             else:

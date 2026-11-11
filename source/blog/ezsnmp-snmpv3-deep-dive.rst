@@ -111,6 +111,8 @@ and library resources when the block exits:
         (system_descr,) = session.get('sysDescr.0')
         print(f"Device Description: {system_descr.value}")
 
+📥 `Download this script: 01_configuring_an_authpriv_session.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-snmpv3-deep-dive/01_configuring_an_authpriv_session.py>`_
+
 2. Configuring authNoPriv (Integrity Only)
 ------------------------------------------
 
@@ -131,6 +133,8 @@ encryption is unnecessary or unsupported:
     ) as session:
         (uptime,) = session.get('sysUpTime.0')
         print(f"System Uptime: {uptime.value}")
+
+📥 `Download this script: 02_configuring_authnopriv.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-snmpv3-deep-dive/02_configuring_authnopriv.py>`_
 
 3. Handling Multi-Context & VRF Monitoring
 ------------------------------------------
@@ -159,6 +163,8 @@ queries to a specific VRF or customer partition:
         vrf_routes = vrf_session.bulk_walk('ipRouteDest')
         for route in vrf_routes:
             print(f"VRF Route: {route.oid}.{route.index} = {route.value}")
+
+📥 `Download this script: 03_handling_multi_context_vrf_monitoring.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-snmpv3-deep-dive/03_handling_multi_context_vrf_monitoring.py>`_
 
 4. Explicit EngineID Configuration
 ----------------------------------
@@ -190,6 +196,7 @@ EngineID to bypass discovery:
         (contact,) = session.get('sysContact.0')
         print(f"Contact Info: {contact.value}")
 
+📥 `Download this script: 04_explicit_engineid_configuration.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-snmpv3-deep-dive/04_explicit_engineid_configuration.py>`_
 
 Production Best Practices
 =========================
@@ -250,6 +257,8 @@ issues from USM authentication and cryptographic failures:
     except GenericError as exc:
         # Catches syntax issues, unsupported security parameters, or MIB errors
         print(f"SNMPv3 operational error: {exc}")
+
+📥 `Download this script: 05_catching_specific_snmpv3_exception_state.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-snmpv3-deep-dive/05_catching_specific_snmpv3_exception_state.py>`_
 
 .. note::
 

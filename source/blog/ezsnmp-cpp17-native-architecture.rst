@@ -153,6 +153,7 @@ global C-level lock boundaries:
         with session_lock:
             return session.get(oid)
 
+📥 `Download this script: thread_safe_get.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-cpp17-native-architecture/thread_safe_get.py>`_
 
 Structured Exception Translation
 ================================

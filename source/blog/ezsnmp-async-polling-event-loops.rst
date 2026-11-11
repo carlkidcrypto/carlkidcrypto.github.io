@@ -131,6 +131,8 @@ GET, WALK, and BULKWALK operations alongside concurrency throttling via
                     self._executor, self.session.bulk_walk, oids
                 )
 
+📥 `Download this script: 01_bulk_walk.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-async-polling-event-loops/01_bulk_walk.py>`_
+
 2. Polling Multiple Devices Concurrently
 ----------------------------------------
 
@@ -192,6 +194,7 @@ simultaneously while bounding local socket and thread consumption:
     if __name__ == "__main__":
         asyncio.run(main())
 
+📥 `Download this script: 02_poll_device.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-async-polling-event-loops/02_poll_device.py>`_
 
 Production Tuning & Best Practices
 ==================================

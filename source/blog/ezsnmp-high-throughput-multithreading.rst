@@ -180,6 +180,8 @@ and immune protection against Net-SNMP global state contention.
         workers = min(os.cpu_count() or 4, 8)
         run_parallel_poll(DEVICE_INVENTORY, max_workers=workers)
 
+📥 `Download this script: 01_run_parallel_poll.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-high-throughput-multithreading/01_run_parallel_poll.py>`_
+
 2. Large Table Extraction with Worker Pools (bulk_walk)
 -------------------------------------------------------
 
@@ -216,6 +218,8 @@ each network PDU, slashing network round-trips by up to 90%:
             results = list(executor.map(collect_interface_table, devices))
         return results
 
+📥 `Download this script: 02_run_bulk_collection.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-high-throughput-multithreading/02_run_bulk_collection.py>`_
+
 3. Low-Concurrency Threading with ThreadPoolExecutor (≤4 Threads)
 -----------------------------------------------------------------
 
@@ -237,6 +241,8 @@ concurrency to at most 4 workers**:
         for future in concurrent.futures.as_completed(future_to_device):
             res = future.result()
             print(f"[{res['status']}] Polled {res['ip']}")
+
+📥 `Download this script: 03_low_concurrency_threading_with_threadpoo.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-high-throughput-multithreading/03_low_concurrency_threading_with_threadpoo.py>`_
 
 .. warning::
 

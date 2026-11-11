@@ -123,6 +123,8 @@ between network timeouts, reachability failures, and MIB-level errors:
             print(f"[{host}] Unexpected SNMP protocol failure: {err}")
             return None
 
+📥 `Download this script: 01_safe_poll_scalar.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-resilient-polling-error-handling/01_safe_poll_scalar.py>`_
+
 2. Right-Sizing Timeouts & Retries
 ----------------------------------
 
@@ -183,6 +185,8 @@ worker thread capacity. Implement a simple circuit breaker using monotonic clock
         def record_success(self, host: str):
             self.failures[host] = 0
             self.tripped_until.pop(host, None)
+
+📥 `Download this script: 02_record_success.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-resilient-polling-error-handling/02_record_success.py>`_
 
 4. Handling Partial Table Walks Gracefully
 ------------------------------------------

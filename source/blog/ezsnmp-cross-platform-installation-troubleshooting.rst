@@ -197,6 +197,7 @@ properly by executing a quick check in Python:
         (sys_descr,) = session.get("sysDescr.0")
         print(f"Connected: {sys_descr.value}")
 
+📥 `Download this script: verifying_your_installation.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-cross-platform-installation-troubleshooting/verifying_your_installation.py>`_
 
 Diagnostic Cheat Sheet: Common Error Signatures
 ===============================================

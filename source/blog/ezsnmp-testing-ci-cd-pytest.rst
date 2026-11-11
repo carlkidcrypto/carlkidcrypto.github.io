@@ -126,6 +126,8 @@ down after the test session:
             proc.terminate()
             proc.wait()
 
+📥 `Download this script: 01_snmp_daemon.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-testing-ci-cd-pytest/01_snmp_daemon.py>`_
+
 2. Testing Client Operations (test_telemetry.py)
 ------------------------------------------------
 
@@ -182,6 +184,7 @@ scalar queries, walks, and error handling:
         with pytest.raises(TimeoutError):
             session.get("sysDescr.0")
 
+📥 `Download this script: 02_test_snmp_timeout_fault_injection.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-testing-ci-cd-pytest/02_test_snmp_timeout_fault_injection.py>`_
 
 CI/CD Integration: GitHub Actions Workflow
 ==========================================

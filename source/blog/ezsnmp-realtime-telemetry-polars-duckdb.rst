@@ -189,6 +189,7 @@ bandwidth rates via Polars, and executes analytical SQL in DuckDB:
     if __name__ == "__main__":
         run_pipeline()
 
+📥 `Download this script: run_pipeline.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-realtime-telemetry-polars-duckdb/run_pipeline.py>`_
 
 Handling Counter Overflows & Device Resets
 ==========================================

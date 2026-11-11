@@ -135,6 +135,8 @@ method returns a tuple of :class:`~ezsnmp.datatypes.Result` objects:
         print(f"Value: {sys_descr.value}")
         print(f"Type: {sys_descr.type}")
 
+📥 `Download this script: 01_basic_snmp_get_request.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/01_basic_snmp_get_request.py>`_
+
 2. Context Managers & Batch Queries
 -----------------------------------
 
@@ -154,6 +156,8 @@ PDU request to drastically reduce network round-trips:
         for item in results:
             print(f"{item.oid}.{item.index} ({item.type}) = {item.value}")
 
+📥 `Download this script: 02_context_managers_batch_queries.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/02_context_managers_batch_queries.py>`_
+
 3. Walking an MIB Subtree
 -------------------------
 
@@ -168,6 +172,8 @@ To traverse tabular MIB data (such as network interface descriptions), use :meth
         interfaces = session.walk('ifDescr')
         for iface in interfaces:
             print(f"Interface {iface.index}: {iface.value}")
+
+📥 `Download this script: 03_walking_an_mib_subtree.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/03_walking_an_mib_subtree.py>`_
 
 4. High-Performance Bulk Walk (GETBULK)
 ---------------------------------------
@@ -186,6 +192,8 @@ network datagram:
         route_entries = session.bulk_walk('ipRouteDest')
         for route in route_entries:
             print(f"Route: {route.value}")
+
+📥 `Download this script: 04_high_performance_bulk_walk.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/04_high_performance_bulk_walk.py>`_
 
 5. Secure Enterprise SNMPv3 (authPriv)
 --------------------------------------
@@ -213,6 +221,8 @@ encryption) directly to C and OpenSSL:
     if results:
         print(f"Secure Uptime: {results[0].value}")
 
+📥 `Download this script: 05_secure_enterprise_snmpv3.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/05_secure_enterprise_snmpv3.py>`_
+
 Best Practices for Production Monitoring
 ========================================
 
@@ -235,6 +245,8 @@ across polling iterations:
 
     def poll_metrics():
         return session.get(['sysUpTime.0', 'sysDescr.0'])
+
+📥 `Download this script: 06_poll_metrics.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/06_poll_metrics.py>`_
 
 Fine-Grained Exception Handling
 -------------------------------
@@ -271,6 +283,8 @@ unreachable hosts separately from agent MIB faults:
     except GenericError as exc:
         print(f"General SNMP error encountered: {exc}")
 
+📥 `Download this script: 07_ezsnmp_uses_a_clean_exception_hierarchy.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/07_ezsnmp_uses_a_clean_exception_hierarchy.py>`_
+
 Concurrency: Multiprocessing Recommended
 ----------------------------------------
 When scaling SNMP polling across large fleets of network targets, **multiprocessing**
@@ -306,6 +320,8 @@ reliable, linear performance across CPU cores:
         for future in as_completed(futures):
             host, status = future.result()
             print(f"{host}: {status}")
+
+📥 `Download this script: 08_poll_device.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/08_poll_device.py>`_
 
 Migration Guide: Upgrading from Easy SNMP
 =========================================
@@ -405,6 +421,8 @@ Updating your polling calls is straightforward:
                 print(f"Interface {item.index}: {item.value}")
         except TimeoutError:
             print("Device did not respond in time.")
+
+📥 `Download this script: 09_code_migration_example.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/ezsnmp-getting-started-guide/09_code_migration_example.py>`_
 
 Useful Links & Community
 ========================
