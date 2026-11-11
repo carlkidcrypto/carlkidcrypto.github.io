@@ -50,6 +50,7 @@ ORDERED_STACK = [
     ("feature/blog-purpleair-matterbridge-smart-home-integration", 46),
     ("feature/blog-ezsnmp-mpls-segment-routing-lsp-telemetry", 50),
     ("feature/blog-purpleair-api-historical-data-bounding-box-queries", 51),
+    ("feature/blog-purpleair-data-logger-local-csv-sqlite-archival", 52),
 ]
 
 
