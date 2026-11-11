@@ -22,6 +22,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :caption: Articles:
 
 
+
+   purpleair-api-historical-data-bounding-box-queries
    ezsnmp-mpls-segment-routing-lsp-telemetry
    purpleair-matterbridge-smart-home-integration
    purpleair-data-logger-timescaledb-postgresql-ingestion
@@ -57,6 +59,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Historical Sensor Data Extraction and Bounding Box Geographic Queries with purpleair_api
+      :link: purpleair-api-historical-data-bounding-box-queries
+      :link-type: doc
+
+      :Author: Written by Gemini :Co-Author: Carlos Santos :Date: November 8, 2026 :Category: Environmental Data Science :Tags: purpleair, python, api,...
+
+      +++
+      📅 *November 8, 2026* • ⏱️ *5 min read* • `Purpleair` `Python` `Api` `Open-Source`
 
    .. grid-item-card:: 📖 MPLS & Segment Routing LSP Telemetry: Label Switched Path Auditing with ezsnmp
       :link: ezsnmp-mpls-segment-routing-lsp-telemetry
