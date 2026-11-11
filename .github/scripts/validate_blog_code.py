@@ -469,7 +469,9 @@ class MockSession:
         if "ntpEntStatusStratum" in oid:
             return MockResult("ntpEntStatusStratum", "0", "2", "INTEGER")
         if "ntpEntStatusActiveRefSourceId" in oid:
-            return MockResult("ntpEntStatusActiveRefSourceId", "0", "192.0.2.10", "OCTETSTR")
+            return MockResult(
+                "ntpEntStatusActiveRefSourceId", "0", "192.0.2.10", "OCTETSTR"
+            )
         if "ntpEntStatusActiveOffset" in oid:
             return MockResult("ntpEntStatusActiveOffset", "0", "0.245 ms", "OCTETSTR")
         if "ntpEntStatusDispersion" in oid:
@@ -706,21 +708,50 @@ def execute_test_harness(
         pass
 
     class MockPurpleAirBase:
-        def __init__(self, *a: Any, **k: Any): pass
+        def __init__(self, *a: Any, **k: Any):
+            pass
+
         def request_sensor_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {"sensor": {"name": "Mock Station", "pm2.5_atm": 12.5, "pm2.5_cf_1": 12.0, "temperature": 72.0, "humidity": 45.0, "pressure": 1013.25}}
+            return {
+                "sensor": {
+                    "name": "Mock Station",
+                    "pm2.5_atm": 12.5,
+                    "pm2.5_cf_1": 12.0,
+                    "temperature": 72.0,
+                    "humidity": 45.0,
+                    "pressure": 1013.25,
+                }
+            }
+
         def request_multiple_sensors_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {"fields": ["name", "latitude", "longitude", "pm2.5_atm", "temperature"], "data": [["Mock Sensor 1", 46.7, -117.1, 10.2, 70.0]]}
+            return {
+                "fields": ["name", "latitude", "longitude", "pm2.5_atm", "temperature"],
+                "data": [["Mock Sensor 1", 46.7, -117.1, 10.2, 70.0]],
+            }
+
         def request_group_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
             return {"group_id": 1234, "name": "Mock Group"}
+
         def request_members_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {"fields": ["sensor_index", "name", "pm2.5_atm"], "data": [[282168, "Mock Station", 12.5]]}
+            return {
+                "fields": ["sensor_index", "name", "pm2.5_atm"],
+                "data": [[282168, "Mock Station", 12.5]],
+            }
+
         def post_create_group_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
             return {"group_id": 1234, "name": "Mock Group"}
+
         def post_create_member(self, *a: Any, **k: Any) -> Dict[str, Any]:
             return {"member_id": 5678, "sensor_index": 282168}
+
         def request_local_sensor_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {"SensorId": "MockLocal", "pm2_5_atm": 12.5, "current_temp_f": 72.0, "current_humidity": 45.0, "pressure": 1013.25}
+            return {
+                "SensorId": "MockLocal",
+                "pm2_5_atm": 12.5,
+                "current_temp_f": 72.0,
+                "current_humidity": 45.0,
+                "pressure": 1013.25,
+            }
 
     mock_paa_mod.PurpleAirAPI = MockPurpleAirBase
     mock_paa_mod.PurpleAirAPIError = MockPurpleAirAPIError
@@ -781,6 +812,42 @@ def execute_test_harness(
     sys.stdin = io.StringIO("PING\nget\n.1.3.6.1.4.1.99999.1.1.0\n\n")
 
     # Mock external network bindings
+    old_requests_get = None
+    try:
+        import requests
+
+        old_requests_get = getattr(requests, "get", None)
+
+        class MockRequestsResponse:
+            def __init__(self, data: Dict[str, Any], status_code: int = 200):
+                self._data = data
+                self.status_code = status_code
+
+            def json(self) -> Dict[str, Any]:
+                return self._data
+
+            def raise_for_status(self) -> None:
+                pass
+
+        def mock_requests_get(url: str, *a: Any, **k: Any) -> MockRequestsResponse:
+            if "/json" in url:
+                return MockRequestsResponse(
+                    {
+                        "SensorId": "84:f3:eb:12:34:56",
+                        "pm2_5_atm": 12.5,
+                        "pm2_5_cf_1": 11.2,
+                        "pm10_0_atm": 15.0,
+                        "current_temp_f": 72.0,
+                        "current_humidity": 45.0,
+                        "pressure": 1013.25,
+                    }
+                )
+            return MockRequestsResponse({})
+
+        requests.get = mock_requests_get  # type: ignore
+    except Exception:
+        pass
+
     try:
         import prometheus_client
 
@@ -882,6 +949,13 @@ def execute_test_harness(
     finally:
         if old_version_fn is not None:
             importlib.metadata.version = old_version_fn  # type: ignore
+        if old_requests_get is not None:
+            try:
+                import requests
+
+                requests.get = old_requests_get
+            except Exception:
+                pass
         sys.stdout = old_stdout
         sys.stdin = old_stdin
         subprocess.Popen = old_popen
@@ -1076,7 +1150,18 @@ def derive_script_filename(
                             main_calls.append(sub.func.id)
 
         called_in_main = [
-            f for f in funcs if f in main_calls and f not in ("main", "run", "test")
+            f
+            for f in funcs
+            if f in main_calls
+            and f
+            not in (
+                "main",
+                "run",
+                "test",
+                "initialize_database",
+                "init_database",
+                "init_db",
+            )
         ]
         meaningful_funcs = [
             f

@@ -121,7 +121,7 @@ readings using Python:
         data = response.json()
 
         epoch = int(datetime.now(timezone.utc).timestamp())
-        mac = data.get("mac")
+        mac = data.get("SensorId") or data.get("mac")
         pm25 = data.get("pm2_5_atm")
         pm25_cf1 = data.get("pm2_5_cf_1")
         pm10 = data.get("pm10_0_atm")
@@ -140,6 +140,17 @@ readings using Python:
                 temp, humidity, pressure
             ))
 
+    if __name__ == "__main__":
+        initialize_database()
+        # Poll configured local sensors (replace IP with your local sensor's LAN address)
+        configured_sensors = ["192.168.1.100"]
+        for ip in configured_sensors:
+            try:
+                log_local_sensor(ip)
+                print(f"Successfully recorded telemetry from {ip}")
+            except Exception as err:
+                print(f"Sensor polling skipped or failed for {ip}: {err}")
+
 📥 `Download this script: 01_log_local_sensor.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-local-csv-sqlite-archival/01_log_local_sensor.py>`_
 
 Flat CSV Archival with Rolling Partitions
@@ -154,7 +165,9 @@ streams can be appended directly to daily or monthly CSV files:
 
 .. code-block:: python
 
+    import json
     import os
+    from pathlib import Path
     from purpleair_data_logger.PurpleAirCSVDataLogger import (
         PurpleAirCSVDataLogger,
     )
@@ -166,13 +179,28 @@ streams can be appended directly to daily or monthly CSV files:
     # Initialize CSV data logger for local LAN IP addresses
     local_sensor_ips = ["192.168.1.150", "192.168.1.151"]
 
+    # Ensure local configuration file exists
+    config_file = Path("local_sensor_config.json")
+    if not config_file.exists():
+        config_file.write_text(
+            json.dumps(
+                {
+                    "sensor_ip_list": local_sensor_ips,
+                    "poll_interval_seconds": 60,
+                },
+                indent=4,
+            )
+        )
+
     csv_logger = PurpleAirCSVDataLogger(
-        save_file_path=csv_output_dir,
-        local_sensor_ip_list=local_sensor_ips
+        PurpleAirApiIpv4Address=local_sensor_ips,
+        path_to_save_csv_files_in=csv_output_dir,
     )
 
     # Ingest from local sensor endpoints directly to CSV
-    csv_logger.store_local_sensors_data()
+    csv_logger.validate_parameters_and_run(
+        paa_local_sensor_request_json_file=str(config_file)
+    )
     print("Successfully appended local readings to CSV log.")
 
 📥 `Download this script: 02_flat_csv_archival_with_rolling_partition.py <https://raw.githubusercontent.com/carlkidcrypto/carlkidcrypto.github.io/main/example_scripts/purpleair-data-logger-local-csv-sqlite-archival/02_flat_csv_archival_with_rolling_partition.py>`_
@@ -182,6 +210,18 @@ Deploying as a Resilient Systemd Edge Service
 
 To run the offline data logger continuously on an edge device (such as an SEL
 gateway, Debian appliance, or Raspberry Pi), configure a systemd service unit.
+
+First, set up your project directory and provision the polling script:
+
+.. code-block:: bash
+
+    mkdir -p /home/pi/purpleair-logging
+    cd /home/pi/purpleair-logging
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install requests
+    # Copy the downloadable polling script into place as local_logger.py
+    cp 01_log_local_sensor.py local_logger.py
 
 Create ``/etc/systemd/system/purpleair-local-logger.service``:
 
