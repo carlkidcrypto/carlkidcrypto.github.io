@@ -7,9 +7,9 @@ from ezsnmp import Session
 from ezsnmp.exceptions import GenericError
 
 # Standard RFC 3811 / RFC 3812 MIB OIDs
-OID_MPLS_XC_OPER_STATUS = "1.3.6.1.2.1.10.166.2.1.10.1.7"
-OID_MPLS_XC_ADMIN_STATUS = "1.3.6.1.2.1.10.166.2.1.10.1.6"
-OID_MPLS_TUNNEL_NAME = "1.3.6.1.2.1.10.166.3.2.2.1.6"
+OID_MPLS_XC_OPER_STATUS = "1.3.6.1.2.1.10.166.2.1.10.1.10"
+OID_MPLS_XC_ADMIN_STATUS = "1.3.6.1.2.1.10.166.2.1.10.1.9"
+OID_MPLS_TUNNEL_NAME = "1.3.6.1.2.1.10.166.3.2.2.1.35"
 OID_MPLS_TUNNEL_OPER_STATUS = "1.3.6.1.2.1.10.166.3.2.2.1.5"
 
 XC_STATUS_MAP = {
@@ -38,21 +38,16 @@ def audit_mpls_telemetry(host: str, community: str = "public"):
         community=community,
         version=2,
         timeout=3,
-        retries=1
+        retries=1,
+        set_max_repeaters_to_num=25,
     )
 
     try:
         print(f"[*] Auditing MPLS and SR-TE state on {host}...")
 
         # 1. Audit MPLS Cross-Connect Forwarding Plane
-        xc_oper_vars = session.bulk_walk(
-            OID_MPLS_XC_OPER_STATUS,
-            max_repetitions=25
-        )
-        xc_admin_vars = session.bulk_walk(
-            OID_MPLS_XC_ADMIN_STATUS,
-            max_repetitions=25
-        )
+        xc_oper_vars = session.bulk_walk(OID_MPLS_XC_OPER_STATUS)
+        xc_admin_vars = session.bulk_walk(OID_MPLS_XC_ADMIN_STATUS)
 
         admin_status_dict = {
             var.index: var.value for var in xc_admin_vars
@@ -80,14 +75,8 @@ def audit_mpls_telemetry(host: str, community: str = "public"):
                 print(f"    - XC Index {idx}: Operational Status {status}")
 
         # 2. Audit Traffic Engineering & Segment Routing Tunnels
-        tunnel_names = session.bulk_walk(
-            OID_MPLS_TUNNEL_NAME,
-            max_repetitions=25
-        )
-        tunnel_status = session.bulk_walk(
-            OID_MPLS_TUNNEL_OPER_STATUS,
-            max_repetitions=25
-        )
+        tunnel_names = session.bulk_walk(OID_MPLS_TUNNEL_NAME)
+        tunnel_status = session.bulk_walk(OID_MPLS_TUNNEL_OPER_STATUS)
 
         status_dict = {
             var.index: var.value for var in tunnel_status
