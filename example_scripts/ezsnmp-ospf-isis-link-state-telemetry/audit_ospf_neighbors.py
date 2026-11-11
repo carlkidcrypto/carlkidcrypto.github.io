@@ -21,14 +21,23 @@ def parse_numeric(val, default=0):
     digits = "".join(c for c in str(val) if c.isdigit())
     return int(digits) if digits else default
 
-def extract_nbr_ip(index_str: str, oid_str: str) -> str:
-    parts = [p for p in index_str.split(".") if p.isdigit()]
+def extract_composite_index(var) -> str:
+    """Extract the complete table row index suffix ([neighbor_ip].[address_less_index])."""
+    oid_parts = [p for p in str(var.oid).split(".") if p.strip()]
+    idx_parts = [p for p in str(var.index).split(".") if p.strip()]
+    if len(idx_parts) >= 5:
+        return ".".join(idx_parts[:5])
+    combined = oid_parts + idx_parts
+    numeric = [p for p in combined if p.isdigit()]
+    if len(numeric) >= 5:
+        return ".".join(numeric[-5:])
+    return var.index or "0"
+
+def extract_nbr_ip_from_key(key: str) -> str:
+    parts = [p for p in key.split(".") if p.isdigit()]
     if len(parts) >= 4:
         return ".".join(parts[:4])
-    oid_parts = [p for p in oid_str.split(".") if p.isdigit()]
-    if len(oid_parts) >= 5:
-        return ".".join(oid_parts[-5:-1])
-    return index_str or "Unknown"
+    return key
 
 def audit_ospf_neighbors(hostname: str, community: str = "public"):
     """Audit OSPF neighbor states, flap events, and LSA queue depth."""
@@ -49,16 +58,16 @@ def audit_ospf_neighbors(hostname: str, community: str = "public"):
         event_vars = session.bulk_walk("ospfNbrEvents")
         retrans_vars = session.bulk_walk("ospfNbrLsRetransQLen")
 
-        rtr_map = {v.index: v.value for v in rtr_vars}
-        event_map = {v.index: parse_numeric(v.value) for v in event_vars}
-        retrans_map = {v.index: parse_numeric(v.value) for v in retrans_vars}
+        # Map by composite 5-part index to avoid collisions on address-less indices
+        rtr_map = {extract_composite_index(v): v.value for v in rtr_vars}
+        event_map = {extract_composite_index(v): parse_numeric(v.value) for v in event_vars}
+        retrans_map = {extract_composite_index(v): parse_numeric(v.value) for v in retrans_vars}
 
         neighbors = []
 
         for var in state_vars:
-            # OID index format: [neighbor_ip].[address_less_index]
-            idx = var.index
-            nbr_ip_str = extract_nbr_ip(idx, var.oid)
+            idx = extract_composite_index(var)
+            nbr_ip_str = extract_nbr_ip_from_key(idx)
 
             raw_state = str(var.value).strip()
             if raw_state.isdigit():
@@ -74,18 +83,36 @@ def audit_ospf_neighbors(hostname: str, community: str = "public"):
             events = event_map.get(idx, 0)
             retrans_len = retrans_map.get(idx, 0)
 
-            # An operational point-to-point adjacency must be FULL (8)
-            is_stuck = state_code in (5, 6, 7)  # ExStart/Exchange/Loading
+            # Evaluate operational state vs abnormal/unidirectional or transitional conditions
             is_down = state_code == 1
+            is_init_or_attempt = state_code in (2, 3)
+            is_transitional = state_code in (5, 6, 7)
+            is_2way = state_code == 4
+            is_full = state_code == 8
             has_retrans = retrans_len > 0
 
-            status = "OK"
+            status = "OPERATIONAL"
+            alert = False
             if is_down:
                 status = "DOWN"
-            elif is_stuck:
-                status = "STUCK_MTU_MISMATCH"
+                alert = True
+            elif is_init_or_attempt:
+                status = "INIT_UNIDIRECTIONAL_OR_ATTEMPT"
+                alert = True
+            elif is_transitional:
+                # Single snapshots may capture normal transitions; qualify as transitional/stuck
+                status = "TRANSITIONAL_OR_STUCK"
+                alert = True
             elif has_retrans:
-                status = "LSA_PACKET_LOSS"
+                # Retransmission backlog: persistent queues indicate MTU mismatch or packet loss
+                status = "RETRANS_QUEUE_BACKLOG"
+                alert = True
+            elif is_2way:
+                status = "2-WAY_DROTHER"
+                alert = False
+            elif is_full:
+                status = "FULL"
+                alert = False
 
             neighbors.append({
                 "neighbor_ip": nbr_ip_str,
@@ -94,7 +121,7 @@ def audit_ospf_neighbors(hostname: str, community: str = "public"):
                 "flaps": events,
                 "retrans_queue": retrans_len,
                 "status": status,
-                "alert": is_down or is_stuck or has_retrans
+                "alert": alert
             })
 
         return neighbors
