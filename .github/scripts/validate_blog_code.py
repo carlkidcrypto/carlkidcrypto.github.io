@@ -463,6 +463,16 @@ class MockSession:
             return MockResult("pethMainPsePower", "1", "740", "GAUGE")
         if "pethMainPseConsumptionPower" in oid:
             return MockResult("pethMainPseConsumptionPower", "1", "320", "GAUGE")
+        if "ntpEntStatusCurrentMode" in oid:
+            return MockResult("ntpEntStatusCurrentMode", "0", "6", "INTEGER")
+        if "ntpEntStatusStratum" in oid:
+            return MockResult("ntpEntStatusStratum", "0", "2", "INTEGER")
+        if "ntpEntStatusActiveRefSourceId" in oid:
+            return MockResult("ntpEntStatusActiveRefSourceId", "0", "192.0.2.10", "OCTETSTR")
+        if "ntpEntStatusActiveOffset" in oid:
+            return MockResult("ntpEntStatusActiveOffset", "0", "0.245 ms", "OCTETSTR")
+        if "ntpEntStatusDispersion" in oid:
+            return MockResult("ntpEntStatusDispersion", "0", "1.420 ms", "OCTETSTR")
         return MockResult(oid, "0", "mock-value", "OCTETSTR")
 
     def get_next(self, oids: Any) -> Tuple[MockResult, ...]:
@@ -973,9 +983,15 @@ def derive_script_filename(
         main_calls = []
         for node in ast.walk(tree):
             if isinstance(node, ast.If):
-                for sub in ast.walk(node):
-                    if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name):
-                        main_calls.append(sub.func.id)
+                # Only inspect calls inside `if __name__ == "__main__":` blocks
+                is_main_block = any(
+                    isinstance(t, ast.Name) and t.id == "__name__"
+                    for t in ast.walk(node.test)
+                )
+                if is_main_block:
+                    for sub in ast.walk(node):
+                        if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name):
+                            main_calls.append(sub.func.id)
 
         called_in_main = [
             f for f in funcs if f in main_calls and f not in ("main", "run", "test")
