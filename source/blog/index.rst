@@ -21,6 +21,8 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 1
    :caption: Articles:
 
+
+   ezsnmp-mpls-segment-routing-lsp-telemetry
    purpleair-matterbridge-smart-home-integration
    purpleair-data-logger-timescaledb-postgresql-ingestion
    purpleair-api-getting-started-guide
@@ -55,6 +57,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 MPLS & Segment Routing LSP Telemetry: Label Switched Path Auditing with ezsnmp
+      :link: ezsnmp-mpls-segment-routing-lsp-telemetry
+      :link-type: doc
+
+      Modern enterprise campus backbones, wide-area networks (WAN), and service provider backbones rely on Multiprotocol Label Switching (MPLS) and Segment...
+
+      +++
+      📅 *November 7, 2026* • ⏱️ *5 min read* • `Ezsnmp` `Python` `Snmp` `Mpls`
 
    .. grid-item-card:: 📖 Bridging PurpleAir Air Quality Sensors into Smart Home Matter Ecosystems
       :link: purpleair-matterbridge-smart-home-integration
