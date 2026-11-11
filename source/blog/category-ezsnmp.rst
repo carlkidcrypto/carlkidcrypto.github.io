@@ -17,6 +17,7 @@ High-throughput SNMP network automation, SNMPv3 cryptography, protocol telemetry
    :maxdepth: 1
    :hidden:
 
+   ezsnmp-mpls-segment-routing-lsp-telemetry
    ezsnmp-vrrp-hsrp-redundancy-monitoring
    ezsnmp-network-time-ntp-ptp-telemetry
    ezsnmp-ospf-isis-link-state-telemetry
@@ -48,6 +49,42 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 MPLS & Segment Routing LSP Telemetry: Label Switched Path Auditing with ezsnmp
+      :link: ezsnmp-mpls-segment-routing-lsp-telemetry
+      :link-type: doc
+
+      Modern enterprise campus backbones, wide-area networks (WAN), and service provider backbones rely on Multiprotocol Label Switching (MPLS) and Segment Routing for traffic engineering. Audit cross-connect tables and tunnel states with ezsnmp.
+
+      +++
+      📅 *November 07, 2026* • ⏱️ *5 min read* • `Ezsnmp` `Python` `Snmp` `Mpls`
+
+   .. grid-item-card:: 📖 First-Hop Redundancy Monitoring: VRRP & HSRP with ezsnmp
+      :link: ezsnmp-vrrp-hsrp-redundancy-monitoring
+      :link-type: doc
+
+      Query VRRP and HSRP operational parameters, cross-reconcile HA gateway pairs, and detect split-brain dual-master anomalies in real time using ezsnmp.
+
+      +++
+      📅 *November 03, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Vrrp` `Hsrp`
+
+   .. grid-item-card:: 📖 Network Time & Clock Synchronization Telemetry with ezsnmp
+      :link: ezsnmp-network-time-ntp-ptp-telemetry
+      :link-type: doc
+
+      Inspect system NTP synchronization states, evaluate stratum levels, and alert on clock skew and dispersion across network fleets using ezsnmp and Net-SNMP C bindings.
+
+      +++
+      📅 *November 02, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Ntp` `Ptp`
+
+   .. grid-item-card:: 📖 OSPF & IS-IS Link-State Telemetry: Neighbor Auditing in ezsnmp
+      :link: ezsnmp-ospf-isis-link-state-telemetry
+      :link-type: doc
+
+      Audit OSPF and IS-IS neighbor adjacencies, detect MTU-induced stuck sessions, and monitor LSA retransmission queues in real time using ezsnmp and Net-SNMP C bindings.
+
+      +++
+      📅 *November 01, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Ospf` `Is-Is`
 
    .. grid-item-card:: 📖 Traffic Flow Auditing: Monitoring NetFlow & IPFIX with ezsnmp
       :link: ezsnmp-traffic-flow-netflow-ipfix-auditing
