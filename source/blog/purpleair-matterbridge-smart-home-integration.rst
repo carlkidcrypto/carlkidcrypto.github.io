@@ -53,17 +53,16 @@ Understanding the Matter Air Quality Architecture
 The Matter specification defines discrete clusters and device types for
 environmental sensing:
 
-- **Air Quality Sensor Device Type (0x002D)**: Represents dedicated air quality
-  hardware. It exposes calibrated particulate concentrations and categorical
-  evaluations (e.g. Good, Moderate, Unhealthy for Sensitive Groups, Hazard).
-- **Air Quality Measurement Cluster (0x005D)**: Reports the discrete air
-  quality rating value alongside standard evaluation formulas.
+- **Air Quality Sensor Device Type (0x002C)**: Represents dedicated air quality
+  sensing accessories.
+- **Air Quality Measurement Cluster (0x005B)**: Exposes a standardized discrete
+  categorical enumeration (``AirQualityEnum``: 0=Unknown, 1=Good, 2=Fair,
+  3=Moderate, 4=Poor, 5=Very Poor, 6=Extremely Poor) rather than a raw numeric score.
 - **Concentration Measurement Clusters**: Standardized clusters for discrete
-  particle densities, including PM1.0, PM2.5, and PM10 in micrograms per cubic
+  particulate densities, including PM1.0, PM2.5, and PM10 in micrograms per cubic
   meter (ug/m3).
 - **Environmental Sensing Clusters**: Exposes temperature (Cluster 0x0402),
-  relative humidity (Cluster 0x0405), and atmospheric pressure (Cluster 0x0403)
-  on nested child endpoints.
+  relative humidity (Cluster 0x0405), and atmospheric pressure (Cluster 0x0403).
 
 The ``purpleair-matterbridge`` plugin maps PurpleAir telemetry into standard
 Matter endpoints:
@@ -72,8 +71,8 @@ Matter endpoints:
 
     Matterbridge Root Node (Endpoint 0)
      └── Bridged Node Endpoint
-          ├── Device Type: Air Quality Sensor (0x002D)
-          ├── Cluster: AirQuality (0x005D) -> EPA AQI & Category
+          ├── Device Type: Air Quality Sensor (0x002C)
+          ├── Cluster: AirQuality (0x005B) -> AirQualityEnum (0..6)
           ├── Cluster: PM2.5 Measurement -> Measured ug/m3
           ├── Cluster: TemperatureMeasurement (0x0402) -> Ambient deg C
           ├── Cluster: RelativeHumidityMeasurement (0x0405) -> % RH
@@ -101,14 +100,33 @@ Create a configuration file named ``purpleair-matterbridge.config.json``:
       "type": "DynamicPlatform",
       "feedUrl": "http://127.0.0.1:9855/matter/sensors",
       "pollIntervalSeconds": 30,
-      "reconnectTimeoutSeconds": 10,
-      "logLevel": "info"
+      "requestTimeoutSeconds": 10,
+      "debug": false
     }
 
-The configuration schema validates feed parameters, fallback intervals, and
-sensor filtering lists. If a sensor temporarily loses connectivity, the bridge
-retains the last verified reading and marks the Matter cluster availability
-without dropping the paired device from the controller.
+The configuration schema validates supported platform parameters: ``feedUrl``,
+``pollIntervalSeconds``, ``requestTimeoutSeconds``, and ``debug`` logging flags.
+
+.. important::
+
+   **Stale Telemetry Handling**: On a failed poll or missing sensor entry in
+   the HTTP feed, ``purpleair-matterbridge`` intentionally preserves its
+   last-known-good readings in memory without marking the sensor offline in
+   Matterbridge. This prevents momentary network blips from triggering false
+   device-unavailable states. In production, configure separate container
+   health checks or feed freshness monitoring to catch prolonged upstream
+   outages.
+
+Next, create the logger configuration file ``purpleair-settings.json`` in your
+project directory. For local LAN sensor polling:
+
+.. code-block:: json
+
+    {
+      "your_ipv4_address": [
+        "192.168.1.100"
+      ]
+    }
 
 Deploying with Docker & Host Networking
 =======================================
@@ -125,17 +143,19 @@ To ensure seamless discovery, run the container with **host networking**:
     # docker-compose.yml
     services:
       purpleair-matterbridge:
-        image: carlkidcrypto/purpleair-matterbridge:latest
+        image: carlkidcrypto/purpleair-matterbridge-images:2026.11.3-0
         container_name: purpleair-matterbridge
         restart: unless-stopped
         network_mode: host
         environment:
-          - PURPLEAIR_LOGGER_MODE=--local
+          - PURPLEAIR_LOGGER_MODE=local
+          - PURPLEAIR_SETTINGS_FILE=/config/purpleair-settings.json
           - NODE_ENV=production
         volumes:
           - ./purpleair-settings.json:/config/purpleair-settings.json:ro
-          - matterbridge-data:/root/.matterbridge
-          - logger-data:/root/.purpleair-data-logger
+          - ./purpleair-matterbridge.config.json:/data/.matterbridge/purpleair-matterbridge.config.json:ro
+          - matterbridge-data:/data
+          - logger-data:/data/logger
 
     volumes:
       matterbridge-data:
@@ -146,11 +166,15 @@ Key deployment details:
 - **Host Network Mode (network_mode: host)**: Binds container sockets directly
   to the host interface (such as ``eth0`` or ``wlan0``), enabling native mDNS
   broadcasts and IPv6 neighbor discovery.
-- **Persistent Matterbridge Volume (matterbridge-data)**: Stores the bridge's
-  cryptographic fabric identity, fabric keys, and controller pairings.
-  Replacing or upgrading the container preserves your smart home pairings.
-- **Logger Mode**: Supports ``--local`` for polling LAN PurpleAir monitors
-  without API keys, or ``--remote`` when querying cloud API groups.
+- **Published Container Image**: Uses the official multi-architecture build
+  ``carlkidcrypto/purpleair-matterbridge-images`` pinned to a release tag (or
+  updated dynamically via ``docker/update_pa_matterbridge.sh``).
+- **Persistent Data Paths**: The container runs with ``HOME=/data``. Mounting
+  ``matterbridge-data`` at ``/data`` and ``logger-data`` at ``/data/logger``
+  preserves Matter fabric pairing keys and logger state across image recreations.
+- **Logger Mode**: Configured via ``PURPLEAIR_LOGGER_MODE`` as plain ``local``
+  (for LAN sensor queries) or ``remote`` (for cloud API queries) without
+  leading dashes.
 
 Launch the stack:
 
@@ -189,7 +213,10 @@ Automation Recipes
 ==================
 
 With PurpleAir sensors exposed as native Matter devices, you can trigger home
-automations with sub-second responsiveness without relying on cloud services.
+automations locally without relying on cloud services. Telemetry updates reflect
+the combined sampling interval of the logger (e.g., 60 seconds) and the bridge
+feed polling interval (e.g., 30 seconds), propagating state transitions within
+approximately 30 to 90 seconds.
 
 Automated Energy Recovery Ventilator (ERV) Quarantine
 -----------------------------------------------------
