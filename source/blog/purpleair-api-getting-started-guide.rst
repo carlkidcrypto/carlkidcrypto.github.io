@@ -73,7 +73,7 @@ submodules coordinated by a unified facade class, ``PurpleAirAPI``:
 Installation and Requirements
 =============================
 
-The package requires Python 3.10 or newer and relies on the foundational
+The package requires Python 3.11 or newer (officially supported on Python 3.11 through 3.15, declaring ``python_requires = >=3.11,<3.16``) and relies on the foundational
 ``requests`` library for reliable HTTP networking.
 
 Install the package directly from PyPI:
@@ -88,7 +88,7 @@ GitHub:
 .. code-block:: bash
 
     git clone https://github.com/carlkidcrypto/purpleair_api.git
-    cd purpleair_api
+    cd purpleair_api/python
     pip install .
 
 Initializing the Client
@@ -280,6 +280,7 @@ Here is a resilient query helper pattern:
 .. code-block:: python
 
     import time
+    from purpleair_api.PurpleAirAPI import PurpleAirAPIError
     from requests.exceptions import RequestException
 
     def resilient_sensor_query(client, sensor_index, fields, max_retries=3):
@@ -292,7 +293,10 @@ Here is a resilient query helper pattern:
                     sensor_index=sensor_index,
                     fields=fields_str
                 )
-            except RequestException as exc:
+            except (RequestException, PurpleAirAPIError) as exc:
+                msg = str(exc)
+                if any(code in msg for code in ("400", "401", "403")):
+                    raise
                 if attempt == max_retries:
                     err_msg = (
                         f"Sensor {sensor_index} failed after {attempt} tries"

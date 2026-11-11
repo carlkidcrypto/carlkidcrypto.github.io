@@ -700,6 +700,10 @@ def execute_test_harness(
     mock_pread_mod = types.ModuleType("purpleair_api.PurpleAirReadAPI")
     mock_pwrite_mod = types.ModuleType("purpleair_api.PurpleAirWriteAPI")
     mock_plocal_mod = types.ModuleType("purpleair_api.PurpleAirLocalAPI")
+    mock_paerror_mod = types.ModuleType("purpleair_api.PurpleAirAPIError")
+
+    class MockPurpleAirAPIError(Exception):
+        pass
 
     class MockPurpleAirBase:
         def __init__(self, *a: Any, **k: Any): pass
@@ -719,24 +723,29 @@ def execute_test_harness(
             return {"SensorId": "MockLocal", "pm2_5_atm": 12.5, "current_temp_f": 72.0, "current_humidity": 45.0, "pressure": 1013.25}
 
     mock_paa_mod.PurpleAirAPI = MockPurpleAirBase
+    mock_paa_mod.PurpleAirAPIError = MockPurpleAirAPIError
     mock_pread_mod.PurpleAirReadAPI = MockPurpleAirBase
     mock_pwrite_mod.PurpleAirWriteAPI = MockPurpleAirBase
     mock_plocal_mod.PurpleAirLocalAPI = MockPurpleAirBase
+    mock_paerror_mod.PurpleAirAPIError = MockPurpleAirAPIError
     mock_purpleair_module.PurpleAirAPI = MockPurpleAirBase
     mock_purpleair_module.PurpleAirReadAPI = MockPurpleAirBase
     mock_purpleair_module.PurpleAirWriteAPI = MockPurpleAirBase
     mock_purpleair_module.PurpleAirLocalAPI = MockPurpleAirBase
+    mock_purpleair_module.PurpleAirAPIError = MockPurpleAirAPIError
 
     old_purpleair = sys.modules.get("purpleair_api")
     old_purpleair_api = sys.modules.get("purpleair_api.PurpleAirAPI")
     old_purpleair_read = sys.modules.get("purpleair_api.PurpleAirReadAPI")
     old_purpleair_write = sys.modules.get("purpleair_api.PurpleAirWriteAPI")
     old_purpleair_local = sys.modules.get("purpleair_api.PurpleAirLocalAPI")
+    old_purpleair_error = sys.modules.get("purpleair_api.PurpleAirAPIError")
     sys.modules["purpleair_api"] = mock_purpleair_module
     sys.modules["purpleair_api.PurpleAirAPI"] = mock_paa_mod
     sys.modules["purpleair_api.PurpleAirReadAPI"] = mock_pread_mod
     sys.modules["purpleair_api.PurpleAirWriteAPI"] = mock_pwrite_mod
     sys.modules["purpleair_api.PurpleAirLocalAPI"] = mock_plocal_mod
+    sys.modules["purpleair_api.PurpleAirAPIError"] = mock_paerror_mod
 
     # Default environment variables for mock tests
     os.environ.setdefault("PURPLEAIR_READ_KEY", "mock-read-key-12345")
@@ -909,6 +918,10 @@ def execute_test_harness(
             sys.modules["purpleair_api.PurpleAirLocalAPI"] = old_purpleair_local
         else:
             sys.modules.pop("purpleair_api.PurpleAirLocalAPI", None)
+        if old_purpleair_error is not None:
+            sys.modules["purpleair_api.PurpleAirAPIError"] = old_purpleair_error
+        else:
+            sys.modules.pop("purpleair_api.PurpleAirAPIError", None)
 
     return issues
 

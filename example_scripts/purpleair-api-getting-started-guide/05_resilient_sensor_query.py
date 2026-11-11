@@ -4,6 +4,7 @@ Source: https://carlkidcrypto.github.io/blog/purpleair-api-getting-started-guide
 """
 
 import time
+from purpleair_api.PurpleAirAPI import PurpleAirAPIError
 from requests.exceptions import RequestException
 
 def resilient_sensor_query(client, sensor_index, fields, max_retries=3):
@@ -16,7 +17,10 @@ def resilient_sensor_query(client, sensor_index, fields, max_retries=3):
                 sensor_index=sensor_index,
                 fields=fields_str
             )
-        except RequestException as exc:
+        except (RequestException, PurpleAirAPIError) as exc:
+            msg = str(exc)
+            if any(code in msg for code in ("400", "401", "403")):
+                raise
             if attempt == max_retries:
                 err_msg = (
                     f"Sensor {sensor_index} failed after {attempt} tries"
