@@ -40,7 +40,7 @@ Explore by Topic
       Deep dives into high-throughput SNMP polling, SNMPv3 security, network protocols (BGP, OSPF, IS-IS, VRRP, NetFlow, PoE, LLDP), and C++17 internals.
 
       +++
-      📚 *23 Articles* • `ezsnmp` `Networking` `SNMP`
+      📚 *24 Articles* • `ezsnmp` `Networking` `SNMP`
 
    .. grid-item-card:: 🌬️ PurpleAir API & IoT Sensing
       :link: category-purpleair-api
@@ -70,11 +70,22 @@ Explore by Topic
       📚 *Smart Home* • `Matter` `Smart Home` `Apple Home`
 
 
+
+
 All Posts
 ---------
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Network Time & Clock Synchronization Telemetry with ezsnmp
+      :link: ezsnmp-network-time-ntp-ptp-telemetry
+      :link-type: doc
+
+      Inspect system NTP synchronization states, evaluate stratum levels, and alert on clock skew and dispersion across network fleets using ezsnmp and Net-SNMP C bindings.
+
+      +++
+      📅 *November 02, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Ntp` `Ptp`
 
    .. grid-item-card:: 📖 OSPF & IS-IS Link-State Telemetry: Neighbor Auditing in ezsnmp
       :link: ezsnmp-ospf-isis-link-state-telemetry

@@ -17,6 +17,7 @@ High-throughput SNMP network automation, SNMPv3 cryptography, protocol telemetry
    :maxdepth: 1
    :hidden:
 
+   ezsnmp-network-time-ntp-ptp-telemetry
    ezsnmp-ospf-isis-link-state-telemetry
    ezsnmp-traffic-flow-netflow-ipfix-auditing
    ezsnmp-enterprise-poe-power-auditing
