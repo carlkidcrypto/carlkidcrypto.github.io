@@ -32,6 +32,18 @@ BLOG_DIR = REPO_ROOT / "source" / "blog"
 INDEX_FILE = BLOG_DIR / "index.rst"
 
 
+def get_category_for_slug(slug: str) -> str:
+    if slug.startswith("ezsnmp-"):
+        return "ezsnmp"
+    elif slug.startswith("purpleair-api-"):
+        return "purpleair-api"
+    elif slug.startswith("purpleair-data-logger-"):
+        return "purpleair-data-logger"
+    elif slug.startswith("purpleair-matterbridge-"):
+        return "purpleair-matterbridge"
+    return "ezsnmp"
+
+
 def audit_posts() -> int:
     if not BLOG_DIR.exists():
         print(f"Error: Blog directory not found at {BLOG_DIR}")
@@ -42,10 +54,26 @@ def audit_posts() -> int:
         INDEX_FILE.read_text(encoding="utf-8") if INDEX_FILE.exists() else ""
     )
 
+    # Verify category hub pages
+    expected_categories = [
+        "category-ezsnmp",
+        "category-purpleair-api",
+        "category-purpleair-data-logger",
+        "category-purpleair-matterbridge",
+    ]
+    for cat in expected_categories:
+        cat_file = BLOG_DIR / f"{cat}.rst"
+        if not cat_file.exists():
+            errors.append(f"Missing category hub file: {cat_file}")
+        elif not re.search(rf"^\s*{re.escape(cat)}\s*$", index_content, re.MULTILINE):
+            errors.append(f"Category '{cat}' is not in source/blog/index.rst toctree.")
+
     post_files = [
         f
         for f in sorted(BLOG_DIR.glob("*"))
-        if f.name != "index.rst" and f.suffix in (".rst", ".md")
+        if f.name != "index.rst"
+        and not f.name.startswith("category-")
+        and f.suffix in (".rst", ".md")
     ]
 
     print(f"Auditing {len(post_files)} blog post(s) in {BLOG_DIR}...")
@@ -71,10 +99,19 @@ def audit_posts() -> int:
         if not re.search(r"\*\s+\*\*Authors:\*\*", content):
             errors.append(f"[{post.name}] Missing '* **Authors:**' in metadata block.")
 
-        # Rule 3: Registration in index.rst
+        # Rule 3: Registration in category toctree & index.rst grid card
+        cat_name = get_category_for_slug(slug)
+        cat_file = BLOG_DIR / f"category-{cat_name}.rst"
+        if cat_file.exists():
+            cat_content = cat_file.read_text(encoding="utf-8")
+            if not re.search(rf"^\s*{re.escape(slug)}\s*$", cat_content, re.MULTILINE):
+                errors.append(
+                    f"[{post.name}] Slug '{slug}' is not registered in source/blog/category-{cat_name}.rst toctree."
+                )
+
         if not re.search(rf"\b{re.escape(slug)}\b", index_content):
             errors.append(
-                f"[{post.name}] Slug '{slug}' is not registered in source/blog/index.rst (toctree or grid card)."
+                f"[{post.name}] Slug '{slug}' is not registered in source/blog/index.rst (grid card)."
             )
 
         # Rule 4: Code block syntax and ezsnmp API compliance

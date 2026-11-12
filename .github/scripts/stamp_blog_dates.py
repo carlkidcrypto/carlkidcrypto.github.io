@@ -20,6 +20,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+
 def find_repo_root() -> Path:
     p = Path(__file__).resolve().parent
     while p != p.parent:
@@ -88,8 +89,10 @@ def get_added_or_modified_posts_from_git() -> list[Path]:
         result = subprocess.run(
             cmd, cwd=REPO_ROOT, capture_output=True, text=True, check=True
         )
-        added_files = [line.strip() for line in result.stdout.splitlines() if line.strip()]
-        
+        added_files = [
+            line.strip() for line in result.stdout.splitlines() if line.strip()
+        ]
+
         posts = []
         for f in added_files:
             path = REPO_ROOT / f
@@ -102,7 +105,9 @@ def get_added_or_modified_posts_from_git() -> list[Path]:
                 posts.append(path)
         return posts
     except Exception as e:
-        print(f"Warning: git diff-tree failed ({e}). Checking for pending posts by content.")
+        print(
+            f"Warning: git diff-tree failed ({e}). Checking for pending posts by content."
+        )
         return []
 
 
@@ -113,7 +118,7 @@ def get_pending_posts_by_content() -> list[Path]:
         return pending
 
     pending_pattern = re.compile(
-        r'\*\s+\*\*Published:\*\*\s*(Pending|Unreleased|TODO|Draft)',
+        r"\*\s+\*\*Published:\*\*\s*(Pending|Unreleased|TODO|Draft)",
         re.IGNORECASE,
     )
 
@@ -138,12 +143,12 @@ def stamp_post_file(path: Path, new_date: str, dry_run: bool = False) -> bool:
         return False
 
     # Matches '* **Published:** <anything up to end of line>'
-    post_pattern = re.compile(r'(\*\s+\*\*Published:\*\*)\s+[^\n]+')
+    post_pattern = re.compile(r"(\*\s+\*\*Published:\*\*)\s+[^\n]+")
     if not post_pattern.search(original):
         print(f"  Note: No '* **Published:**' pattern found in {path.name}")
         return False
 
-    updated = post_pattern.sub(rf'\1 {new_date}', original)
+    updated = post_pattern.sub(rf"\1 {new_date}", original)
     if updated == original:
         print(f"  {path.name} already has date '{new_date}'")
         return False
@@ -170,13 +175,13 @@ def stamp_index_file(slug: str, new_date: str, dry_run: bool = False) -> bool:
 
     # Match the card referencing the slug and its 📅 *<date>* badge
     card_pattern = re.compile(
-        rf'(:link:\s+{re.escape(slug)}\b[\s\S]*?📅\s+\*)([^*]+)(\*)'
+        rf"(:link:\s+{re.escape(slug)}\b[\s\S]*?📅\s+\*)([^*]+)(\*)"
     )
     if not card_pattern.search(original):
         print(f"  Note: No card for slug '{slug}' with '📅 *date*' found in index.rst")
         return False
 
-    updated = card_pattern.sub(rf'\g<1>{new_date}\g<3>', original)
+    updated = card_pattern.sub(rf"\g<1>{new_date}\g<3>", original)
     if updated == original:
         print(f"  index.rst card for '{slug}' already up to date")
         return False
@@ -187,6 +192,30 @@ def stamp_index_file(slug: str, new_date: str, dry_run: bool = False) -> bool:
         INDEX_FILE.write_text(updated, encoding="utf-8")
         print(f"  Updated index.rst card for '{slug}' -> {new_date}")
     return True
+
+
+def stamp_category_file(slug: str, new_date: str, dry_run: bool = False) -> bool:
+    """Update the date badge in the category hub card corresponding to slug."""
+    for cat_file in sorted(BLOG_DIR.glob("category-*.rst")):
+        try:
+            original = cat_file.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        card_pattern = re.compile(
+            rf"(:link:\s+{re.escape(slug)}\b[\s\S]*?📅\s+\*)([^*]+)(\*)"
+        )
+        if card_pattern.search(original):
+            updated = card_pattern.sub(rf"\g<1>{new_date}\g<3>", original)
+            if updated != original:
+                if dry_run:
+                    print(
+                        f"  [DRY-RUN] Would update {cat_file.name} card for '{slug}' to '{new_date}'"
+                    )
+                else:
+                    cat_file.write_text(updated, encoding="utf-8")
+                    print(f"  Updated {cat_file.name} card for '{slug}' -> {new_date}")
+                return True
+    return False
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -224,7 +253,9 @@ def main(argv: list[str] | None = None) -> int:
         if not post_path.exists():
             post_path = BLOG_DIR / f"{args.slug}.md"
         if not post_path.exists():
-            print(f"Error: Could not find post file for slug '{args.slug}' under {BLOG_DIR}")
+            print(
+                f"Error: Could not find post file for slug '{args.slug}' under {BLOG_DIR}"
+            )
             return 1
         posts_to_process.add(post_path)
 
@@ -250,7 +281,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Stamping date '{post_date}' on {post_path.name}...")
         post_modified = stamp_post_file(post_path, post_date, dry_run=args.dry_run)
         index_modified = stamp_index_file(slug, post_date, dry_run=args.dry_run)
-        if post_modified or index_modified:
+        cat_modified = stamp_category_file(slug, post_date, dry_run=args.dry_run)
+        if post_modified or index_modified or cat_modified:
             modified = True
 
     if modified:

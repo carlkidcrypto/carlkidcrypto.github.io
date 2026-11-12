@@ -1283,7 +1283,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         posts = [
             f
             for f in sorted(BLOG_DIR.glob("*"))
-            if f.name != "index.rst" and f.suffix in (".rst", ".md")
+            if f.name != "index.rst"
+            and not f.name.startswith("category-")
+            and f.suffix in (".rst", ".md")
         ]
 
     if args.fix:
