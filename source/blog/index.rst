@@ -40,7 +40,7 @@ Explore by Topic
       Deep dives into high-throughput SNMP polling, SNMPv3 security, network protocols (BGP, OSPF, IS-IS, VRRP, NetFlow, PoE, LLDP), and C++17 internals.
 
       +++
-      📚 *24 Articles* • `ezsnmp` `Networking` `SNMP`
+      📚 *25 Articles* • `ezsnmp` `Networking` `SNMP`
 
    .. grid-item-card:: 🌬️ PurpleAir API & IoT Sensing
       :link: category-purpleair-api
@@ -72,11 +72,22 @@ Explore by Topic
 
 
 
+
+
 All Posts
 ---------
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 First-Hop Redundancy Monitoring: VRRP & HSRP with ezsnmp
+      :link: ezsnmp-vrrp-hsrp-redundancy-monitoring
+      :link-type: doc
+
+      Query VRRP and HSRP operational parameters, cross-reconcile HA gateway pairs, and detect split-brain dual-master anomalies in real time using ezsnmp.
+
+      +++
+      📅 *November 03, 2026* • ⏱️ *5 min read* • `Python` `Snmp` `Vrrp` `Hsrp`
 
    .. grid-item-card:: 📖 Network Time & Clock Synchronization Telemetry with ezsnmp
       :link: ezsnmp-network-time-ntp-ptp-telemetry
