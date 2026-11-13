@@ -20,10 +20,20 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-matterbridge-device-clustering-telemetry-mapping
    purpleair-matterbridge-smart-home-integration
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Matter Device Clustering & Sensor Telemetry Mapping for Smart Homes
+      :link: purpleair-matterbridge-device-clustering-telemetry-mapping
+      :link-type: doc
+
+      Explore Matter 1.5.1 Air Quality Sensor clusters (0x002C), EPA AQI breakpoints, and real-time environmental telemetry mapping in purpleair-matterbridge.
+
+      +++
+      📅 *November 10, 2026* • ⏱️ *5 min read* • `PurpleAir` `Matter` `Smart-Home` `IoT`
 
    .. grid-item-card:: 📖 Integrating PurpleAir Sensors into Matter & Smart Home Ecosystems
       :link: purpleair-matterbridge-smart-home-integration

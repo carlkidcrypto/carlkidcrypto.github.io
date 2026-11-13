@@ -415,7 +415,7 @@ def register_in_index(
     if cat_file.exists():
         cat_content = cat_file.read_text(encoding="utf-8")
         if not re.search(rf"^\s*{re.escape(slug)}\s*$", cat_content, re.MULTILINE):
-            cat_pattern = r"(\.\. toctree::\s*\n\s*:maxdepth:\s*\d+\s*\n\s*:caption:\s*Articles:\s*\n)"
+            cat_pattern = r"(\.\. toctree::\s*\n(?:\s*:[a-zA-Z0-9_\-]+:[^\n]*\n)*)"
             m = re.search(cat_pattern, cat_content)
             if m:
                 cat_content = (
