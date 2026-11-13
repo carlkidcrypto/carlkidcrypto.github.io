@@ -16,4 +16,20 @@ Developer tutorials, client architecture, and automation patterns for querying r
 Articles
 --------
 
-Coming soon in upcoming release guides.
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   purpleair-api-getting-started-guide
+
+.. grid:: 1
+   :gutter: 3
+
+   .. grid-item-card:: 📖 Getting Started with the Python PurpleAir API Wrapper: Sensor Discovery, Keys & Rate Limits
+      :link: purpleair-api-getting-started-guide
+      :link-type: doc
+
+      Explore the official PurpleAir API Python wrapper (purpleair_api). Learn sensor discovery, read and write credential separation, bounding box queries, and resilient rate-limited polling.
+
+      +++
+      📅 *November 04, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `IoT` `Air-Quality`
