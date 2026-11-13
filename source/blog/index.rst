@@ -39,7 +39,7 @@ Explore by Topic
       Deep dives into high-throughput SNMP polling, SNMPv3 security, network protocols (BGP, OSPF, IS-IS, VRRP, NetFlow, PoE, LLDP), and C++17 internals.
 
       +++
-      📚 *25 Articles* • `ezsnmp` `Networking` `SNMP`
+      📚 *26 Articles* • `ezsnmp` `Networking` `SNMP`
 
    .. grid-item-card:: 🌬️ PurpleAir API & IoT Sensing
       :link: category-purpleair-api
@@ -73,6 +73,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 MPLS & Segment Routing LSP Telemetry: Label Switched Path Auditing with ezsnmp
+      :link: ezsnmp-mpls-segment-routing-lsp-telemetry
+      :link-type: doc
+
+      Modern enterprise campus backbones, wide-area networks (WAN), and service provider backbones rely on Multiprotocol Label Switching (MPLS) and Segment...
+
+      +++
+      📅 *November 7, 2026* • ⏱️ *5 min read* • `Ezsnmp` `Python` `Snmp` `Mpls`
 
    .. grid-item-card:: 📖 Bridging PurpleAir Air Quality Sensors into Smart Home Matter Ecosystems
       :link: purpleair-matterbridge-smart-home-integration
