@@ -26,6 +26,7 @@ Articles, release notes, and engineering tutorials on open source software, air 
    category-purpleair-data-logger
    category-purpleair-matterbridge
 
+<<<<<<< HEAD
 Explore by Topic
 ----------------
 
@@ -48,7 +49,7 @@ Explore by Topic
       Developer tutorials for extracting real-time and historical air quality sensor telemetry, bounding box queries, and sensor group management.
 
       +++
-      📚 *1 Article* • `PurpleAir` `IoT` `Air Quality`
+      📚 *2 Articles* • `PurpleAir` `IoT` `Air Quality`
 
    .. grid-item-card:: 📊 PurpleAir Data Logger & TimescaleDB
       :link: category-purpleair-data-logger
@@ -73,6 +74,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Historical Sensor Data Extraction and Bounding Box Geographic Queries with purpleair_api
+      :link: purpleair-api-historical-data-bounding-box-queries
+      :link-type: doc
+
+      Extract historical sensor measurements, query spatial bounding boxes across geographic regions, and manage chunked time-series retrievals using the official purpleair_api Python library.
+
+      +++
+      📅 *November 08, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `IoT` `Air-Quality`
 
    .. grid-item-card:: 📖 MPLS & Segment Routing LSP Telemetry: Label Switched Path Auditing with ezsnmp
       :link: ezsnmp-mpls-segment-routing-lsp-telemetry
