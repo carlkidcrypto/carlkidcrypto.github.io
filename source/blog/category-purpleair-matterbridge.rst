@@ -16,4 +16,20 @@ Bridging PurpleAir air quality and environmental telemetry into Apple Home, Home
 Articles
 --------
 
-Coming soon in upcoming release guides.
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   purpleair-matterbridge-smart-home-integration
+
+.. grid:: 1
+   :gutter: 3
+
+   .. grid-item-card:: 📖 Integrating PurpleAir Sensors into Matter & Smart Home Ecosystems
+      :link: purpleair-matterbridge-smart-home-integration
+      :link-type: doc
+
+      Bridge hyper-local PurpleAir sensor telemetry into Matter 1.5.1 smart home ecosystems using purpleair-matterbridge, Docker Compose, and native Apple Home automations.
+
+      +++
+      📅 *November 06, 2026* • ⏱️ *5 min read* • `PurpleAir` `Matter` `Smart-Home` `IoT`

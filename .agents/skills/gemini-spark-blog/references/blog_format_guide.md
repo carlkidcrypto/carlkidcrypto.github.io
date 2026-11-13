@@ -165,6 +165,16 @@ Before publishing, verify against the common issues identified in Copilot and ag
 - **Drop-in Compatibility**: Do not claim 100% drop-in compatibility with Easy SNMP; explain exact modern API differences.
 - **Packaging & Builds**: When explaining C-extensions, distinguish between pre-built binary wheels (which bundle compiled DLLs on Windows) versus source distributions (`sdist`), which require SWIG and compilers.
 - **Code Snippet Reproducibility**: All code samples should pass `validate_blog_code.py` including bytecode compilation and sandbox execution.
+- **RFC 3433 Sensor MIB**: Standard `entPhySensor*` columns. Scale factor exponent is `(scale - 9) * 3`. Celsius is enum value 8 (Hertz is 7).
+- **BGP Telemetry**: `Active(3)` state actively attempts TCP connection establishment before OpenSent. Reconstruct 4-octet IPv4 peer IP dynamically.
+- **VRRP / HSRP Redundancy**: Cross-reconcile gateway pairs concurrently; extract VRID from `[ifIndex].[vrid]`; flag both split-brain and no-master states.
+- **Network Time (NTP/PTP)**: Batch scalar lookups in a single `session.get([...])`; alert on expanding root dispersion before sync fails; use `time.monotonic()` for timers.
+- **Traffic Flow (NetFlow/IPFIX)**: Query scalar exporter drop/export counters via `session.get()`, active flow tables via `bulk_walk()`.
+- **PurpleAir Ecosystem**:
+  * `purpleair_api`: Use `post_create_group_data(name=...)` (not `post_create_group`) and `request_members_data(group_id=...)` (not `request_group_data`).
+  * `purpleair_data_logger`: `PurpleAirPSQLDataLogger` constructor takes `pg8000.connect(...)` database connection; auto-provisions TimescaleDB hypertables, compression policies, and continuous aggregates; executes via `validate_parameters_and_run()`.
+  * `purpleair-matterbridge`: Matter 1.5.1 clustering requires Docker `network_mode: host` for mDNS (UDP 5353) and IPv6 neighbor discovery.
+- **Centralized Findings & Guidelines Reference**: Refer to `COMMON_REVIEW_FINDINGS_AND_GUIDELINES.rst` in Google Drive (`Auto Blog Posts/`) for the comprehensive live catalog of all architectural findings and review feedback.
 
 ---
 
