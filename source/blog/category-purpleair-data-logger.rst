@@ -16,4 +16,20 @@ Production deployment guides and architecture patterns for logging PurpleAir sen
 Articles
 --------
 
-Coming soon in upcoming release guides.
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   purpleair-data-logger-timescaledb-postgresql-ingestion
+
+.. grid:: 1
+   :gutter: 3
+
+   .. grid-item-card:: 📖 Automated TimescaleDB & PostgreSQL Ingestion for PurpleAir Sensors
+      :link: purpleair-data-logger-timescaledb-postgresql-ingestion
+      :link-type: doc
+
+      Stream real-time and historical PurpleAir air quality telemetry into PostgreSQL with TimescaleDB hypertables, automated compression, continuous aggregates, and time_bucket analytical SQL rollups.
+
+      +++
+      📅 *November 05, 2026* • ⏱️ *5 min read* • `PurpleAir` `TimescaleDB` `PostgreSQL` `IoT`

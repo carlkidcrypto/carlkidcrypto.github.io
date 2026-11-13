@@ -21,7 +21,6 @@ Articles, release notes, and engineering tutorials on open source software, air 
    :maxdepth: 2
    :caption: Topics:
 
-
    category-ezsnmp
    category-purpleair-api
    category-purpleair-data-logger
@@ -58,7 +57,7 @@ Explore by Topic
       Architecture and deployment guides for logging sensor data to TimescaleDB, PostgreSQL hypertables, and local CSV/SQLite archives.
 
       +++
-      📚 *Data Logging* • `TimescaleDB` `PostgreSQL` `Data Logging`
+      📚 *1 Article* • `TimescaleDB` `PostgreSQL` `Data Logging`
 
    .. grid-item-card:: 🏠 Matter Smart Home & Matterbridge
       :link: category-purpleair-matterbridge
@@ -74,6 +73,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Automated TimescaleDB & PostgreSQL Ingestion for PurpleAir Sensors
+      :link: purpleair-data-logger-timescaledb-postgresql-ingestion
+      :link-type: doc
+
+      Stream real-time and historical PurpleAir air quality telemetry into PostgreSQL with TimescaleDB hypertables, automated compression, continuous aggregates, and time_bucket analytical SQL rollups.
+
+      +++
+      📅 *November 05, 2026* • ⏱️ *5 min read* • `PurpleAir` `TimescaleDB` `PostgreSQL` `IoT`
 
    .. grid-item-card:: 📖 Getting Started with the Python PurpleAir API Wrapper: Sensor Discovery, Keys & Rate Limits
       :link: purpleair-api-getting-started-guide
