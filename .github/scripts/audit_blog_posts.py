@@ -130,7 +130,7 @@ def audit_posts() -> int:
             sys.path.insert(0, str(Path(__file__).resolve().parent))
             from validate_blog_code import validate_post
 
-            code_issues = validate_post(post, run_tests=True)
+            code_issues = validate_post(post, run_tests=True, save_scripts=False)
             for iss in code_issues:
                 if iss.severity == "ERROR":
                     errors.append(

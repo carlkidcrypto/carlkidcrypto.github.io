@@ -78,10 +78,10 @@ All Posts
       :link: purpleair-matterbridge-device-clustering-telemetry-mapping
       :link-type: doc
 
-      The Connectivity Standards Alliance (CSA) Matter specification has fundamentally transformed smart home interoperability. By providing an open, IP-based...
+      Deep dive into how purpleair-matterbridge translates raw particulate laser counters and environmental readings into Matter 1.5.1 compliant clusters.
 
       +++
-      📅 *November 10, 2026* • ⏱️ *5 min read* • `Purpleair` `Matter` `Smart-Home` `Iot`
+      📅 *November 10, 2026* • ⏱️ *5 min read* • `PurpleAir` `Matter` `Smart-Home` `IoT`
 
    .. grid-item-card:: 📖 Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
       :link: purpleair-data-logger-local-csv-sqlite-archival

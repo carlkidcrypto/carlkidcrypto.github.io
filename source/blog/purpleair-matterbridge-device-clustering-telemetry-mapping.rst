@@ -1,15 +1,15 @@
 .. meta::
-   :description: The Connectivity Standards Alliance (CSA) Matter specification has fundamentally transformed smart home interoperability. By providing an open, IP-based...
-   :keywords: Purpleair, Matter, Smart-Home, Iot, Home-Assistant, Apple-Home, Standards, Python, ezsnmp, Networking, DevOps
+   :description: Deep dive into how purpleair-matterbridge translates raw particulate laser counters and environmental readings into Matter 1.5.1 compliant clusters.
+   :keywords: PurpleAir, Matter, Smart-Home, IoT, Home-Assistant, Apple-Home, Standards, Matterbridge
    :author: Carlos Santos (@carlkidcrypto)
    :property=og:title: Matter Device Clustering & Sensor Telemetry Mapping for Smart Homes
-   :property=og:description: The Connectivity Standards Alliance (CSA) Matter specification has fundamentally transformed smart home interoperability. By providing an open, IP-based...
+   :property=og:description: Deep dive into how purpleair-matterbridge translates raw particulate laser counters and environmental readings into Matter 1.5.1 compliant clusters.
    :property=og:type: article
    :property=og:url: https://carlkidcrypto.github.io/blog/purpleair-matterbridge-device-clustering-telemetry-mapping.html
    :property=og:image: https://carlkidcrypto.github.io/_static/logo.png
    :name=twitter:card: summary
    :name=twitter:title: Matter Device Clustering & Sensor Telemetry Mapping for Smart Homes
-   :name=twitter:description: The Connectivity Standards Alliance (CSA) Matter specification has fundamentally transformed smart home interoperability. By providing an open, IP-based...
+   :name=twitter:description: Deep dive into how purpleair-matterbridge translates raw particulate laser counters and environmental readings into Matter 1.5.1 compliant clusters.
    :name=twitter:image: https://carlkidcrypto.github.io/_static/logo.png
 
 ===================================================================
@@ -21,7 +21,7 @@ Matter Device Clustering & Sensor Telemetry Mapping for Smart Homes
    * **Published:** November 10, 2026
    * **Authors:** Written by Gemini 3.8 Flash, Co-Authored & Reviewed by `Carlos Santos (@carlkidcrypto) <https://github.com/carlkidcrypto>`_
    * **Estimated Reading Time:** 5 minutes
-   * **Tags:** `Purpleair` • `Matter` • `Smart-Home` • `Iot` • `Home-Assistant` • `Apple-Home` • `Standards`
+   * **Tags:** `PurpleAir` • `Matter` • `Smart-Home` • `IoT` • `Home-Assistant` • `Apple-Home` • `Standards`
 
 The Connectivity Standards Alliance (CSA) Matter specification has fundamentally
 transformed smart home interoperability. By providing an open, IP-based protocol
