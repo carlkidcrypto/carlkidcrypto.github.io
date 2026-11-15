@@ -20,11 +20,22 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-data-logger-grafana-timescaledb-dashboards
+
    purpleair-data-logger-local-csv-sqlite-archival
    purpleair-data-logger-timescaledb-postgresql-ingestion
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Building Automated Grafana Dashboards over TimescaleDB PurpleAir Telemetry
+      :link: purpleair-data-logger-grafana-timescaledb-dashboards
+      :link-type: doc
+
+      Connect Grafana to TimescaleDB and PostgreSQL telemetry from purpleair_data_logger with read-only roles, time_bucket panels, heatmaps, and spike alerts.
+
+      +++
+      📅 *November 13, 2026* • ⏱️ *5 min read* • `PurpleAir` `Grafana` `TimescaleDB` `PostgreSQL`
 
    .. grid-item-card:: 📖 Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
       :link: purpleair-data-logger-local-csv-sqlite-archival
