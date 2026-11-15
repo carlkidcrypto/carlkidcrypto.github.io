@@ -78,10 +78,10 @@ All Posts
       :link: purpleair-data-logger-local-csv-sqlite-archival
       :link-type: doc
 
-      Enterprise cloud data warehouses and managed time-series databases like TimescaleDB offer exceptional query performance for central dashboards. However,...
+      Configure and run the SQLite and CSV backends in purpleair_data_logger for zero-infrastructure edge logging, automated file rotation, and SQL analytics.
 
       +++
-      📅 *November 9, 2026* • ⏱️ *5 min read* • `Purpleair` `Python` `Sqlite` `Csv`
+      📅 *November 9, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `SQLite` `CSV`
 
    .. grid-item-card:: 📖 Historical Sensor Data Extraction and Bounding Box Geographic Queries with purpleair_api
       :link: purpleair-api-historical-data-bounding-box-queries

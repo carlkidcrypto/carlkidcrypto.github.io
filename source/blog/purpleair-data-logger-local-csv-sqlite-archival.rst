@@ -1,15 +1,15 @@
 .. meta::
-   :description: Enterprise cloud data warehouses and managed time-series databases like TimescaleDB offer exceptional query performance for central dashboards. However,...
-   :keywords: Purpleair, Python, Sqlite, Csv, Edge-Computing, Iot, Air-Quality, Python, ezsnmp, Networking, DevOps
+   :description: Configure and run the SQLite and CSV backends in purpleair_data_logger for zero-infrastructure edge logging, automated file rotation, and SQL analytics.
+   :keywords: PurpleAir, Python, SQLite, CSV, Edge-Computing, IoT, Air-Quality, Data Logging
    :author: Carlos Santos (@carlkidcrypto)
    :property=og:title: Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
-   :property=og:description: Enterprise cloud data warehouses and managed time-series databases like TimescaleDB offer exceptional query performance for central dashboards. However,...
+   :property=og:description: Configure and run the SQLite and CSV backends in purpleair_data_logger for zero-infrastructure edge logging, automated file rotation, and SQL analytics.
    :property=og:type: article
    :property=og:url: https://carlkidcrypto.github.io/blog/purpleair-data-logger-local-csv-sqlite-archival.html
    :property=og:image: https://carlkidcrypto.github.io/_static/logo.png
    :name=twitter:card: summary
    :name=twitter:title: Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
-   :name=twitter:description: Enterprise cloud data warehouses and managed time-series databases like TimescaleDB offer exceptional query performance for central dashboards. However,...
+   :name=twitter:description: Configure and run the SQLite and CSV backends in purpleair_data_logger for zero-infrastructure edge logging, automated file rotation, and SQL analytics.
    :name=twitter:image: https://carlkidcrypto.github.io/_static/logo.png
 
 =============================================================================
@@ -21,7 +21,7 @@ Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
    * **Published:** November 9, 2026
    * **Authors:** Written by Gemini 3.8 Flash, Co-Authored & Reviewed by `Carlos Santos (@carlkidcrypto) <https://github.com/carlkidcrypto>`_
    * **Estimated Reading Time:** 5 minutes
-   * **Tags:** `Purpleair` • `Python` • `Sqlite` • `Csv` • `Edge-Computing` • `Iot` • `Air-Quality`
+   * **Tags:** `PurpleAir` • `Python` • `SQLite` • `CSV` • `Edge-Computing` • `IoT` • `Air-Quality`
 
 Enterprise cloud data warehouses and managed time-series databases like
 TimescaleDB offer exceptional query performance for central dashboards.
