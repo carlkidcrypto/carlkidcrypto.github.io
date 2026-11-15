@@ -54,6 +54,17 @@ def audit_posts() -> int:
         INDEX_FILE.read_text(encoding="utf-8") if INDEX_FILE.exists() else ""
     )
 
+    # Reject lingering git merge conflict markers in index or category pages
+    conflict_pattern = re.compile(
+        r"^(?:<{7}(?:\s|$)|>{7}(?:\s|$)|\|{7}(?:\s|$))", re.MULTILINE
+    )
+    for rst_file in sorted(BLOG_DIR.glob("*.rst")):
+        rst_text = rst_file.read_text(encoding="utf-8")
+        if conflict_pattern.search(rst_text):
+            errors.append(
+                f"[{rst_file.name}] Found lingering git merge conflict marker ('<<<<<<<', '|||||||', or '>>>>>>>')."
+            )
+
     # Verify category hub pages
     expected_categories = [
         "category-ezsnmp",

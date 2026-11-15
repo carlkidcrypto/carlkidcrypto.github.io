@@ -26,7 +26,6 @@ Articles, release notes, and engineering tutorials on open source software, air 
    category-purpleair-data-logger
    category-purpleair-matterbridge
 
-<<<<<<< HEAD
 Explore by Topic
 ----------------
 
