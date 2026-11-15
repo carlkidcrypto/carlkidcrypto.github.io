@@ -1,15 +1,15 @@
 .. meta::
-   :description: Official developer portfolio and open source project index for Carlos (@carlkidcrypto) — home of ezsnmp (fast Python SNMP library), PurpleAir API, PurpleAir Data Logger (PADLs), PurpleAir Matterbridge, and OS Specific Runner.
-   :keywords: ezsnmp, purpleair api, purpleair_api, purple air data logger, purpleair_data_logger, purpleair matter bridge, purpleair-matterbridge, os-specific-runner, carlkidcrypto, python snmp, net-snmp, air quality iot, matter smart home
+   :description: Official developer portfolio and open source project index for Carlos (@carlkidcrypto) — home of ezsnmp (fast Python SNMP library), EzSnmp Data Logger, PurpleAir API, PurpleAir Data Logger (PADLs), PurpleAir Matterbridge, and OS Specific Runner.
+   :keywords: ezsnmp, ezsnmp_data_logger, ezsnmp data logger, purpleair api, purpleair_api, purple air data logger, purpleair_data_logger, purpleair matter bridge, purpleair-matterbridge, os-specific-runner, carlkidcrypto, python snmp, net-snmp, air quality iot, matter smart home
    :author: Carlos (@carlkidcrypto)
-   :property=og:title: carlkidcrypto — ezsnmp, PurpleAir API, Data Logger, Matterbridge & OS Specific Runner
-   :property=og:description: Open source software by Carlos (@carlkidcrypto): ezsnmp (fast Python SNMP), PurpleAir API & Data Logger, PurpleAir Matterbridge, and OS Specific Runner.
+   :property=og:title: carlkidcrypto — ezsnmp, EzSnmp Data Logger, PurpleAir API, Data Logger, Matterbridge & OS Specific Runner
+   :property=og:description: Open source software by Carlos (@carlkidcrypto): ezsnmp (fast Python SNMP), EzSnmp Data Logger, PurpleAir API & Data Logger, PurpleAir Matterbridge, and OS Specific Runner.
    :property=og:type: website
    :property=og:url: https://carlkidcrypto.github.io/
    :property=og:image: https://carlkidcrypto.github.io/_static/logo.png
    :name=twitter:card: summary
-   :name=twitter:title: carlkidcrypto — ezsnmp, PurpleAir API, Data Logger, Matterbridge
-   :name=twitter:description: Open source software by Carlos (@carlkidcrypto): ezsnmp, PurpleAir API & Data Logger, PurpleAir Matterbridge, and OS Specific Runner.
+   :name=twitter:title: carlkidcrypto — ezsnmp, EzSnmp Data Logger, PurpleAir API, Data Logger, Matterbridge & OS Specific Runner
+   :name=twitter:description: Open source software by Carlos (@carlkidcrypto): ezsnmp, EzSnmp Data Logger, PurpleAir API & Data Logger, PurpleAir Matterbridge, and OS Specific Runner.
    :name=twitter:image: https://carlkidcrypto.github.io/_static/logo.png
 
 Carlos — Software Engineer
@@ -101,6 +101,15 @@ A collection of projects that I work on when time appears...
 
       +++
       `GitHub <https://github.com/carlkidcrypto/ezsnmp>`__ • `Documentation <https://carlkidcrypto.github.io/ezsnmp/>`__
+
+   .. grid-item-card:: 🗄️ EzSnmp Data Logger
+      :link: https://github.com/carlkidcrypto/ezsnmp_data_logger
+      :link-type: url
+
+      Self-contained C++17 SNMP telemetry logger powered by EzSnmp supporting SQLite, PostgreSQL, CSV, JSONL, and Prometheus across Python, Node.js, C#, and Go.
+
+      +++
+      `GitHub <https://github.com/carlkidcrypto/ezsnmp_data_logger>`__ • `Documentation <https://carlkidcrypto.github.io/ezsnmp_data_logger/>`__
 
    .. grid-item-card:: 🚀 OS Specific Runner
       :link: https://github.com/carlkidcrypto/os-specific-runner
