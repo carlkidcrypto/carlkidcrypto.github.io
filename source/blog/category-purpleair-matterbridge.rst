@@ -20,11 +20,22 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-matterbridge-multi-fabric-commissioning
+
    purpleair-matterbridge-device-clustering-telemetry-mapping
    purpleair-matterbridge-smart-home-integration
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Multi-Fabric Commissioning: Sharing PurpleAir Matterbridge with Apple Home and Google Home Concurrently
+      :link: purpleair-matterbridge-multi-fabric-commissioning
+      :link-type: doc
+
+      Share a single purpleair-matterbridge instance concurrently across Apple Home and Google Home using Matter Multi-Admin and Enhanced Commissioning Windows.
+
+      +++
+      📅 *November 14, 2026* • ⏱️ *5 min read* • `PurpleAir` `Matterbridge` `Matter` `Multi-Fabric`
 
    .. grid-item-card:: 📖 Matter Device Clustering & Sensor Telemetry Mapping for Smart Homes
       :link: purpleair-matterbridge-device-clustering-telemetry-mapping
