@@ -486,11 +486,19 @@ class MockSession:
 
     def bulk_walk(self, oids: Any, max_repetitions: int = 25) -> Tuple[MockResult, ...]:
         oid_name = str(oids)
-        if "ifDescr" in oid_name:
+        if "ifDescr" in oid_name or oid_name == "1.3.6.1.2.1.2.2.1.2":
             return (
                 MockResult("ifDescr", "1", "GigabitEthernet0/1", "OCTETSTR"),
                 MockResult("ifDescr", "2", "GigabitEthernet0/2", "OCTETSTR"),
                 MockResult("ifDescr", "3", "TenGigabitEthernet0/1", "OCTETSTR"),
+                MockResult("ifDescr", "4", "Vxlan1", "OCTETSTR"),
+            )
+        if "ifOperStatus" in oid_name or oid_name == "1.3.6.1.2.1.2.2.1.8":
+            return (
+                MockResult("ifOperStatus", "1", "1", "INTEGER"),
+                MockResult("ifOperStatus", "2", "1", "INTEGER"),
+                MockResult("ifOperStatus", "3", "1", "INTEGER"),
+                MockResult("ifOperStatus", "4", "1", "INTEGER"),
             )
         if "ifHCInOctets" in oid_name:
             return (
@@ -504,12 +512,17 @@ class MockSession:
                 MockResult("ifHCOutOctets", "2", "1897152000", "COUNTER64"),
                 MockResult("ifHCOutOctets", "3", "4242880000", "COUNTER64"),
             )
-        if "bgpPeerState" in oid_name:
+        if "bgpPeerState" in oid_name or oid_name == "1.3.6.1.2.1.15.3.1.2":
             return (
                 MockResult("bgpPeerState", "192.0.2.1.0", "6", "INTEGER"),
                 MockResult("bgpPeerState", "192.0.2.2.0", "6", "INTEGER"),
             )
-        if "bgpPeerRemoteAs" in oid_name:
+        if "bgpPeerAdminStatus" in oid_name or oid_name == "1.3.6.1.2.1.15.3.1.3":
+            return (
+                MockResult("bgpPeerAdminStatus", "192.0.2.1.0", "2", "INTEGER"),
+                MockResult("bgpPeerAdminStatus", "192.0.2.2.0", "2", "INTEGER"),
+            )
+        if "bgpPeerRemoteAs" in oid_name or oid_name == "1.3.6.1.2.1.15.3.1.9":
             return (
                 MockResult("bgpPeerRemoteAs", "192.0.2.1.0", "64512", "INTEGER"),
                 MockResult("bgpPeerRemoteAs", "192.0.2.2.0", "64513", "INTEGER"),
@@ -703,23 +716,36 @@ def execute_test_harness(
     mock_pwrite_mod = types.ModuleType("purpleair_api.PurpleAirWriteAPI")
     mock_plocal_mod = types.ModuleType("purpleair_api.PurpleAirLocalAPI")
     mock_paerror_mod = types.ModuleType("purpleair_api.PurpleAirAPIError")
+    mock_pamatter_mod = types.ModuleType("purpleair_api.PurpleAirMatterConverter")
 
     class MockPurpleAirAPIError(Exception):
         pass
 
     class MockPurpleAirBase:
         def __init__(self, *a: Any, **k: Any):
-            pass
+            if a and isinstance(a[0], list):
+                self._ips = a[0]
+            else:
+                self._ips = k.get("ipv4_address_list") or ["192.168.1.50"]
 
         def request_sensor_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
             return {
                 "sensor": {
+                    "sensor_index": 282168,
                     "name": "Mock Station",
+                    "latitude": 46.74113,
+                    "longitude": -116.99895,
+                    "firmware_version": "7.02",
+                    "hardware": "2.0+BME280+PMSX003-A",
+                    "pm2.5": 12.5,
+                    "pm1.0": 5.7,
+                    "pm10.0": 18.4,
+                    "voc": 0.123,
                     "pm2.5_atm": 12.5,
                     "pm2.5_cf_1": 12.0,
                     "temperature": 72.0,
                     "humidity": 45.0,
-                    "pressure": 1013.25,
+                    "pressure": 13.247,
                 }
             }
 
@@ -745,13 +771,340 @@ def execute_test_harness(
             return {"member_id": 5678, "sensor_index": 282168}
 
         def request_local_sensor_data(self, *a: Any, **k: Any) -> Dict[str, Any]:
-            return {
-                "SensorId": "MockLocal",
+            payload = {
+                "SensorId": "84:f3:eb:12:34:56",
                 "pm2_5_atm": 12.5,
+                "pm1_0_atm": 5.7,
+                "pm10_0_atm": 18.4,
                 "current_temp_f": 72.0,
                 "current_humidity": 45.0,
                 "pressure": 1013.25,
             }
+            return {ip: dict(payload) for ip in self._ips}
+
+    from enum import Enum
+
+    MATTER_DEVICE_TYPE_AIR_QUALITY_SENSOR = 0x002D
+    MATTER_CLUSTER_TEMP_MEASUREMENT = 0x0402
+    MATTER_CLUSTER_HUMIDITY_MEASUREMENT = 0x0405
+    MATTER_CLUSTER_PRESSURE_MEASUREMENT = 0x0403
+    MATTER_CLUSTER_AIR_QUALITY_MEASUREMENT = 0x005D
+    MATTER_CLUSTER_CO2_MEASUREMENT = 0x040D
+
+    class MockMatterAirQualityRating(Enum):
+        UNKNOWN = 0
+        EXCELLENT = 1
+        GOOD = 2
+        FAIR = 3
+        POOR = 4
+        VERY_POOR = 5
+        EXTREMELY_POOR = 6
+
+        @classmethod
+        def from_aqi(cls, aqi: float) -> "MockMatterAirQualityRating":
+            if aqi < 0:
+                return cls.UNKNOWN
+            if aqi <= 50:
+                return cls.EXCELLENT
+            if aqi <= 100:
+                return cls.GOOD
+            if aqi <= 150:
+                return cls.FAIR
+            if aqi <= 200:
+                return cls.POOR
+            if aqi <= 300:
+                return cls.VERY_POOR
+            return cls.EXTREMELY_POOR
+
+    class MockEpaAqiCalculator:
+        BREAKPOINTS = [
+            (0.0, 12.0, 0, 50),
+            (12.1, 35.4, 51, 100),
+            (35.5, 55.4, 101, 150),
+            (55.5, 150.4, 151, 200),
+            (150.5, 250.4, 201, 300),
+            (250.5, 500.4, 301, 500),
+        ]
+
+        @classmethod
+        def pm25_to_aqi(cls, pm25: float) -> float:
+            if pm25 < 0:
+                raise ValueError(f"PM2.5 concentration cannot be negative; got {pm25}")
+            pm25 = round(pm25, 1)
+            if pm25 <= 0.0:
+                return 0.0
+            for c_low, c_high, i_low, i_high in cls.BREAKPOINTS:
+                if c_low <= pm25 <= c_high:
+                    if c_high == c_low:
+                        return float(i_low)
+                    return round(
+                        ((i_high - i_low) / (c_high - c_low)) * (pm25 - c_low) + i_low
+                    )
+            return 500.0
+
+        @classmethod
+        def aqi_to_epa_category(cls, aqi: float) -> str:
+            if aqi <= 50:
+                return "Good"
+            if aqi <= 100:
+                return "Moderate"
+            if aqi <= 150:
+                return "Unhealthy for Sensitive Groups"
+            if aqi <= 200:
+                return "Unhealthy"
+            if aqi <= 300:
+                return "Very Unhealthy"
+            if aqi <= 500:
+                return "Hazardous"
+            return "Beyond Hazardous"
+
+    def _mock_fahrenheit_to_celsius(fahrenheit: float) -> float:
+        return (fahrenheit - 32) * 5 / 9
+
+    def _mock_pressure_psi_to_kpa(psi: float) -> float:
+        return psi * 6.89476
+
+    def _mock_safe_float(val: Any, default: float = 0.0) -> float:
+        try:
+            return float(val)
+        except (TypeError, ValueError):
+            return default
+
+    class MockPurpleAirMatterConverter:
+        DEFAULT_SENSOR_INDEX: int = -1
+        MATTER_VERSION: str = "1.5.1"
+
+        def __init__(self, purpleair_sensor_data: Any = None) -> None:
+            self._data: Dict[str, Any] = (
+                self._normalise(purpleair_sensor_data)
+                if purpleair_sensor_data is not None
+                else {}
+            )
+
+        def with_data(self, data: Dict[str, Any]) -> "MockPurpleAirMatterConverter":
+            return self.__class__(data)
+
+        @staticmethod
+        def _normalise(raw: Any) -> Dict[str, Any]:
+            if not isinstance(raw, dict):
+                return {}
+            inner = raw.get("sensor", raw)
+            return inner if isinstance(inner, dict) else {}
+
+        @staticmethod
+        def to_air_quality_sensor(
+            purpleair_data: Dict[str, Any], sensor_name: Optional[str] = None
+        ) -> Dict[str, Any]:
+            data = MockPurpleAirMatterConverter._normalise(purpleair_data)
+            pm25 = _mock_safe_float(data.get("pm2.5"))
+            pm1 = _mock_safe_float(data.get("pm1.0"))
+            pm10 = _mock_safe_float(data.get("pm10.0"))
+            voc = _mock_safe_float(data.get("voc"))
+            temp_f = _mock_safe_float(data.get("temperature"), 32.0)
+            humidity = _mock_safe_float(data.get("humidity"))
+            pressure_psi = _mock_safe_float(data.get("pressure"))
+            aqi = MockEpaAqiCalculator.pm25_to_aqi(pm25)
+            rating = MockMatterAirQualityRating.from_aqi(aqi)
+            temp_c = _mock_fahrenheit_to_celsius(temp_f)
+            pressure_kpa = _mock_pressure_psi_to_kpa(pressure_psi)
+            return {
+                "device_type": {
+                    "id": MATTER_DEVICE_TYPE_AIR_QUALITY_SENSOR,
+                    "label": "Air Quality Sensor",
+                    "matter_version": "1.5.1",
+                },
+                "endpoint": 1,
+                "sensor_index": data.get("sensor_index", -1),
+                "sensor_name": sensor_name or data.get("name") or "PurpleAir Sensor",
+                "latitude": data.get("latitude"),
+                "longitude": data.get("longitude"),
+                "firmware_version": data.get("firmware_version"),
+                "hardware_model": data.get("hardware"),
+                "clusters": {
+                    "air_quality_measurement": {
+                        "cluster_id": MATTER_CLUSTER_AIR_QUALITY_MEASUREMENT,
+                        "attributes": {
+                            "measuredValue": int(round(pm25 * 100)),
+                            "pm1Density": int(round(pm1 * 100)),
+                            "pm10Density": int(round(pm10 * 100)),
+                            "vocDensity": int(round(voc * 100)),
+                            "airQuality": rating.value,
+                            "aqiRating": rating.value,
+                        },
+                        "_raw": {
+                            "pm25_ug_m3": pm25,
+                            "pm1_ug_m3": pm1,
+                            "pm10_ug_m3": pm10,
+                            "voc_ug_m3": voc,
+                        },
+                    },
+                    "temperature_measurement": {
+                        "cluster_id": MATTER_CLUSTER_TEMP_MEASUREMENT,
+                        "attributes": {
+                            "measuredValue": int(round(temp_c * 100)),
+                            "minMeasuredValue": -27315,
+                            "maxMeasuredValue": 20000,
+                        },
+                        "_raw_celsius": temp_c,
+                        "_raw_fahrenheit": temp_f,
+                    },
+                    "humidity_measurement": {
+                        "cluster_id": MATTER_CLUSTER_HUMIDITY_MEASUREMENT,
+                        "attributes": {
+                            "measuredValue": int(round(humidity * 100)),
+                            "minMeasuredValue": 0,
+                            "maxMeasuredValue": 10000,
+                        },
+                        "_raw_percent": humidity,
+                    },
+                    "pressure_measurement": {
+                        "cluster_id": MATTER_CLUSTER_PRESSURE_MEASUREMENT,
+                        "attributes": {
+                            "measuredValue": int(round(pressure_kpa * 10)),
+                            "minMeasuredValue": 0,
+                            "maxMeasuredValue": 11500,
+                        },
+                        "_raw_kpa": pressure_kpa,
+                        "_raw_psi": pressure_psi,
+                    },
+                },
+                "air_quality_summary": {
+                    "epa_aqi": aqi,
+                    "epa_category": MockEpaAqiCalculator.aqi_to_epa_category(aqi),
+                    "matter_air_quality_rating": rating.name,
+                    "matter_air_quality_rating_value": rating.value,
+                },
+            }
+
+        @staticmethod
+        def to_temperature_sensor(
+            purpleair_data: Dict[str, Any], sensor_name: Optional[str] = None
+        ) -> Dict[str, Any]:
+            data = MockPurpleAirMatterConverter._normalise(purpleair_data)
+            temp_f = data.get("temperature")
+            temp_c = (
+                _mock_fahrenheit_to_celsius(float(temp_f))
+                if temp_f is not None
+                else None
+            )
+            return {
+                "device_type": {
+                    "id": 0x0302,
+                    "label": "Temperature Sensor",
+                    "matter_version": "1.5.1",
+                },
+                "endpoint": 1,
+                "sensor_name": sensor_name
+                or data.get("name")
+                or "PurpleAir Temperature",
+                "clusters": {
+                    "temperature_measurement": {
+                        "cluster_id": MATTER_CLUSTER_TEMP_MEASUREMENT,
+                        "attributes": {
+                            "measuredValue": (
+                                int(round(temp_c * 100)) if temp_c is not None else None
+                            ),
+                            "minMeasuredValue": -27315,
+                            "maxMeasuredValue": 20000,
+                        },
+                        "_raw_celsius": temp_c,
+                        "_raw_fahrenheit": (
+                            float(temp_f) if temp_f is not None else None
+                        ),
+                    }
+                },
+            }
+
+        @staticmethod
+        def to_environmental_sensor(
+            purpleair_data: Dict[str, Any], sensor_name: Optional[str] = None
+        ) -> Dict[str, Any]:
+            data = MockPurpleAirMatterConverter._normalise(purpleair_data)
+            temp_f = data.get("temperature")
+            hum = data.get("humidity")
+            pres = data.get("pressure")
+            temp_c = (
+                _mock_fahrenheit_to_celsius(float(temp_f))
+                if temp_f is not None
+                else None
+            )
+            pres_kpa = (
+                _mock_pressure_psi_to_kpa(float(pres)) if pres is not None else None
+            )
+            return {
+                "device_type": {
+                    "id": 0x0307,
+                    "label": "Environmental Sensor",
+                    "matter_version": "1.5.1",
+                },
+                "endpoint": 1,
+                "sensor_name": sensor_name
+                or data.get("name")
+                or "PurpleAir Environmental",
+                "clusters": {
+                    "temperature_measurement": {
+                        "cluster_id": MATTER_CLUSTER_TEMP_MEASUREMENT,
+                        "attributes": {
+                            "measuredValue": (
+                                int(round(temp_c * 100)) if temp_c is not None else None
+                            ),
+                            "minMeasuredValue": -27315,
+                            "maxMeasuredValue": 20000,
+                        },
+                        "_raw_celsius": temp_c,
+                        "_raw_fahrenheit": (
+                            float(temp_f) if temp_f is not None else None
+                        ),
+                    },
+                    "humidity_measurement": {
+                        "cluster_id": MATTER_CLUSTER_HUMIDITY_MEASUREMENT,
+                        "attributes": {
+                            "measuredValue": (
+                                int(round(float(hum) * 100))
+                                if hum is not None
+                                else None
+                            ),
+                            "minMeasuredValue": 0,
+                            "maxMeasuredValue": 10000,
+                        },
+                        "_raw_percent": float(hum) if hum is not None else None,
+                    },
+                    "pressure_measurement": {
+                        "cluster_id": MATTER_CLUSTER_PRESSURE_MEASUREMENT,
+                        "attributes": {
+                            "measuredValue": (
+                                int(round(pres_kpa * 10))
+                                if pres_kpa is not None
+                                else None
+                            ),
+                            "minMeasuredValue": 0,
+                            "maxMeasuredValue": 11500,
+                        },
+                        "_raw_kpa": pres_kpa,
+                        "_raw_psi": float(pres) if pres is not None else None,
+                    },
+                },
+            }
+
+    mock_pamatter_mod.MATTER_DEVICE_TYPE_AIR_QUALITY_SENSOR = (
+        MATTER_DEVICE_TYPE_AIR_QUALITY_SENSOR
+    )
+    mock_pamatter_mod.MATTER_CLUSTER_TEMP_MEASUREMENT = MATTER_CLUSTER_TEMP_MEASUREMENT
+    mock_pamatter_mod.MATTER_CLUSTER_HUMIDITY_MEASUREMENT = (
+        MATTER_CLUSTER_HUMIDITY_MEASUREMENT
+    )
+    mock_pamatter_mod.MATTER_CLUSTER_PRESSURE_MEASUREMENT = (
+        MATTER_CLUSTER_PRESSURE_MEASUREMENT
+    )
+    mock_pamatter_mod.MATTER_CLUSTER_AIR_QUALITY_MEASUREMENT = (
+        MATTER_CLUSTER_AIR_QUALITY_MEASUREMENT
+    )
+    mock_pamatter_mod.MATTER_CLUSTER_CO2_MEASUREMENT = MATTER_CLUSTER_CO2_MEASUREMENT
+    mock_pamatter_mod.MatterAirQualityRating = MockMatterAirQualityRating
+    mock_pamatter_mod.EpaAqiCalculator = MockEpaAqiCalculator
+    mock_pamatter_mod.PurpleAirMatterConverter = MockPurpleAirMatterConverter
+    mock_pamatter_mod.fahrenheit_to_celsius = _mock_fahrenheit_to_celsius
+    mock_pamatter_mod.pressure_psi_to_kpa = _mock_pressure_psi_to_kpa
 
     mock_paa_mod.PurpleAirAPI = MockPurpleAirBase
     mock_paa_mod.PurpleAirAPIError = MockPurpleAirAPIError
@@ -764,6 +1117,9 @@ def execute_test_harness(
     mock_purpleair_module.PurpleAirWriteAPI = MockPurpleAirBase
     mock_purpleair_module.PurpleAirLocalAPI = MockPurpleAirBase
     mock_purpleair_module.PurpleAirAPIError = MockPurpleAirAPIError
+    mock_purpleair_module.PurpleAirMatterConverter = MockPurpleAirMatterConverter
+    mock_purpleair_module.EpaAqiCalculator = MockEpaAqiCalculator
+    mock_purpleair_module.MatterAirQualityRating = MockMatterAirQualityRating
 
     old_purpleair = sys.modules.get("purpleair_api")
     old_purpleair_api = sys.modules.get("purpleair_api.PurpleAirAPI")
@@ -771,12 +1127,14 @@ def execute_test_harness(
     old_purpleair_write = sys.modules.get("purpleair_api.PurpleAirWriteAPI")
     old_purpleair_local = sys.modules.get("purpleair_api.PurpleAirLocalAPI")
     old_purpleair_error = sys.modules.get("purpleair_api.PurpleAirAPIError")
+    old_purpleair_matter = sys.modules.get("purpleair_api.PurpleAirMatterConverter")
     sys.modules["purpleair_api"] = mock_purpleair_module
     sys.modules["purpleair_api.PurpleAirAPI"] = mock_paa_mod
     sys.modules["purpleair_api.PurpleAirReadAPI"] = mock_pread_mod
     sys.modules["purpleair_api.PurpleAirWriteAPI"] = mock_pwrite_mod
     sys.modules["purpleair_api.PurpleAirLocalAPI"] = mock_plocal_mod
     sys.modules["purpleair_api.PurpleAirAPIError"] = mock_paerror_mod
+    sys.modules["purpleair_api.PurpleAirMatterConverter"] = mock_pamatter_mod
 
     # Default environment variables for mock tests
     os.environ.setdefault("PURPLEAIR_READ_KEY", "mock-read-key-12345")
@@ -996,6 +1354,12 @@ def execute_test_harness(
             sys.modules["purpleair_api.PurpleAirAPIError"] = old_purpleair_error
         else:
             sys.modules.pop("purpleair_api.PurpleAirAPIError", None)
+        if old_purpleair_matter is not None:
+            sys.modules["purpleair_api.PurpleAirMatterConverter"] = old_purpleair_matter
+        else:
+            sys.modules.pop("purpleair_api.PurpleAirMatterConverter", None)
+        for suffix in ("", "-shm", "-wal"):
+            Path(f"purpleair_local_telemetry.db{suffix}").unlink(missing_ok=True)
 
     return issues
 
