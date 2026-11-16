@@ -20,10 +20,20 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-api-historical-data-bounding-box-queries
    purpleair-api-getting-started-guide
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Historical Sensor Data Extraction and Bounding Box Geographic Queries with purpleair_api
+      :link: purpleair-api-historical-data-bounding-box-queries
+      :link-type: doc
+
+      Extract historical sensor measurements, query spatial bounding boxes across geographic regions, and manage chunked time-series retrievals using the official purpleair_api Python library.
+
+      +++
+      📅 *November 08, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `IoT` `Air-Quality`
 
    .. grid-item-card:: 📖 Getting Started with the Python PurpleAir API Wrapper: Sensor Discovery, Keys & Rate Limits
       :link: purpleair-api-getting-started-guide
