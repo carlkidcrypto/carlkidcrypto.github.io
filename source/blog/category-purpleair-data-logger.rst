@@ -20,10 +20,20 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-data-logger-local-csv-sqlite-archival
    purpleair-data-logger-timescaledb-postgresql-ingestion
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
+      :link: purpleair-data-logger-local-csv-sqlite-archival
+      :link-type: doc
+
+      Poll local PurpleAir air quality monitors directly over LAN HTTP and archive telemetry into lightweight SQLite databases or partitioned flat CSV files.
+
+      +++
+      📅 *November 09, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `SQLite` `CSV`
 
    .. grid-item-card:: 📖 Automated TimescaleDB & PostgreSQL Ingestion for PurpleAir Sensors
       :link: purpleair-data-logger-timescaledb-postgresql-ingestion

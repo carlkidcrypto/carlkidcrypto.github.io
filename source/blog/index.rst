@@ -57,7 +57,7 @@ Explore by Topic
       Architecture and deployment guides for logging sensor data to TimescaleDB, PostgreSQL hypertables, and local CSV/SQLite archives.
 
       +++
-      📚 *1 Article* • `TimescaleDB` `PostgreSQL` `Data Logging`
+      📚 *2 Articles* • `TimescaleDB` `PostgreSQL` `Data Logging`
 
    .. grid-item-card:: 🏠 Matter Smart Home & Matterbridge
       :link: category-purpleair-matterbridge
@@ -73,6 +73,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Local Sensor Polling & Offline CSV/SQLite Archival with purpleair_data_logger
+      :link: purpleair-data-logger-local-csv-sqlite-archival
+      :link-type: doc
+
+      Configure and run the SQLite and CSV backends in purpleair_data_logger for zero-infrastructure edge logging, automated file rotation, and SQL analytics.
+
+      +++
+      📅 *November 9, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `SQLite` `CSV`
 
    .. grid-item-card:: 📖 Historical Sensor Data Extraction and Bounding Box Geographic Queries with purpleair_api
       :link: purpleair-api-historical-data-bounding-box-queries
