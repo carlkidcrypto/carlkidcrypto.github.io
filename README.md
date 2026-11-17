@@ -1,5 +1,8 @@
 # carlkidcrypto.github.io
 
+[![Deploy](https://img.shields.io/github/actions/workflow/status/carlkidcrypto/carlkidcrypto.github.io/deploy.yml?branch=main&style=flat-square&label=Deploy)](https://github.com/carlkidcrypto/carlkidcrypto.github.io/actions/workflows/deploy.yml)
+[![License](https://img.shields.io/github/license/carlkidcrypto/carlkidcrypto.github.io?style=flat-square)](https://github.com/carlkidcrypto/carlkidcrypto.github.io)
+
 Personal website and developer portfolio for Carlos ([@carlkidcrypto](https://github.com/carlkidcrypto)), built with [Sphinx](https://www.sphinx-doc.org/), [Furo](https://pradyunsg.me/furo/), and [sphinx-design](https://sphinx-design.readthedocs.io/).
 
 Styled to match the look and feel of [@carlkidcrypto](https://github.com/carlkidcrypto)'s open source projects ([ezsnmp](https://github.com/carlkidcrypto/ezsnmp), [ezsnmp_data_logger](https://github.com/carlkidcrypto/ezsnmp_data_logger), [purpleair_api](https://github.com/carlkidcrypto/purpleair_api), [purpleair_data_logger](https://github.com/carlkidcrypto/purpleair_data_logger), [purpleair-matterbridge](https://github.com/carlkidcrypto/purpleair-matterbridge), and [os-specific-runner](https://github.com/carlkidcrypto/os-specific-runner)).
