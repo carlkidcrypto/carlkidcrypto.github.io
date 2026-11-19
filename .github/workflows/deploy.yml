@@ -19,52 +19,12 @@ permissions:
   id-token: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository code
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 2
-
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.13"
-          cache: "pip"
-
-      - name: Install documentation requirements
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-
-      - name: Stamp blog publication date for deploy build
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          python3 .github/scripts/stamp_blog_dates.py --auto
-
-      - name: Audit blog posts
-        run: |
-          python3 .github/scripts/audit_blog_posts.py
-
-      - name: Build Sphinx website
-        run: |
-          make html SPHINXOPTS="-W"
-
-      - name: Upload Pages artifact
-        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: _build/html
-
-  deploy:
-    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+  build_and_deploy:
+    uses: carlkidcrypto/shared-workflows/.github/workflows/reusable_sphinx_build.yml@14e025f6c182b7b20718538f533ca467a9ff9c6c
+    with:
+      docs-dir: '.'
+      requirements-file: 'requirements.txt'
+      output-dir: '_build/html'
+      pre-build-cmd: 'if [ "$GITHUB_REF" = "refs/heads/main" ] && [ "$GITHUB_EVENT_NAME" = "push" ]; then python3 .github/scripts/stamp_blog_dates.py --auto; fi'
+      blog-audit-script: '.github/scripts/audit_blog_posts.py'
+      deploy-pages: true
