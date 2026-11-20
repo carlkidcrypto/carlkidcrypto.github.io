@@ -39,7 +39,7 @@ Explore by Topic
       Deep dives into high-throughput SNMP polling, SNMPv3 security, network protocols (BGP, OSPF, IS-IS, VRRP, NetFlow, PoE, LLDP), and C++17 internals.
 
       +++
-      📚 *27 Articles* • `ezsnmp` `Networking` `SNMP`
+      📚 *28 Articles* • `ezsnmp` `Networking` `SNMP`
 
    .. grid-item-card:: 🌬️ PurpleAir API & IoT Sensing
       :link: category-purpleair-api
@@ -73,6 +73,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Real-Time QoS Telemetry: Auditing Differentiated Services (DiffServ) & Queue Drops with ezsnmp
+      :link: ezsnmp-qos-diffserv-queue-drop-telemetry
+      :link-type: doc
+
+      Poll RFC 3289 DIFFSERV-MIB counters and algorithmic tail-drop or WRED queue discards in real time using ezsnmp and Python.
+
+      +++
+      📅 *November 15, 2026* • ⏱️ *5 min read* • `ezsnmp` `Python` `SNMP` `QoS`
 
    .. grid-item-card:: 📖 Multi-Fabric Commissioning: Sharing PurpleAir Matterbridge with Apple Home and Google Home Concurrently
       :link: purpleair-matterbridge-multi-fabric-commissioning
