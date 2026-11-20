@@ -74,6 +74,15 @@ All Posts
 .. grid:: 1
    :gutter: 3
 
+   .. grid-item-card:: 📖 Real-Time WebSocket Telemetry Streams & Event-Driven Cluster Updates
+      :link: purpleair-matterbridge-websocket-event-driven-updates
+      :link-type: doc
+
+      Traditional smart home bridges rely heavily on fixed-interval HTTP polling. Every 30 or 60 seconds, the bridge requests a full JSON snapshot from an API or...
+
+      +++
+      📅 *November 18, 2026* • ⏱️ *5 min read* • `Purpleair` `Matter` `Websocket` `Matterbridge`
+
    .. grid-item-card:: 📖 Containerized Edge Deployments: Multi-Architecture Docker Builds for Raspberry Pi & NAS Systems
       :link: purpleair-data-logger-multiarch-docker-edge
       :link-type: doc
