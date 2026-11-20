@@ -20,6 +20,8 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-api-async-batch-polling-pipelines
+
    purpleair-api-matter-device-converter-guide
 
    purpleair-api-historical-data-bounding-box-queries
@@ -27,6 +29,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Asynchronous Batch Polling & High-Concurrency Telemetry Pipelines with purpleair_api
+      :link: purpleair-api-async-batch-polling-pipelines
+      :link-type: doc
+
+      Scale purpleair_api telemetry pipelines from single sensors to hundreds of stations using asyncio, bounded ThreadPoolExecutor concurrency, and rate-limit-safe backoff.
+
+      +++
+      📅 *November 16, 2026* • ⏱️ *5 min read* • `Purpleair` `Python` `Asyncio` `Concurrency`
 
    .. grid-item-card:: 📖 Working with the Matter Device Converter: Mapping Sensor Data to Matter 1.5.1 Clusters
       :link: purpleair-api-matter-device-converter-guide
