@@ -66,13 +66,22 @@ Explore by Topic
       Exposing PurpleAir sensors as Matter 1.5.1 Air Quality devices into Apple Home, Home Assistant, and Matterbridge smart home ecosystems.
 
       +++
-      📚 *2 Articles* • `Matter` `Smart Home` `Apple Home`
+      📚 *3 Articles* • `Matter` `Smart Home` `Apple Home`
 
 All Posts
 ---------
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Multi-Fabric Commissioning: Sharing PurpleAir Matterbridge with Apple Home and Google Home Concurrently
+      :link: purpleair-matterbridge-multi-fabric-commissioning
+      :link-type: doc
+
+      Share a single purpleair-matterbridge instance concurrently across Apple Home and Google Home using Matter Multi-Admin and Enhanced Commissioning Windows.
+
+      +++
+      📅 *November 14, 2026* • ⏱️ *5 min read* • `PurpleAir` `Matterbridge` `Matter` `Multi-Fabric`
 
    .. grid-item-card:: 📖 Building Automated Grafana Dashboards over TimescaleDB PurpleAir Telemetry
       :link: purpleair-data-logger-grafana-timescaledb-dashboards
