@@ -616,6 +616,7 @@ def main(argv: list[str] | None = None) -> int:
 
         # Validate code blocks in the generated post, extract example scripts, and add download links
         try:
+            sys.path.insert(0, str(REPO_ROOT / ".github" / "scripts"))
             sys.path.insert(0, str(Path(__file__).resolve().parent))
             from validate_blog_code import validate_post, save_example_scripts
 
