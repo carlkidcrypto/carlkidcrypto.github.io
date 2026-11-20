@@ -20,6 +20,8 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-data-logger-multiarch-docker-edge
+
    purpleair-data-logger-grafana-timescaledb-dashboards
 
    purpleair-data-logger-local-csv-sqlite-archival
@@ -27,6 +29,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Containerized Edge Deployments: Multi-Architecture Docker Builds for Raspberry Pi & NAS Systems
+      :link: purpleair-data-logger-multiarch-docker-edge
+      :link-type: doc
+
+      Containerize purpleair_data_logger with multi-architecture Docker Buildx images, non-root security, persistent volumes, and healthchecks for Raspberry Pi and NAS systems.
+
+      +++
+      📅 *November 17, 2026* • ⏱️ *5 min read* • `Purpleair` `Docker` `Raspberry-Pi` `Arm64`
 
    .. grid-item-card:: 📖 Building Automated Grafana Dashboards over TimescaleDB PurpleAir Telemetry
       :link: purpleair-data-logger-grafana-timescaledb-dashboards
