@@ -16,10 +16,11 @@ OID_SENSOR_VALUE = "1.3.6.1.2.1.99.1.1.1.4"
 
 # SI Scale exponents per RFC 3433 EntitySensorDataScale
 SCALE_EXPONENT = {
-    "7": -6,   # micro
-    "8": -3,   # milli
-    "9": 0,    # units
+    "7": -6,  # micro
+    "8": -3,  # milli
+    "9": 0,  # units
 }
+
 
 def audit_optical_dom(
     host: str,
@@ -38,21 +39,11 @@ def audit_optical_dom(
     try:
         print(f"[*] Auditing transceiver DOM/DDM power on {host}...")
 
-        names = {
-            v.index: v.value
-            for v in session.bulk_walk(OID_ENT_PHYSICAL_NAME)
-        }
-        types = {
-            v.index: v.value
-            for v in session.bulk_walk(OID_SENSOR_TYPE)
-        }
-        scales = {
-            v.index: v.value
-            for v in session.bulk_walk(OID_SENSOR_SCALE)
-        }
+        names = {v.index: v.value for v in session.bulk_walk(OID_ENT_PHYSICAL_NAME)}
+        types = {v.index: v.value for v in session.bulk_walk(OID_SENSOR_TYPE)}
+        scales = {v.index: v.value for v in session.bulk_walk(OID_SENSOR_SCALE)}
         precisions = {
-            v.index: int(v.value)
-            for v in session.bulk_walk(OID_SENSOR_PRECISION)
+            v.index: int(v.value) for v in session.bulk_walk(OID_SENSOR_PRECISION)
         }
         values = session.bulk_walk(OID_SENSOR_VALUE)
 
@@ -69,7 +60,7 @@ def audit_optical_dom(
             exp = SCALE_EXPONENT.get(scales.get(idx, "9"), 0)
 
             # Convert to watts, then to milliwatts, then to dBm
-            watts = raw_val * (10 ** (-precision)) * (10 ** exp)
+            watts = raw_val * (10 ** (-precision)) * (10**exp)
             mw = watts * 1000.0
 
             if mw <= 0:
