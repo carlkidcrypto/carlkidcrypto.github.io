@@ -9,6 +9,7 @@ import time
 from typing import Any, Dict, List
 from purpleair_api.PurpleAirReadAPI import PurpleAirReadAPI
 
+
 class AsyncPurpleAirPoller:
     def __init__(
         self,
@@ -20,9 +21,7 @@ class AsyncPurpleAirPoller:
         self.semaphore = asyncio.Semaphore(max_concurrent)
         self.min_delay_sec = min_delay_sec
 
-    def _fetch_sync(
-        self, sensor_index: int, fields: str
-    ) -> Dict[str, Any]:
+    def _fetch_sync(self, sensor_index: int, fields: str) -> Dict[str, Any]:
         return self.client.request_sensor_data(
             sensor_index=sensor_index,
             fields=fields,
@@ -48,10 +47,9 @@ class AsyncPurpleAirPoller:
     async def poll_grid(
         self, sensor_ids: List[int], fields: List[str]
     ) -> List[Dict[str, Any]]:
-        tasks = [
-            self.fetch_sensor(sid, fields) for sid in sensor_ids
-        ]
+        tasks = [self.fetch_sensor(sid, fields) for sid in sensor_ids]
         return await asyncio.gather(*tasks)
+
 
 async def main():
     read_key = os.environ["PURPLEAIR_READ_KEY"]
@@ -71,9 +69,9 @@ async def main():
         else:
             sensor = item["data"].get("sensor", {})
             print(
-                f"[+] {sensor.get('name')}: "
-                f"PM2.5 = {sensor.get('pm2.5_atm')} ug/m3"
+                f"[+] {sensor.get('name')}: " f"PM2.5 = {sensor.get('pm2.5_atm')} ug/m3"
             )
+
 
 if __name__ == "__main__":
     asyncio.run(main())
