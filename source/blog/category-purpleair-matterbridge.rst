@@ -20,6 +20,8 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-matterbridge-websocket-event-driven-updates
+
    purpleair-matterbridge-multi-fabric-commissioning
 
    purpleair-matterbridge-device-clustering-telemetry-mapping
@@ -27,6 +29,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Real-Time WebSocket Telemetry Streams & Event-Driven Cluster Updates
+      :link: purpleair-matterbridge-websocket-event-driven-updates
+      :link-type: doc
+
+      Traditional smart home bridges rely heavily on fixed-interval HTTP polling. Every 30 or 60 seconds, the bridge requests a full JSON snapshot from an API or...
+
+      +++
+      📅 *November 18, 2026* • ⏱️ *5 min read* • `Purpleair` `Matter` `Websocket` `Matterbridge`
 
    .. grid-item-card:: 📖 Multi-Fabric Commissioning: Sharing PurpleAir Matterbridge with Apple Home and Google Home Concurrently
       :link: purpleair-matterbridge-multi-fabric-commissioning
