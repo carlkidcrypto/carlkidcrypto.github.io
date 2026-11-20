@@ -57,7 +57,7 @@ Explore by Topic
       Architecture and deployment guides for logging sensor data to TimescaleDB, PostgreSQL hypertables, and local CSV/SQLite archives.
 
       +++
-      📚 *2 Articles* • `TimescaleDB` `PostgreSQL` `Data Logging`
+      📚 *3 Articles* • `TimescaleDB` `PostgreSQL` `Data Logging`
 
    .. grid-item-card:: 🏠 Matter Smart Home & Matterbridge
       :link: category-purpleair-matterbridge
@@ -73,6 +73,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Building Automated Grafana Dashboards over TimescaleDB PurpleAir Telemetry
+      :link: purpleair-data-logger-grafana-timescaledb-dashboards
+      :link-type: doc
+
+      Connect Grafana to TimescaleDB and PostgreSQL telemetry from purpleair_data_logger with read-only roles, time_bucket panels, heatmaps, and spike alerts.
+
+      +++
+      📅 *November 13, 2026* • ⏱️ *5 min read* • `PurpleAir` `Grafana` `TimescaleDB` `PostgreSQL`
 
    .. grid-item-card:: 📖 Working with the Matter Device Converter: Mapping Sensor Data to Matter 1.5.1 Clusters
       :link: purpleair-api-matter-device-converter-guide
