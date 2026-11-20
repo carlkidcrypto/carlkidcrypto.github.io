@@ -74,6 +74,15 @@ All Posts
 .. grid:: 1
    :gutter: 3
 
+   .. grid-item-card:: 📖 Asynchronous Batch Polling & High-Concurrency Telemetry Pipelines with purpleair_api
+      :link: purpleair-api-async-batch-polling-pipelines
+      :link-type: doc
+
+      Scale purpleair_api telemetry pipelines from single sensors to hundreds of stations using asyncio, bounded ThreadPoolExecutor concurrency, and rate-limit-safe backoff.
+
+      +++
+      📅 *November 16, 2026* • ⏱️ *5 min read* • `Purpleair` `Python` `Asyncio` `Concurrency`
+
    .. grid-item-card:: 📖 Real-Time QoS Telemetry: Auditing Differentiated Services (DiffServ) & Queue Drops with ezsnmp
       :link: ezsnmp-qos-diffserv-queue-drop-telemetry
       :link-type: doc
