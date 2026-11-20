@@ -170,10 +170,10 @@ Before committing or opening a pull request, run all verification and test suite
 ```bash
 # 1. Test and validate all example code snippets in the blog post(s)
 # Validates Python syntax, ezsnmp API compliance, bash/YAML syntax, and executes mock test harness
-python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py --post <slug>
+python3 .github/scripts/validate_blog_code.py --post <slug>
 
 # Or validate all posts across the repository:
-python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py
+python3 .github/scripts/validate_blog_code.py
 
 # 2. Audit structural standards and Furo theme rules
 python3 .github/scripts/audit_blog_posts.py
@@ -212,7 +212,7 @@ All code blocks in published articles must pass rigorous automated validation:
   - `validate_blog_code.py` mounts a sandbox test harness with simulated mock MIB responses (`sysDescr`, `ifDescr`, `ifHCInOctets`, `pethMainPsePower`, `dot1qPvid`, `bgpPeerState`, etc.).
   - Asserts complete runtime execution without `NameError`, `TypeError`, `AttributeError`, `KeyError`, or unhandled exceptions. Missing external third-party libraries (e.g. `pynetbox`, `duckdb`) are safely skipped, but any invalid `ezsnmp` import triggers a hard validation error.
 * **Auto-Correction**:
-  - Run `python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py --fix` to automatically upgrade legacy API patterns in draft code blocks, preserving comparison tables and historical prose.
+  - Run `python3 .github/scripts/validate_blog_code.py --fix` to automatically upgrade legacy API patterns in draft code blocks, preserving comparison tables and historical prose.
 * **Mandatory AI Disclaimer Footer**:
   - Ensure every article concludes with the standard warning admonition:
     ```rst
@@ -399,7 +399,7 @@ When review feedback, Copilot comments, or maintainer suggestions ("mail items")
 
 1. **Targeted Implementation & Staging**:
    - Implement the requested fixes in the affected files.
-   - Run tests and code audits (`python3 .agents/skills/gemini-spark-blog/scripts/validate_blog_code.py`).
+   - Run tests and code audits (`python3 .github/scripts/validate_blog_code.py`).
    - Use targeted staging only (`git add <file1> <file2>`).
    - Commit changes:
      ```bash
