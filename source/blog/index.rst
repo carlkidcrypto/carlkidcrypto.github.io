@@ -48,7 +48,7 @@ Explore by Topic
       Developer tutorials for extracting real-time and historical air quality sensor telemetry, bounding box queries, and sensor group management.
 
       +++
-      📚 *2 Articles* • `PurpleAir` `IoT` `Air Quality`
+      📚 *3 Articles* • `PurpleAir` `IoT` `Air Quality`
 
    .. grid-item-card:: 📊 PurpleAir Data Logger & TimescaleDB
       :link: category-purpleair-data-logger
@@ -73,6 +73,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Working with the Matter Device Converter: Mapping Sensor Data to Matter 1.5.1 Clusters
+      :link: purpleair-api-matter-device-converter-guide
+      :link-type: doc
+
+      Convert PurpleAir PM2.5, VOC, temperature, humidity, and pressure readings into CSA Matter 1.5.1 cluster payloads and US EPA AQI ratings in Python.
+
+      +++
+      📅 *November 12, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `Matter` `IoT`
 
    .. grid-item-card:: 📖 Auditing BGP EVPN and VXLAN Overlay Fabric Health with ezsnmp
       :link: ezsnmp-bgp-evpn-vxlan-fabric-telemetry

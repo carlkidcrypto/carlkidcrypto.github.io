@@ -20,11 +20,22 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-api-matter-device-converter-guide
+
    purpleair-api-historical-data-bounding-box-queries
    purpleair-api-getting-started-guide
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Working with the Matter Device Converter: Mapping Sensor Data to Matter 1.5.1 Clusters
+      :link: purpleair-api-matter-device-converter-guide
+      :link-type: doc
+
+      Convert PurpleAir PM2.5, VOC, temperature, humidity, and pressure readings into CSA Matter 1.5.1 cluster payloads and US EPA AQI ratings in Python.
+
+      +++
+      📅 *November 12, 2026* • ⏱️ *5 min read* • `PurpleAir` `Python` `Matter` `IoT`
 
    .. grid-item-card:: 📖 Historical Sensor Data Extraction and Bounding Box Geographic Queries with purpleair_api
       :link: purpleair-api-historical-data-bounding-box-queries
