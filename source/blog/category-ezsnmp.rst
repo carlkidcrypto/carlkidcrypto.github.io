@@ -17,6 +17,8 @@ High-throughput SNMP network automation, SNMPv3 cryptography, protocol telemetry
    :maxdepth: 1
    :hidden:
 
+   ezsnmp-bgp-evpn-vxlan-fabric-telemetry
+
    ezsnmp-mpls-segment-routing-lsp-telemetry
    ezsnmp-vrrp-hsrp-redundancy-monitoring
    ezsnmp-network-time-ntp-ptp-telemetry
@@ -49,6 +51,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Auditing BGP EVPN and VXLAN Overlay Fabric Health with ezsnmp
+      :link: ezsnmp-bgp-evpn-vxlan-fabric-telemetry
+      :link-type: doc
+
+      Audit BGP EVPN control-plane sessions, VNI state, and VXLAN tunnel endpoints (VTEPs) across leaf-spine data center fabrics using ezsnmp and Net-SNMP.
+
+      +++
+      📅 *November 11, 2026* • ⏱️ *5 min read* • `ezsnmp` `Python` `SNMP` `BGP`
 
    .. grid-item-card:: 📖 MPLS & Segment Routing LSP Telemetry: Label Switched Path Auditing with ezsnmp
       :link: ezsnmp-mpls-segment-routing-lsp-telemetry

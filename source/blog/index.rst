@@ -39,7 +39,7 @@ Explore by Topic
       Deep dives into high-throughput SNMP polling, SNMPv3 security, network protocols (BGP, OSPF, IS-IS, VRRP, NetFlow, PoE, LLDP), and C++17 internals.
 
       +++
-      📚 *26 Articles* • `ezsnmp` `Networking` `SNMP`
+      📚 *27 Articles* • `ezsnmp` `Networking` `SNMP`
 
    .. grid-item-card:: 🌬️ PurpleAir API & IoT Sensing
       :link: category-purpleair-api
@@ -73,6 +73,15 @@ All Posts
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Auditing BGP EVPN and VXLAN Overlay Fabric Health with ezsnmp
+      :link: ezsnmp-bgp-evpn-vxlan-fabric-telemetry
+      :link-type: doc
+
+      Audit BGP EVPN control-plane sessions, VNI state, and VXLAN tunnel endpoints (VTEPs) across leaf-spine data center fabrics using ezsnmp and Net-SNMP.
+
+      +++
+      📅 *November 11, 2026* • ⏱️ *5 min read* • `ezsnmp` `Python` `SNMP` `BGP`
 
    .. grid-item-card:: 📖 Matter Device Clustering & Sensor Telemetry Mapping for Smart Homes
       :link: purpleair-matterbridge-device-clustering-telemetry-mapping
