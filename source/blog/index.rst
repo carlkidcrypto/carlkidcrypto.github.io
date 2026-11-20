@@ -74,6 +74,15 @@ All Posts
 .. grid:: 1
    :gutter: 3
 
+   .. grid-item-card:: 📖 Monitoring Hardware Transceiver Optical Power (DOM/DDM) with ezsnmp
+      :link: ezsnmp-transceiver-optical-power-dom-telemetry
+      :link-type: doc
+
+      High-speed datacenter spine uplinks and metro fiber rings depend on pluggable optical transceivers—such as SFP+, SFP28, QSFP28, and QSFP-DD modules. Before...
+
+      +++
+      📅 *November 19, 2026* • ⏱️ *5 min read* • `Ezsnmp` `Python` `Snmp` `Optics`
+
    .. grid-item-card:: 📖 Real-Time WebSocket Telemetry Streams & Event-Driven Cluster Updates
       :link: purpleair-matterbridge-websocket-event-driven-updates
       :link-type: doc
