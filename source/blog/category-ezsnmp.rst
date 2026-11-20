@@ -17,6 +17,8 @@ High-throughput SNMP network automation, SNMPv3 cryptography, protocol telemetry
    :maxdepth: 1
    :hidden:
 
+   ezsnmp-transceiver-optical-power-dom-telemetry
+
    ezsnmp-qos-diffserv-queue-drop-telemetry
 
    ezsnmp-bgp-evpn-vxlan-fabric-telemetry
@@ -53,6 +55,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Monitoring Hardware Transceiver Optical Power (DOM/DDM) with ezsnmp
+      :link: ezsnmp-transceiver-optical-power-dom-telemetry
+      :link-type: doc
+
+      High-speed datacenter spine uplinks and metro fiber rings depend on pluggable optical transceivers—such as SFP+, SFP28, QSFP28, and QSFP-DD modules. Before...
+
+      +++
+      📅 *November 19, 2026* • ⏱️ *5 min read* • `Ezsnmp` `Python` `Snmp` `Optics`
 
    .. grid-item-card:: 📖 Real-Time QoS Telemetry: Auditing Differentiated Services (DiffServ) & Queue Drops with ezsnmp
       :link: ezsnmp-qos-diffserv-queue-drop-telemetry
