@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   build_and_deploy:
-    uses: carlkidcrypto/shared-workflows/.github/workflows/reusable_sphinx_build.yml@3538efdfabdbcf0ae956cfc5685fd4c21a59696b
+    uses: carlkidcrypto/shared-workflows/.github/workflows/reusable_sphinx_build.yml@22f04e222fa07048891327e4d34bb174d36e7bfa
     with:
       docs-dir: '.'
       requirements-file: 'requirements.txt'
