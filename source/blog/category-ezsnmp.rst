@@ -17,6 +17,8 @@ High-throughput SNMP network automation, SNMPv3 cryptography, protocol telemetry
    :maxdepth: 1
    :hidden:
 
+   shared-workflows-reusable-github-actions-cicd
+
    ezsnmp-data-logger-getting-started-pipelines
 
    ezsnmp-transceiver-optical-power-dom-telemetry
@@ -57,6 +59,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Standardizing Multi-Repo CI/CD with Reusable GitHub Actions
+      :link: shared-workflows-reusable-github-actions-cicd
+      :link-type: doc
+
+      Maintaining a single open source repository requires a handful of GitHub Actions workflows for linting, unit testing, and package publishing. However, once...
+
+      +++
+      📅 *November 21, 2026* • ⏱️ *7 min read* • `Github-Actions` `Cicd` `Shared-Workflows` `Python`
 
    .. grid-item-card:: 📖 Getting Started with ezsnmp_data_logger: SNMP Telemetry Pipelines
       :link: ezsnmp-data-logger-getting-started-pipelines
