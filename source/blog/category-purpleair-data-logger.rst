@@ -20,6 +20,8 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-data-logger-backfilling-gap-recovery
+
    purpleair-data-logger-multiarch-docker-edge
 
    purpleair-data-logger-grafana-timescaledb-dashboards
@@ -29,6 +31,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Automated Data Backfilling & Gap Recovery with purpleair_data_logger
+      :link: purpleair-data-logger-backfilling-gap-recovery
+      :link-type: doc
+
+      Continuous air quality monitoring pipelines inevitably encounter data gaps. Home routers reboot, ISP links drop during winter storms, and edge gateways...
+
+      +++
+      📅 *November 23, 2026* • ⏱️ *7 min read* • `Purpleair` `Python` `Timescaledb` `Sqlite`
 
    .. grid-item-card:: 📖 Containerized Edge Deployments: Multi-Architecture Docker Builds for Raspberry Pi & NAS Systems
       :link: purpleair-data-logger-multiarch-docker-edge
