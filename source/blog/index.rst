@@ -74,6 +74,15 @@ All Posts
 .. grid:: 1
    :gutter: 3
 
+   .. grid-item-card:: 📖 Customizing Matter Bridge Device Naming & Sensor Filtering
+      :link: purpleair-matterbridge-device-naming-and-filtering
+      :link-type: doc
+
+      When you first deploy `purpleair-matterbridge <https://github.com/carlkidcrypto/purpleair-matterbridge>`_ in a smart home environment, exposing every...
+
+      +++
+      📅 *November 24, 2026* • ⏱️ *7 min read* • `Purpleair` `Matter` `Matterbridge` `Smart-Home`
+
    .. grid-item-card:: 📖 Automated Data Backfilling & Gap Recovery with purpleair_data_logger
       :link: purpleair-data-logger-backfilling-gap-recovery
       :link-type: doc

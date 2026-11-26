@@ -20,6 +20,8 @@ Articles
    :maxdepth: 1
    :hidden:
 
+   purpleair-matterbridge-device-naming-and-filtering
+
    purpleair-matterbridge-websocket-event-driven-updates
 
    purpleair-matterbridge-multi-fabric-commissioning
@@ -29,6 +31,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Customizing Matter Bridge Device Naming & Sensor Filtering
+      :link: purpleair-matterbridge-device-naming-and-filtering
+      :link-type: doc
+
+      When you first deploy `purpleair-matterbridge <https://github.com/carlkidcrypto/purpleair-matterbridge>`_ in a smart home environment, exposing every...
+
+      +++
+      📅 *November 24, 2026* • ⏱️ *7 min read* • `Purpleair` `Matter` `Matterbridge` `Smart-Home`
 
    .. grid-item-card:: 📖 Real-Time WebSocket Telemetry Streams & Event-Driven Cluster Updates
       :link: purpleair-matterbridge-websocket-event-driven-updates
