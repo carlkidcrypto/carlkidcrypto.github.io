@@ -74,6 +74,15 @@ All Posts
 .. grid:: 1
    :gutter: 3
 
+   .. grid-item-card:: 📖 Automated Sensor Health Auditing with purpleair_api
+      :link: purpleair-api-sensor-health-channel-auditing
+      :link-type: doc
+
+      Low-cost optical particulate sensors democratize hyper-local air quality monitoring, yet outdoor deployments face harsh environmental stressors. Spider webs...
+
+      +++
+      📅 *November 22, 2026* • ⏱️ *7 min read* • `Purpleair` `Python` `Api` `Qaqc`
+
    .. grid-item-card:: 📖 Standardizing Multi-Repo CI/CD with Reusable GitHub Actions
       :link: shared-workflows-reusable-github-actions-cicd
       :link-type: doc
