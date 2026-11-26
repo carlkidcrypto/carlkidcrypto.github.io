@@ -74,6 +74,15 @@ All Posts
 .. grid:: 1
    :gutter: 3
 
+   .. grid-item-card:: 📖 Getting Started with ezsnmp_data_logger: SNMP Telemetry Pipelines
+      :link: ezsnmp-data-logger-getting-started-pipelines
+      :link-type: doc
+
+      Polling network devices with `ezsnmp <https://github.com/carlkidcrypto/ezsnmp>`_ gives Python engineers direct, high-speed access to Net-SNMP's C++17...
+
+      +++
+      📅 *November 20, 2026* • ⏱️ *7 min read* • `Ezsnmp` `Ezsnmp_Data_Logger` `Python` `Snmp`
+
    .. grid-item-card:: 📖 Monitoring Hardware Transceiver Optical Power (DOM/DDM) with ezsnmp
       :link: ezsnmp-transceiver-optical-power-dom-telemetry
       :link-type: doc
