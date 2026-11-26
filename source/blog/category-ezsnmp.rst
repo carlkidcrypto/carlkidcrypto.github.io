@@ -17,6 +17,8 @@ High-throughput SNMP network automation, SNMPv3 cryptography, protocol telemetry
    :maxdepth: 1
    :hidden:
 
+   ezsnmp-stp-rstp-topology-auditing
+
    shared-workflows-reusable-github-actions-cicd
 
    ezsnmp-data-logger-getting-started-pipelines
@@ -59,6 +61,15 @@ Articles
 
 .. grid:: 1
    :gutter: 3
+
+   .. grid-item-card:: 📖 Auditing Spanning Tree (STP/RSTP) Stability with ezsnmp
+      :link: ezsnmp-stp-rstp-topology-auditing
+      :link-type: doc
+
+      Even in modern routed-access campuses, Layer 2 switching loops and Topology Change Notification (TCN) storms remain among the most disruptive failure modes...
+
+      +++
+      📅 *November 25, 2026* • ⏱️ *7 min read* • `Ezsnmp` `Python` `Snmp` `Stp`
 
    .. grid-item-card:: 📖 Standardizing Multi-Repo CI/CD with Reusable GitHub Actions
       :link: shared-workflows-reusable-github-actions-cicd

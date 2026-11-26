@@ -74,6 +74,15 @@ All Posts
 .. grid:: 1
    :gutter: 3
 
+   .. grid-item-card:: 📖 Auditing Spanning Tree (STP/RSTP) Stability with ezsnmp
+      :link: ezsnmp-stp-rstp-topology-auditing
+      :link-type: doc
+
+      Even in modern routed-access campuses, Layer 2 switching loops and Topology Change Notification (TCN) storms remain among the most disruptive failure modes...
+
+      +++
+      📅 *November 25, 2026* • ⏱️ *7 min read* • `Ezsnmp` `Python` `Snmp` `Stp`
+
    .. grid-item-card:: 📖 Customizing Matter Bridge Device Naming & Sensor Filtering
       :link: purpleair-matterbridge-device-naming-and-filtering
       :link-type: doc
